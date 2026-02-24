@@ -75,13 +75,29 @@ continue with the others.
 
 ### Present the results
 
+Once all agents have completed, collect the **tunnel URL** returned by each agent. Each agent uses
+the `start-application` skill which creates an FRP tunnel and returns a tunnel URL of the form
+`https://softlight.orianna.ai/api/tunnel/<tunnel_id>`.
+
+**Show all designs on the canvas** by calling `create_project` with all directions as elements:
+
+```
+create_project(
+  elements=[
+    {"url": "<tunnel_url_1>", "title": "<Direction 1 title>"},
+    {"url": "<tunnel_url_2>", "title": "<Direction 2 title>"},
+    {"url": "<tunnel_url_3>", "title": "<Direction 3 title>"},
+  ],
+  title="<design problem summary>"
+)
+```
+
+This displays all design prototypes side by side on the Softlight canvas so the PM can compare them
+visually.
+
 Tell the user:
 - A summary of all implemented directions
-- A list of links to see each running design prototype:
-  - **Direction title** — `http://localhost:8081/`
-  - **Direction title** — `http://localhost:8082/`
-  - **Direction title** — `http://localhost:8083/`
-  - (and so on for each direction)
+- That all designs are visible on the canvas for comparison
 - That each app is running in an isolated worktree and changes will be discarded unless adopted
 - Ask which direction(s) they want to pursue
 

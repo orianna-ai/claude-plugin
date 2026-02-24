@@ -80,5 +80,6 @@ come up and verify it's running.
 
 When done, return:
 - A summary of what was changed (files modified, components added)
-- The URL where the design is visible: `http://localhost:<port>/`
+- The **tunnel URL** returned by `start-application` (e.g., `https://softlight.orianna.ai/api/tunnel/<tunnel_id>`) — the parent agent needs this to display all designs on the canvas
+- The local URL where the design is visible: `http://localhost:<port>/`
 - Any caveats or follow-up suggestions
