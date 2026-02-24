@@ -70,33 +70,16 @@ After the application is confirmed healthy, create and start an FRP tunnel so th
 accessible via a Softlight tunnel URL. This step is **mandatory** — never skip it.
 
 1. Generate a UUIDv4 as `tunnel_id`.
-2. Write an `frpc.toml` file to `/tmp/frpc-<tunnel_id>.toml` with the following contents:
-
-```toml
-serverAddr = "frp.orianna.ai"
-serverPort = 443
-
-[transport]
-protocol = "wss"
-
-[[proxies]]
-name = "<tunnel_id>"
-type = "http"
-localIP = "127.0.0.1"
-localPort = <detected_port>
-subdomain = "<tunnel_id>"
-```
-
-   The FRP server uses `subdomainHost = "frp-gateway.orianna.ai"`, so each tunnel gets routed via
-   the `Host` header `<tunnel_id>.frp-gateway.orianna.ai`. The Softlight server proxies requests
-   from `/api/tunnel/{tunnel_id}/{path}` to the FRP gateway with the appropriate subdomain host
-   header.
-
-3. Start `frpc` in the background:
+2. Start `frpc` directly in the background using CLI arguments (no config file needed):
 
 ```bash
-frpc -c /tmp/frpc-<tunnel_id>.toml
+frpc http -s frp.orianna.ai -P 443 -p wss -n <tunnel_id> -i 127.0.0.1 -l <detected_port> --http-user <tunnel_id>
 ```
+
+   The FRP server routes tunnels by HTTP basic auth user. The Softlight server proxies requests
+   from `/api/tunnel/{tunnel_id}/{path}` to `https://frp-gateway.orianna.ai/{path}` with an
+   `Authorization: Basic <base64(tunnel_id:)>` header, which the FRP server matches against the
+   proxy's `--http-user`.
 
    Run this with `block_until_ms: 0` so it runs in the background. `frpc` must keep running for the
    tunnel to stay open.
@@ -118,4 +101,4 @@ Return:
 - Which application is running
 - Which port it's on
 - The terminal ID and PID (so `stop-application` can tear it down later)
-- The `frpc` PID and config path (so `stop-application` can tear down the tunnel too)
+- The `frpc` PID (so `stop-application` can tear down the tunnel too)
