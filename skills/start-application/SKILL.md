@@ -74,7 +74,7 @@ After the application is confirmed healthy, generate a UUIDv4 as `tunnel_id` and
 - `serverPort = 443`
 - `transport.protocol = "wss"`
 - `type = "http"`
-- `customDomains = ["frp-http.orianna.ai"]`
+- `customDomains = ["frp-gateway.orianna.ai"]`
 - `locations = ["/<tunnel_id>"]`
 - `localIP = "127.0.0.1"`
 - `localPort = <detected_port>`
