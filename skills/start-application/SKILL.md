@@ -67,10 +67,12 @@ Once running, record the local app URL (for example, `http://localhost:<port>`).
 ### 7. Create the tunnel
 
 After the application is confirmed healthy, generate a UUIDv4 as `tunnel_id` and return an
-`frpc.toml` snippet that forwards the running application through FRP:
+`frpc.toml` snippet that forwards the running application through FRP over WebSocket Secure
+(proxied through Cloudflare Access):
 
 - `serverAddr = "frp.orianna.ai"`
-- `serverPort = 7000`
+- `serverPort = 443`
+- `transport.protocol = "wss"`
 - `type = "http"`
 - `customDomains = ["frp-http.orianna.ai"]`
 - `locations = ["/<tunnel_id>"]`
