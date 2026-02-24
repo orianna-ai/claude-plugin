@@ -66,28 +66,29 @@ Once running, record the local app URL (for example, `http://localhost:<port>`).
 
 ### 7. Create the tunnel
 
-After the application is confirmed healthy, generate a UUIDv4 as `tunnel_id` and return an
-`frpc.toml` snippet that forwards the running application through FRP:
+After the application is confirmed healthy, generate a UUIDv4 as `tunnel_id` and start `frpc` in
+the background using CLI arguments (no config file needed):
 
-- `serverAddr = "frp.orianna.ai"`
-- `serverPort = 7000`
-- `type = "http"`
-- `customDomains = ["frp-http.orianna.ai"]`
-- `locations = ["/<tunnel_id>"]`
-- `localIP = "127.0.0.1"`
-- `localPort = <detected_port>`
+```bash
+frpc http \
+  -s frp.orianna.ai \
+  -P 443 \
+  -p wss \
+  -n <tunnel_id> \
+  -l <detected_port> \
+  -d frp-gateway.orianna.ai \
+  --http-user <tunnel_id> \
+  --http-pwd ""
+```
 
-### 8. Return the Softlight tunnel URL and run instructions
+Run this in the background. The tunnel is ready when frpc logs `start proxy success`.
+
+### 8. Return the Softlight tunnel URL
 
 Return:
 
 - Base URL: `https://softlight.orianna.ai/tunnel/<tunnel_id>`
 - Example endpoint: `https://softlight.orianna.ai/tunnel/<tunnel_id>/`
-- `frpc` run command:
-
-```bash
-frpc -c /path/to/frpc.toml
-```
 
 Also include:
 
