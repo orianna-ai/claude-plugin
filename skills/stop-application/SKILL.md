@@ -25,12 +25,25 @@ group with `kill -TERM -<PID>`.
 
 If a graceful kill doesn't work within a few seconds, escalate to `kill -9`.
 
-### 3. Verify shutdown
+### 3. Stop the tunnel
+
+Find and kill the `frpc` process associated with the application. Look for
+`frpc` processes whose config file matches the tunnel ID (config files are
+stored at `/tmp/frpc-<tunnel_id>.toml`). Kill the `frpc` process and remove
+the config file.
+
+If you can't find the specific `frpc` process, search for any `frpc` process
+that was started with a config file in `/tmp/frpc-*.toml`.
+
+### 4. Verify shutdown
 
 Read the terminal output to confirm the process exited. Look for shutdown
 messages (e.g. `Shutting down`, `Finished server process`, `exited`) or check
 that the PID is no longer running with `kill -0 <PID>`.
 
-### 4. Report
+Also verify the `frpc` process is no longer running.
 
-Tell the user which application was stopped and which port was freed.
+### 5. Report
+
+Tell the user which application was stopped, which port was freed, and that
+the tunnel was torn down.

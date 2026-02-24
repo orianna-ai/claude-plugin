@@ -64,11 +64,13 @@ If the probe fails, keep polling — the server may still be warming up.
 
 Once running, record the local app URL (for example, `http://localhost:<port>`).
 
-### 7. Create the tunnel
+### 7. Create and start the tunnel
 
-After the application is confirmed healthy, generate a UUIDv4 as `tunnel_id` and write an
-`frpc.toml` that forwards the running application through FRP using subdomain-based routing over
-websockets:
+After the application is confirmed healthy, create and start an FRP tunnel so the application is
+accessible via a Softlight tunnel URL. This step is **mandatory** — never skip it.
+
+1. Generate a UUIDv4 as `tunnel_id`.
+2. Write an `frpc.toml` file to `/tmp/frpc-<tunnel_id>.toml` with the following contents:
 
 ```toml
 serverAddr = "frp.orianna.ai"
@@ -85,25 +87,35 @@ localPort = <detected_port>
 subdomain = "<tunnel_id>"
 ```
 
-The FRP server uses `subdomainHost = "frp-gateway.orianna.ai"`, so each tunnel gets routed via the
-`Host` header `<tunnel_id>.frp-gateway.orianna.ai`. The Softlight server proxies requests from
-`/api/tunnel/{tunnel_id}/{path}` to the FRP gateway with the appropriate subdomain host header.
+   The FRP server uses `subdomainHost = "frp-gateway.orianna.ai"`, so each tunnel gets routed via
+   the `Host` header `<tunnel_id>.frp-gateway.orianna.ai`. The Softlight server proxies requests
+   from `/api/tunnel/{tunnel_id}/{path}` to the FRP gateway with the appropriate subdomain host
+   header.
 
-Start the tunnel in the background:
+3. Start `frpc` in the background:
 
 ```bash
-frpc -c /path/to/frpc.toml
+frpc -c /tmp/frpc-<tunnel_id>.toml
 ```
 
-### 8. Return the Softlight tunnel URL and run instructions
+   Run this with `block_until_ms: 0` so it runs in the background. `frpc` must keep running for the
+   tunnel to stay open.
+
+4. Verify the tunnel is up by polling the tunnel URL with `curl`:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}' --max-time 5 https://softlight.orianna.ai/api/tunnel/<tunnel_id>/
+```
+
+   Use the same exponential backoff strategy as step 6 (wait 5s, 10s, 20s between checks). If the
+   tunnel doesn't come up after all retries, report the error but don't tear down the application.
+
+### 8. Return the Softlight tunnel URL
 
 Return:
 
-- Base URL: `https://softlight.orianna.ai/api/tunnel/<tunnel_id>`
-- Example endpoint: `https://softlight.orianna.ai/api/tunnel/<tunnel_id>/`
-
-Also include:
-
+- Tunnel URL: `https://softlight.orianna.ai/api/tunnel/<tunnel_id>`
 - Which application is running
 - Which port it's on
 - The terminal ID and PID (so `stop-application` can tear it down later)
+- The `frpc` PID and config path (so `stop-application` can tear down the tunnel too)
