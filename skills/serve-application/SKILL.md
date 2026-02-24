@@ -24,9 +24,13 @@ Note the port and the tunnel URL — both are needed.
 Call the `create_project` MCP tool with the **tunnel URL** of the running application:
 
 ```
-create_project(url="https://softlight.orianna.ai/api/tunnel/<tunnel_id>", title="<app name>")
+create_project(
+  elements=[{"url": "https://softlight.orianna.ai/api/tunnel/<tunnel_id>", "title": "<app name>"}],
+  title="<app name>"
+)
 ```
 
-The tool returns a `project_id` and a `url` where the project can be viewed. Share the URL with the
-user. The MCP app will automatically pick this up and display the running application in an iframe
-on the canvas.
+The `elements` parameter is a list of `IFrameElement` objects (each with a `url` and `title`). For a
+single application, pass one element. The tool returns a `project_id` and a `url` where the project
+can be viewed. Share the URL with the user. The MCP app will automatically pick this up and display
+the running application in an iframe on the canvas.
