@@ -1,5 +1,5 @@
 ---
-name: show-application
+name: serve-application
 description: Start an application and display it on the Softlight canvas. Use when the user wants to preview, demo, or visually show a running application.
 ---
 
