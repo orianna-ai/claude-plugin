@@ -28,12 +28,11 @@ If a graceful kill doesn't work within a few seconds, escalate to `kill -9`.
 ### 3. Stop the tunnel
 
 Find and kill the `frpc` process associated with the application. Look for
-`frpc` processes whose config file matches the tunnel ID (config files are
-stored at `/tmp/frpc-<tunnel_id>.toml`). Kill the `frpc` process and remove
-the config file.
+`frpc` processes whose command line contains the tunnel ID (e.g. `frpc http ... -n <tunnel_id>`).
+Kill the `frpc` process.
 
-If you can't find the specific `frpc` process, search for any `frpc` process
-that was started with a config file in `/tmp/frpc-*.toml`.
+If you can't find the specific `frpc` process, search for any `frpc http`
+process.
 
 ### 4. Verify shutdown
 
