@@ -72,7 +72,7 @@ After the application is confirmed healthy, generate a UUIDv4 as `tunnel_id` and
 - `serverAddr = "frp.orianna.ai"`
 - `serverPort = 7000`
 - `type = "http"`
-- `customDomains = ["frp-http.orianna.ai"]`
+- `customDomains = ["frp-gateway.orianna.ai"]`
 - `locations = ["/<tunnel_id>"]`
 - `localIP = "127.0.0.1"`
 - `localPort = <detected_port>`
