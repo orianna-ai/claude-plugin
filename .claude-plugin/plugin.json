@@ -1,0 +1,9 @@
+{
+  "author": {
+    "name": "Softlight"
+  },
+  "description": "Generate and implement design directions for product design problems. Explores alternatives, makes code changes, and wires the app so you can see results immediately.",
+  "mcpServers": "./.mcp.json",
+  "name": "softlight",
+  "version": "1.0.0"
+}

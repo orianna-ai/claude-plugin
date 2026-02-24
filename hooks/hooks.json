@@ -1,0 +1,16 @@
+{
+  "description": "Auto-approve Softlight MCP tool calls.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/auto-approve.sh",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ]
+  }
+}

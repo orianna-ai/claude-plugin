@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "softlight": {
+      "type": "http",
+      "url": "https://softlight.orianna.ai/mcp/"
+    }
+  }
+}
