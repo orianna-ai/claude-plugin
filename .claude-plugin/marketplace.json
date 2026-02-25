@@ -1,0 +1,20 @@
+{
+  "name": "softlight",
+  "owner": {
+    "name": "Softlight"
+  },
+  "metadata": {
+    "description": "AI-powered product design tools for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "softlight",
+      "source": "./",
+      "description": "Generate and implement design directions for product design problems. Explores alternatives, makes code changes, and wires the app so you can see results immediately.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Softlight"
+      }
+    }
+  ]
+}

@@ -15,15 +15,35 @@ implement the design change, wire it so it's immediately visible at `/`, and sta
 assigned port.
 
 You will be given:
-1. The design direction to implement (title + description)
-2. The port to start the app on (e.g., `8081`, `8082`)
-3. Context about the relevant codebase files and design patterns
+1. The design direction to implement (title + spec + caption)
+2. A concept image URL from the storyboard service
+3. The port to start the app on (e.g., `8082`, `8083`)
+4. A design brief from the orchestrator with:
+   - The design problem being solved and what the user wants to achieve
+   - Specific files and components to modify
+   - The design system in use (component library, CSS approach, tokens/variables)
+   - How this direction changes the current UI
+
+### Phase 2: Verify worktree isolation
+
+**Before doing anything else**, confirm you are running in an isolated git worktree — not the
+main repo. Check your current working directory. It should contain a worktree segment like
+`/.claude/worktrees/agent-<id>/`. If your working directory is the main repo path (e.g.,
+`/workspaces/orianna/` without a worktree segment), STOP and report the error. Do not proceed
+without isolation — you will overwrite other agents' work.
 
 ### Phase 3: Implement the design change
 
 Tell the user: **"Phase 3: Implementing the design change"**
 
 Make the code changes to implement the design direction.
+
+**How to use the concept image**: The concept image is AI-generated and should be treated as
+*directional guidance*, not a pixel-perfect spec. Use it to understand the intended layout,
+visual hierarchy, and design treatment. However, expect and fix artifacts from AI generation —
+garbled text, misaligned elements, impossible UI chrome, inconsistent spacing, or nonsensical
+labels. Extract the *design intent* from the image and implement it cleanly using the real
+codebase's components and patterns.
 
 **Use the existing codebase as your design system.** Before writing any new styles or components:
 - Study the existing components, patterns, and visual language already in the codebase
