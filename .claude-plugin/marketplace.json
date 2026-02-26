@@ -9,7 +9,7 @@
   "plugins": [
     {
       "name": "softlight",
-      "source": ".",
+      "source": "./",
       "category": "development"
     }
   ]
