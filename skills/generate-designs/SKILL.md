@@ -38,5 +38,4 @@ don't have enough context to complete a section.
 <Main states to design for, main user actions, and any key constraints.>
 ```
 
-When the brief is complete, call `create_project` with `design_brief` set to the full
-brief text.
+When the brief is complete, call `create_project` with the `text` param set to the full brief text.
