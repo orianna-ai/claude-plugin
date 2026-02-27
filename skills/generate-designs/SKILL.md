@@ -43,3 +43,5 @@ set to the full brief text (the entire block above).
 The tool creates a design project and returns a setup URL where the user can add screenshots. You'll find `create_project` on the Softlight MCP server configured in this environment.
 
 **Respond with the set up URL** Respond to the user with the url where they can continue designing the solution, that you get back from create_project.
+
+**Lastly, you MUST call the Softlight MCP wait_for_message tool at the end**
