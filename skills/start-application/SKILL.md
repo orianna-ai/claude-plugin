@@ -5,15 +5,21 @@ description: Start an application server and create an FRP tunnel, returning the
 
 # Start Application + Create Tunnel
 
+Your task is to start the application and create a tunnel. It is ok if multiple of the same app are running in parallel. That is intended. Don't waste time reasoning about that, it is supposed to happen.
+
 ## Workflow
 
 ### 1. Run the application on a free port
 
-- Find the run command (Makefile, package.json, `bazel run`, `docker compose`, etc.). Prefer **PORT** env var for the port (e.g. `PORT=8082`).
+**⚠️ You may be running in an isolated worktree. ALL commands must run from your current working directory.**
+- **NEVER** `cd` to a different directory before running commands. This breaks worktree isolation.
+- Use relative paths for everything.
+- Find the run command (Makefile, package.json, or build tool). Prefer **PORT** env var for the port.
 - Pick a port not in use (e.g. `ss -tlnp` or `lsof -i :8080`). Use 8080, 8081, 8082, … and increment if needed.
-- Run the app in the background and **note its PID** (for stop-application). Wait for a clear “listening” / “started” message, then confirm with:
-  `curl -s -o /dev/null -w '%{http_code}' --max-time 5 http://localhost:<port>`
-  Expect 200.
+- Run the app in the background and **note its PID** (for stop-application).
+- Poll every 10 seconds until the app responds (builds can take a few minutes):
+  `sleep 10 && curl -s -o /dev/null -w '%{http_code}' --max-time 5 http://localhost:<port>`
+  Expect 200. Do not use long sleeps — check every 10-20s so you proceed as soon as it's ready.
 
 ### 2. Create the tunnel
 
