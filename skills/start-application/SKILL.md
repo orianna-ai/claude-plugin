@@ -78,7 +78,7 @@ curl -s -o /dev/null -w '%{http_code}' --max-time 5 https://softlight.orianna.ai
 
 Return:
 
-- Tunnel URL: `https://softlight.orianna.ai/api/tunnel/<tunnel_id>/`
+- Tunnel URL: `https://softlight.orianna.ai/api/tunnel/<tunnel_id>`
 - Which application is running
 - Which port it's on
 - The terminal ID and PID (so `stop-application` can tear it down later)
