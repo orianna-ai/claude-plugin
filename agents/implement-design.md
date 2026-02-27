@@ -1,6 +1,6 @@
 ---
 name: implement-design
-description: Implements a single design direction in an isolated worktree, and starts that application on it's own port using a skill. Use when the Softlight MCP asks for a design direction the user wants implemented. There can be multiple of these running in parallel, so worktree isolation must work.
+description: Implements a single design direction in an isolated worktree, and starts that application on it's own port using a skill. Use when the Softlight MCP asks to implement a design direction for the user. There can be multiple of these running in parallel, so worktree isolation must work.
 isolation: worktree
 model: sonnet
 skills:
