@@ -27,12 +27,7 @@ If a graceful kill doesn't work within a few seconds, escalate to `kill -9`.
 
 ### 3. Stop the tunnel
 
-Find and kill the `frpc` process associated with the application. Look for
-`frpc` processes whose command line contains the tunnel ID (e.g. `frpc http ... -n <tunnel_id>`).
-Kill the `frpc` process.
-
-If you can't find the specific `frpc` process, search for any `frpc http`
-process.
+If you have the **frpc PID** from when the tunnel was created (e.g. from start-application or create-tunnel), run `kill <frpc_pid>`. Otherwise find the process: look for `frpc` processes whose command line contains the tunnel ID (e.g. `frpc http ... -n <tunnel_id>`), or search for any `frpc http` process, then kill it.
 
 ### 4. Verify shutdown
 
