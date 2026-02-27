@@ -44,4 +44,4 @@ The tool creates a design project and returns a setup URL where the user can add
 
 **Respond with the set up URL** Respond to the user with the url where they can continue designing the solution, that you get back from create_project.
 
-**Lastly, you MUST call the Softlight MCP wait_for_message tool at the end**
+**Lastly, you MUST call the Softlight MCP wait_for_prompt tool at the end**
