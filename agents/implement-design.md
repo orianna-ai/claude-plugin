@@ -5,6 +5,7 @@ isolation: worktree
 model: sonnet
 skills:
   - softlight:start-application
+  - softlight:create-tunnel
 memory: user
 ---
 
@@ -34,10 +35,14 @@ surrounding code or add unnecessary abstractions.
 
 ### Phase 2: Start the app
 
-Use the `start-application` skill to start the application and create a tunnel.
+Use the `start-application` skill to run the application on a free port.
+
+### Phase 3: Create the tunnel
+
+Use the `create-tunnel` skill with the port from phase 2 to expose the app.
 
 When done, return:
 - A summary of what was changed (files modified, components added)
-- The **tunnel URL** returned by `start-application` (e.g., `https://softlight.orianna.ai/api/tunnel/<tunnel_id>`)
+- The **tunnel URL** from create-tunnel
 - The local URL where the design is visible: `http://localhost:<port>/`
 - App PID and frpc PID

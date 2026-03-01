@@ -6,5 +6,5 @@
   "hooks": "./hooks/hooks.json",
   "mcpServers": "./.mcp.json",
   "name": "softlight",
-  "version": "1.1.1"
+  "version": "1.3.2"
 }
