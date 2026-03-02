@@ -25,17 +25,21 @@ While you're exploring, note things that would help someone make changes to the 
 - **Styling approach** (CSS modules, Tailwind, styled-components, plain CSS)
 - **Routing** (file-based, React Router, vue-router, etc.)
 
-### 2. Install dependencies and build
+### 2. Pick a free port
 
-If the project needs setup before running (e.g. `npm install`, `pip install -e .`, `go build`),
-run that first. Skip if `node_modules` or equivalent already exists and looks current.
+You MUST find a free port to run the application. Even if the project README or run instructions
+say to use a default port (e.g. 8080), that port may already be taken by another service. Always
+check first and use a free port instead.
 
-### 3. Pick a free port
-
-Check which ports are in use: `ss -tlnp` or `lsof -i :8080`.
+Check which ports are in use: `ss -tlnp` or `lsof -i :<port>`.
 
 Start with 8080 and increment (8081, 8082, …) until you find a free one. Most frameworks accept
 a **PORT** env var — prefer that over CLI flags when available.
+
+### 3. Install dependencies and build
+
+If the project needs setup before running (e.g. `npm install`, `pip install -e .`, `go build`),
+run that first. Skip if `node_modules` or equivalent already exists and looks current.
 
 ### 4. Start the app
 
