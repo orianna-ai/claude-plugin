@@ -1,15 +1,19 @@
 ---
 name: create-tunnel
-description: Expose a local port via a Softlight tunnel URL. Use when an app is already listening on a port and you need a public https://softlight.orianna.ai/api/tunnel/<tunnel_id> URL for it (e.g. after start-application or for an existing server).
+description: Expose a local port via a Softlight tunnel URL. Use when an app is already listening on a port and you need a tunnel URL for it (e.g. after start-application or for an existing server).
 ---
 
 # Create Softlight Tunnel
 
 Use this skill when something is already listening on a local port and you need a **Softlight tunnel URL** so the canvas (or other tools) can reach it.
 
+## Deriving the tunnel URL
+
+The tunnel URL is **`<softlight_origin>/api/tunnel/<tunnel_id>`** where `<softlight_origin>` is the MCP server's origin. Derive it by stripping the `/mcp/` path from the `url` in `.mcp.json` (e.g. `http://localhost:8080/mcp/` → `http://localhost:8080`).
+
 ## How it works
 
-- The user opens **`https://softlight.orianna.ai/api/tunnel/<tunnel_id>/`**. Softlight’s server forwards the request to **`https://frp-gateway.orianna.ai/`** with header **`Authorization: Basic base64(tunnel_id:)`** (password empty).
+- The user opens **`<softlight_origin>/api/tunnel/<tunnel_id>/`**. Softlight's server forwards the request to **`https://frp-gateway.orianna.ai/`** with header **`Authorization: Basic base64(tunnel_id:)`** (password empty).
 - The **FRP server** at `frp-gateway.orianna.ai` routes by that Basic auth **username** to the **frpc** proxy that registered with the same value in **`routeByHTTPUser`** (and **`httpUser`**). The server supports multiple proxies on the same domain when each uses a distinct `routeByHTTPUser`.
 - **frpc** runs on your machine: it connects to **frp.orianna.ai**, registers a proxy with `tunnel_id` as proxy name, `httpUser`, and **`routeByHTTPUser`**, and forwards to **`127.0.0.1:<port>`**.
 
@@ -52,12 +56,12 @@ routeByHTTPUser = "<tunnel_id>"
 
 4. **Verify with bounded retries.**  
    Wait **3–5 seconds**, then:  
-   `curl -s -o /dev/null -w '%{http_code}' --max-time 10 https://softlight.orianna.ai/api/tunnel/<tunnel_id>/`  
+   `curl -s -o /dev/null -w '%{http_code}' --max-time 10 <softlight_origin>/api/tunnel/<tunnel_id>/`  
    - If **200**: done.  
    - If 404 or connection error: wait **5 more seconds**, then run the same curl once.  
    - If still not 200: check the frpc process output. **"router config conflict"** → stop the other frpc and retry. **"subdomain and custom domains should not be both empty"** → ensure `customDomains = ["frp-gateway.orianna.ai"]` in the config file.
 
 ## Return
 
-- **Tunnel URL:** `https://softlight.orianna.ai/api/tunnel/<tunnel_id>`
+- **Tunnel URL:** `<softlight_origin>/api/tunnel/<tunnel_id>`
 - **frpc PID** (capture when you start frpc in the background, for stop-application to tear down the tunnel)

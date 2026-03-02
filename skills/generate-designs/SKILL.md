@@ -61,20 +61,22 @@ generate initial design directions, and hand off to Softlight for visual explora
 If the user hasn't already described the design challenge (in their message or earlier in the
 session), ask them to describe it in plain language and wait for their reply before continuing.
 
-### Step 1: Understand the challenge and create Softlight project
+### Step 1: Understand the challenge, create project, and start the app
 
 Quickly understand the app by reading at most a small handful of files — start with README, package.json, or the
 main entry point. If the user is redesigning a specific page or feature, glance at that file too.
 Don't explore beyond that. You need a high-level sense of what the app does and what the current
 experience is like — not a deep understanding of the code.
 
-Then **immediately** call Softlight to create the project — do this BEFORE you present anything to
-the user. You need the URL first. **Call the MCP tool directly. Do NOT delegate to a Task or
-subagent.**
+Then do two things at once:
 
-Call the **softlight** MCP tool `create_project` — see "How to write the `create_project` text
-param" above for what to put in the `text` field.
-Save the returned URL for your response in the next step.
+1. **Create the Softlight project.** Call the **softlight** MCP tool `create_project` — see
+   "How to write the `create_project` text param" above. Save the returned URL. **Call the MCP
+   tool directly. Do NOT delegate to a Task or subagent.**
+
+2. **Launch `preview-application` in the background.** This starts building and serving the app
+   so it's ready by the time the user wants to build prototypes. Don't wait for it — let it run
+   while you continue.
 
 ### Step 2: Generate design directions and present them
 
@@ -111,14 +113,20 @@ interact with the Softlight project.
 
 **Call the MCP tool directly. Do NOT delegate to a Task or subagent.**
 
-### Step 1: Context and create Softlight project
+### Step 1: Context, create project, and start the app
 
 Quickly understand the app by reading at most 2–3 files — start with README, package.json, or the
 main entry point. If the user's change targets a specific page or feature, glance at that file too.
 Don't explore beyond that.
 
-Then call the **softlight** MCP tool `create_project` — see "How to write the `create_project` text
-param" above for what to put in the `text` field. Save the returned URL.
+Then do two things at once:
+
+1. **Create the Softlight project.** Call the **softlight** MCP tool `create_project` — see
+   "How to write the `create_project` text param" above. Save the returned URL. **Call the MCP
+   tool directly. Do NOT delegate to a Task or subagent.**
+
+2. **Launch `preview-application` in the background.** This starts building and serving the app
+   so it's ready by the time prototypes are needed. Don't wait for it.
 
 ### Step 2: Present directions and pause
 
