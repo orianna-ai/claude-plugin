@@ -63,5 +63,6 @@ routeByHTTPUser = "<tunnel_id>"
 
 ## Return
 
-- **Tunnel URL:** `<softlight_origin>/api/tunnel/<tunnel_id>`
+- **Tunnel URL:** `<softlight_origin>/api/tunnel/<tunnel_id>/`
+- It is important that you put the slash at the end
 - **frpc PID** (capture when you start frpc in the background, for stop-application to tear down the tunnel)
