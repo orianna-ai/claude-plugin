@@ -5,7 +5,6 @@ model: sonnet
 skills:
   - softlight:start-application
   - softlight:create-tunnel
-memory: user
 ---
 
 # Preview Application
