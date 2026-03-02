@@ -4,7 +4,6 @@ description: Generate content scripts for design directions and place them on th
 model: sonnet
 skills:
   - softlight:generate-content-script
-memory: user
 ---
 
 # Generate Revision
