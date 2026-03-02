@@ -15,6 +15,19 @@ touching the source or rebuilding.
 
 ## Workflow
 
+### Step 0: Study the reference images
+
+You will receive reference screenshots showing the current experience. **Study them carefully**
+before writing any code. These images are your ground truth for:
+- **Layout**: how elements are arranged, spacing, alignment, visual hierarchy
+- **Visual style**: color palette, typography, backgrounds, light vs dark theme
+- **Content**: what kind of data is shown and how it's formatted
+- **Components**: which UI patterns are used (tables, cards, charts, nav bars, etc.)
+
+Your content script must produce output that **visually resembles these screenshots** with the
+design idea applied on top. Match the overall look and feel — theme, palette, density, and
+component style. Generic placeholder UI that ignores the reference images is not acceptable.
+
 ### Step 1: Read the application source code
 
 Read the source code of the components and pages relevant to the design idea. From the source
@@ -75,17 +88,25 @@ Write a single JavaScript file that follows this structure:
 
 The `setup()` function runs before any mutations. It should always be included.
 
+**Navigate to the right page — this is critical.** The design idea targets a specific page or
+view. The `setup()` function must navigate there before anything else runs. For SPAs, call
+`history.pushState(null, "", "/target/route")` and dispatch a `popstate` event so the
+client-side router picks it up. For multi-page apps, set `window.location.href`. If the app
+is already on the right page, skip this step.
+
 **Mock API data — this is critical.** The app is running without a real backend, so pages will
 load blank or error out without mock data. Intercept `fetch` to return realistic mock data for
 every endpoint the page calls. Read the source to find which API endpoints are used and what
 shape the responses should be. Store the original `fetch` and call through for non-intercepted
-requests. Make the mock data realistic and representative — use plausible names, emails, dates,
-and UUIDs. The design changes are meaningless if the page is blank.
+requests.
+
+**The mock data must match the reference images.** Study the screenshots to understand what
+kind of data the app displays and how it's structured. Your mock data should feel like it
+belongs in the same app — same types of fields, realistic values, and appropriate volume.
+Generic "Lorem ipsum" or "Item 1, Item 2" placeholders are wrong.
 
 Other techniques:
 
-- **Navigate to a route.** For SPAs, call `history.pushState(null, "", "/target/route")` and
-  dispatch a `popstate` event so the client-side router picks it up.
 - **Seed localStorage / sessionStorage.** Set values the app reads on mount — feature flags,
   user preferences, onboarding state.
 - **Programmatic interaction.** Click buttons, fill inputs, or toggle switches to drive the app
@@ -102,7 +123,9 @@ Other techniques:
 - Each distinct change should be its own function so it fails independently.
 - Log warnings to console on failure — never throw or break the host app.
 - Match the app's existing visual language (fonts, colors, spacing, border radii) so the
-  prototype looks integrated.
+  prototype looks integrated. Use the reference screenshots as the source of truth — if the
+  app has a dark theme, your injected CSS must use dark backgrounds. If it uses specific accent
+  colors, reuse them.
 
 ### Step 3: Return
 
