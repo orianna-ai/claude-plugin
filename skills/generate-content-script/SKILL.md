@@ -15,10 +15,23 @@ touching the source or rebuilding.
 
 ## Workflow
 
-### Step 0: Study the reference images
+### Step 0: Download and study the reference images
 
-You will receive reference screenshots showing the current experience. **Study them carefully**
-before writing any code. These images are your ground truth for:
+You will receive URLs for reference screenshots and/or design direction mocks. **Download
+each image and view it before doing anything else.** The URLs are text strings in your
+prompt — you cannot see the images without downloading them.
+
+For each image URL, run:
+
+```
+curl -sL "<url>" -o /tmp/ref_<N>.png
+```
+
+Then use the **Read** tool on the downloaded file (e.g. `Read /tmp/ref_1.png`). The Read
+tool displays images visually so you can inspect them. Do this for every image URL — do not
+skip any.
+
+Study them carefully before writing any code. These images are your ground truth for:
 - **Layout**: how elements are arranged, spacing, alignment, visual hierarchy
 - **Visual style**: color palette, typography, backgrounds, light vs dark theme
 - **Content**: what kind of data is shown and how it's formatted
