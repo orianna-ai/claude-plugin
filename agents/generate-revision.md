@@ -40,11 +40,21 @@ Pass each subagent:
 - The design direction (what to change)
 - The project info (framework, source layout, entry point, styling approach, etc.) so it can
   read the right source files and write selectors/styles that match the app
-- **Reference images from the problem.** The user's problem includes screenshots of the current
-  experience. Pass these image URLs to each subagent so it can see what the app actually looks
-  like and produce output that closely matches the visual style, layout, density, and content
-  of those screenshots. This is critical — without the images the content script will generate
-  generic UI that looks nothing like the real app.
+- **Reference image URLs and design direction mock URL.** Include every relevant image URL
+  in the prompt: the problem screenshots (current app) and the specific `<mock>` URL for
+  this specific direction. Then explicitly instruct the subagent to download and view them:
+
+  > Before writing any code, download each image URL to a temp file and view it with Read:
+  >
+  > ```
+  > curl -sL "<url>" -o /tmp/ref_1.png
+  > ```
+  >
+  > Then use the Read tool on `/tmp/ref_1.png` to visually inspect the image. Repeat for
+  > each URL. These images are your ground truth — do not skip this step.
+
+  This is critical — it cannot see images from URLs in the prompt text alone.
+  It must download and Read them to view them visually.
 - Instruct it to read the `generate-content-script` skill file first, then follow it
 
 After sending all Task calls in one message, wait for every subagent to return, then collect
