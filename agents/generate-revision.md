@@ -12,7 +12,7 @@ Your task is to generate content scripts that implement design directions, then 
 the Softlight canvas as iframe elements.
 
 You will receive:
-- A list of **design directions** (ideas to prototype)
+- A list of **design directions** (ideas to prototype), including images of those directions
 - A **tunnel URL** and **port** where the application is already running
 - **Project info** from preview-application (framework, source layout, styling, routing, etc.)
 - A **project_id** for the Softlight canvas
@@ -45,7 +45,20 @@ Pass each subagent:
   like and produce output that closely matches the visual style, layout, density, and content
   of those screenshots. This is critical — without the images the content script will generate
   generic UI that looks nothing like the real app.
+- **THE DESIGN DIRECTION IMAGE.** Each direction includes a mockup image showing EXACTLY what
+  to build. Pass this image URL to the subagent and tell it explicitly: "This image is the
+  design direction. Your content script MUST implement what you see in this image. Treat this
+  image as the specification — match its layout, components, content, and visual details as
+  closely as possible."
 - Instruct it to read the `generate-content-script` skill file first, then follow it
+
+**⚠️ CRITICAL: THE DESIGN DIRECTION IMAGE IS THE SPECIFICATION ⚠️**
+
+Each design direction includes a mockup image. This image is NOT just a reference — it IS the
+design. The content script must implement exactly what that image shows. If the image shows a
+sidebar with 5 nav items, the content script creates a sidebar with 5 nav items. If the image
+shows a card grid with specific content, the content script creates that card grid with that
+content. The subagent must study the design direction image and reproduce it faithfully.
 
 After sending all Task calls in one message, wait for every subagent to return, then collect
 each content script.

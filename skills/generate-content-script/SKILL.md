@@ -15,18 +15,23 @@ touching the source or rebuilding.
 
 ## Workflow
 
-### Step 0: Study the reference images
+### Step 0: Study the design direction image — THIS IS YOUR SPECIFICATION
 
-You will receive reference screenshots showing the current experience. **Study them carefully**
-before writing any code. These images are your ground truth for:
-- **Layout**: how elements are arranged, spacing, alignment, visual hierarchy
-- **Visual style**: color palette, typography, backgrounds, light vs dark theme
-- **Content**: what kind of data is shown and how it's formatted
-- **Components**: which UI patterns are used (tables, cards, charts, nav bars, etc.)
+**⚠️ CRITICAL: THE DESIGN DIRECTION IMAGE IS NOT A SUGGESTION — IT IS THE SPECIFICATION ⚠️**
 
-Your content script must produce output that **visually resembles these screenshots** with the
-design idea applied on top. Match the overall look and feel — theme, palette, density, and
-component style. Generic placeholder UI that ignores the reference images is not acceptable.
+You will receive a **design direction image** — a mockup showing what to build. This
+image is your primary input. Your content script MUST implement what you see in this image.
+
+The design direction image IS the design. Do not improvise. Do not add your own ideas. Do not
+simplify or skip elements. Implement what the image shows.
+
+You will also receive reference screenshots of the **current experience**. Use these to:
+- **Match the visual style**: color palette, typography, backgrounds, light vs dark theme
+- **Understand the context**: where the design direction fits into the existing app
+- **Copy design tokens**: spacing, fonts, border radii from the existing app
+
+Your content script combines these: implement the **design direction image** using the
+**visual language of the existing app**. Generic placeholder UI is not acceptable.
 
 ### Step 1: Read the application source code
 
