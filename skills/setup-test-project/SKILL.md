@@ -97,7 +97,7 @@ curl -s -o /dev/null -w '%{http_code}' --max-time 10 <softlight_origin>/api/tunn
 If not 200, wait 5 more seconds and retry once. Check frpc output if it still fails —
 "router config conflict" means another frpc is using the same tunnel\_id; kill it and retry.
 
-### 4. Create the example project on the canvas
+### 4. Create the test project on the canvas
 
 Generate a **project\_id** — also a valid UUID v4:
 
@@ -105,11 +105,11 @@ Generate a **project\_id** — also a valid UUID v4:
 python3 -c "import uuid; print(uuid.uuid4())"
 ```
 
-Open the example project page with the project\_id and tunnel\_id as query params. Use curl
-or the browser to hit:
+Open the test project page with the tunnel\_id as a query param. Use curl or the browser to
+hit:
 
 ```
-<softlight_origin>/?project_id=<project_id>&tunnel_id=<tunnel_id>
+<softlight_origin>/projects/<project_id>/test?tunnel_id=<tunnel_id>
 ```
 
 This creates a Softlight project with an iframe on the canvas pointing through the tunnel to
