@@ -107,16 +107,15 @@ view. The `setup()` function must navigate there before anything else runs. For 
 client-side router picks it up. For multi-page apps, set `window.location.href`. If the app
 is already on the right page, skip this step.
 
-**Mock API data — this is critical.** The app is running without a real backend, so pages will
-load blank or error out without mock data. Intercept `fetch` to return realistic mock data for
-every endpoint the page calls. Read the source to find which API endpoints are used and what
-shape the responses should be. Store the original `fetch` and call through for non-intercepted
-requests.
+**Mock API data when needed — this is critical.** The app may or may not have a working backend. If pages load
+blank or error out, intercept `fetch` to return realistic mock data for the failing endpoints.
+Read the source to find which API endpoints are used and what shape the responses should be.
+Store the original `fetch` and call through for requests you don't need to mock.
 
-**The mock data must match the reference images.** Study the screenshots to understand what
-kind of data the app displays and how it's structured. Your mock data should feel like it
-belongs in the same app — same types of fields, realistic values, and appropriate volume.
-Generic "Lorem ipsum" or "Item 1, Item 2" placeholders are wrong.
+**Mock data must match the reference images.** Study the screenshots to understand what kind of
+data the app displays and how it's structured. Your mock data should feel like it belongs in the
+same app — same types of fields, realistic values, and appropriate volume. Generic "Lorem ipsum"
+or "Item 1, Item 2" placeholders are wrong.
 
 Other techniques:
 

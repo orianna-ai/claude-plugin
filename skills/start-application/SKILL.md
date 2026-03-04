@@ -5,18 +5,22 @@ description: Figure out how to build and serve a web application on a free port,
 
 # Start Application
 
-Your task is to figure out how to build and serve a web application on a free port. It is ok if
-multiple instances of the same app are running in parallel — that is intended.
+Your task is to start a web application on a free port, the same way a developer working on the
+project would. It is ok if multiple instances of the same app are running in parallel — that is
+intended.
 
 ## Workflow
 
 ### 1. Understand the project
 
-Look for clues in the project root to figure out how the app is built and how to run it:
+Figure out how developers run this application locally. Look for clues in the project root:
 - **`package.json`** — check `scripts` for `dev`, `start`, `serve`, or `build` commands. Note
   the package manager (`npm`, `yarn`, `pnpm`) and key dependencies.
 - **`Makefile`** — look for `run`, `dev`, or `serve` targets.
 - **`README.md`** — often has setup and run instructions.
+
+Most projects have a single command that starts everything needed (e.g. `npm run dev`, `make run`,
+`docker compose up`, etc.). Prefer that over assembling your own serve setup.
 
 While you're exploring, note things that would help someone make changes to the app later:
 - **Framework** (e.g. Next.js, Vite + React, SvelteKit, Nuxt, Remix)
@@ -39,11 +43,12 @@ a **PORT** env var — prefer that over CLI flags when available.
 ### 3. Install dependencies and build
 
 If the project needs setup before running (e.g. `npm install`, `pip install -e .`, `go build`),
-run that first. Skip if `node_modules` or equivalent already exists and looks current.
+run that first. Skip dependency installation if it looks already done (e.g. `node_modules` exists
+and lock file hasn't changed) — but always use the project's own start command regardless.
 
 ### 4. Start the app
 
-Run the app in the background and note its **PID**.
+Use the start command you identified in step 1. Run it in the background and note its **PID**.
 
 Poll every 3 seconds until the app responds:
 ```
