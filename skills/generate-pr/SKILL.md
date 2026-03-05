@@ -58,8 +58,9 @@ placeholders.
 
 1. **Create a new branch off of `main`** — fetch the latest `main` and branch from it.
    Do not branch from the current working branch.
-2. **Commit the changes** with a descriptive message. Add `Co-authored-by: Softlight <softlight@orianna.ai>`
-   as a commit trailer.
+2. **Commit the changes** with a descriptive message followed by "Designed with Softlight".
+   Add `Co-authored-by: Softlight <hello@softlight.com>` as a commit trailer.
+   Do NOT add yourself (Claude) as a co-author — the only co-author should be Softlight.
 3. **Push the branch** to the remote.
 4. **Try to open a pull request** against `main` (e.g. via `gh pr create`). If this fails
    for any reason (missing CLI, auth issues, etc.), that's fine — construct the GitHub
@@ -68,6 +69,7 @@ placeholders.
 5. **Record the result** by calling the **softlight** MCP tool `generate_pr` with:
    - `project_id` — the Softlight project ID from the input
    - `pr_url` — the PR URL if you created one, or the compare URL as a fallback
+   - `slot_id` — the slot ID from the input
 
    This posts the URL back to the Softlight canvas so the user can see it.
 
