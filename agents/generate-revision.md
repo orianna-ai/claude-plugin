@@ -4,6 +4,7 @@ description: Generate content scripts for design directions and place them on th
 model: sonnet
 skills:
   - softlight:generate-content-script
+  - softlight:download-images
 ---
 
 # Generate Revision
@@ -40,9 +41,7 @@ Pass each subagent:
 - The design direction (what to change)
 - The project info (framework, source layout, entry point, styling approach, etc.) so it can
   read the right source files and write selectors/styles that match the app
-- **Reference image URLs and design direction mock URL.** Include every relevant image URL
-  in the prompt: the problem screenshots (current app) and the specific `<mock>` URL for
-  this specific direction. Then explicitly instruct the subagent to download and view them:
+- **Reference image URLs, design direction mock URLs, and comment image URLs.** Include every relevant image URL in the prompt: the problem screenshots (current app) and the specific relevant image URL(s) for this specific direction. Then explicitly instruct the subagent to download and view them:
 
   > Before writing any code, download each image URL to a temp file and view it with Read:
   >

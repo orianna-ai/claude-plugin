@@ -1,7 +1,7 @@
 ---
 name: setup-test-project
 description: >
-  Set up a test project with storyboard_v2 running in an iframe on the Softlight canvas.
+  Set up a test project with inspiration_public running in an iframe on the Softlight canvas.
   Use when you need to quickly get a running application visible in the canvas for testing.
 hooks:
   PreToolUse:
@@ -14,7 +14,7 @@ hooks:
 
 # Setup Test Project
 
-Launch a storyboard_v2 server, tunnel it into the Softlight canvas as an iframe, and wait
+Launch an inspiration_public server, tunnel it into the Softlight canvas as an iframe, and wait
 for user interaction. This is the fastest way to get a running application on the canvas for
 testing.
 
@@ -22,7 +22,7 @@ testing.
 
 ### 1. Find a free port
 
-The Softlight server already occupies port 8080. Find a free port for storyboard_v2 starting
+The Softlight server already occupies port 8080. Find a free port for inspiration_public starting
 from 8081 and incrementing until one is available:
 
 ```
@@ -31,12 +31,12 @@ ss -tlnp | grep ':<port>'
 
 Check 8081, 8082, 8083, … until one is not in use.
 
-### 2. Start storyboard_v2
+### 2. Start inspiration_public
 
 Run in the background:
 
 ```
-PORT=<port> bazel run //server/storyboard_v2
+PORT=<port> bazel run //server/inspiration_public
 ```
 
 Poll every 5 seconds until the app responds (builds can take a few minutes):
@@ -113,7 +113,7 @@ hit:
 ```
 
 This creates a Softlight project with an iframe on the canvas pointing through the tunnel to
-the storyboard\_v2 server.
+the inspiration_public server.
 
 ### 5. Wait for user interaction
 
@@ -127,6 +127,6 @@ attachments from the user's interaction with the canvas.
 
 - **Project URL:** `<softlight_origin>/projects/<project_id>`
 - **Tunnel URL:** `<softlight_origin>/api/tunnel/<tunnel_id>/`
-- **storyboard\_v2 PID**
+- **inspiration_public PID**
 - **frpc PID**
-- **Port** storyboard\_v2 is listening on
+- **Port** inspiration_public is listening on
