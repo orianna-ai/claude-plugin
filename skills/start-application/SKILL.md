@@ -9,18 +9,29 @@ Your task is to start a web application on a free port, the same way a developer
 project would. It is ok if multiple instances of the same app are running in parallel — that is
 intended.
 
+**NEVER write your own server scripts, build scripts, or scaffolding to serve the application.**
+Every project already has its own way to run — your job is to find and use it, not invent one.
+
 ## Workflow
 
 ### 1. Understand the project
 
-Figure out how developers run this application locally. Look for clues in the project root:
+Figure out how developers run this application locally. Common places to start looking:
 - **`package.json`** — check `scripts` for `dev`, `start`, `serve`, or `build` commands. Note
   the package manager (`npm`, `yarn`, `pnpm`) and key dependencies.
 - **`Makefile`** — look for `run`, `dev`, or `serve` targets.
 - **`README.md`** — often has setup and run instructions.
+- **`Dockerfile` / `docker-compose.yml`** — may reveal the serve command.
+- **Shell scripts** in the repo root (e.g. `start.sh`, `run.sh`, `dev.sh`).
+- **`Procfile`**, **`Taskfile`**, or CI configs.
 
-Most projects have a single command that starts everything needed (e.g. `npm run dev`, `make run`,
-`docker compose up`, etc.). Prefer that over assembling your own serve setup.
+These are starting points, not an exhaustive list. If you don't find a start command in these
+files, keep exploring the project — check deeper directories, read more config files, look at
+how CI runs the app. The project has a way to run; keep looking until you find it.
+
+Every project has a command that starts everything needed (e.g. `npm run dev`, `make run`,
+`docker compose up`, etc.). You MUST find and use that command. Do NOT create your own server,
+build pipeline, or serve setup under any circumstances.
 
 While you're exploring, note things that would help someone make changes to the app later:
 - **Framework** (e.g. Next.js, Vite + React, SvelteKit, Nuxt, Remix)
@@ -49,6 +60,10 @@ and lock file hasn't changed) — but always use the project's own start command
 ### 4. Start the app
 
 Use the start command you identified in step 1. Run it in the background and note its **PID**.
+
+Once you've identified the project's start command, use it exactly as-is. Do not attempt to
+optimize, shortcut, or bypass it by running underlying binaries, scripts, or servers directly.
+The project's start command often handles setup that isn't visible from the code alone.
 
 Poll every 3 seconds until the app responds:
 ```
