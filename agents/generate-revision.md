@@ -40,28 +40,28 @@ Example with 3 items — your response must contain exactly 3 Task tool calls at
 [Task call 3: "Generate content script for item 3" — includes item 3 details + project info]
 ```
 
-For plan items that already have a `content_script_path`, the file already exists — the subagent
-will edit it in place. For new prototypes (no `content_script_path`), assign an output path:
-`/tmp/content_script_new_0.js`, `/tmp/content_script_new_1.js`, etc.
+Plan items that revise an existing prototype have a `content_script` field containing the current
+script source. The subagent will write it to a file and edit it. For new prototypes
+(no `content_script`), the subagent creates a script from scratch.
 
 Pass each subagent:
 
 - The project info & relevant files (framework, source layout, entry point, styling approach, etc.)
 - **The full plan item as raw JSON** — paste the JSON exactly as you received it. Do not
   rephrase, summarize, or convert it to prose. Every field must survive intact: `change_description`,
-  `content_script_path`, `feedback` (with `anchor_selectors`, `anchor_html`, `anchor_location`),
+  `content_script`, `feedback` (with `anchor_selectors`, `anchor_html`, `anchor_location`),
   `reference_image_urls`, `title`, `slot_id`, all of it. Raw JSON in, raw JSON through.
 - Instruct it to read the `generate-content-script` skill file first, then follow it
 
-The subagent handles everything else — editing an existing script or creating a new one,
-downloading images, reading source code. You are just a dispatcher.
+The subagent handles everything else — writing the script to a file, editing it, creating new
+scripts, downloading images, reading source code. You are just a dispatcher.
 
 After sending all Task calls in one message, wait for every subagent to return.
 
 ### Phase 2: Collect content scripts
 
-Read each content script file back — from `content_script_path` for iterations, or from the
-output path you assigned for new prototypes. These are the final scripts to place on the canvas.
+Read each content script file back from the path the subagent returns. These are the final
+scripts to place on the canvas.
 
 ### Phase 3: Place iframes on the canvas
 

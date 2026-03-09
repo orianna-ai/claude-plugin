@@ -19,11 +19,10 @@ touching the source or rebuilding.
 You will receive a **plan item** with everything you need. The plan item contains:
 
 - **`change_description`**: What to build or change.
-- **`content_script_path`**: An absolute file path (e.g. `/tmp/content_script_src_abc123.js`)
-  to the existing content script, already written to disk by the MCP. Each plan item gets its
-  own unique file. **This is the key field that determines your mode.** If set, the file
-  exists — Read it and use Edit for targeted changes. If null, there is no existing prototype —
-  create a new content script from scratch at the output path.
+- **`content_script`**: The full source code of the existing content script as inline text.
+  **This is the key field that determines your mode.** If set, write it to a temp file and use
+  Edit for targeted changes. If null, there is no existing prototype — create a new content
+  script from scratch.
 - **`title`**: Title of the prototype.
 - **`slot_id`**: Slot ID of the existing prototype being revised (if any).
 - **`feedback`**: Array of user feedback comments, each with:
@@ -38,8 +37,8 @@ You will receive a **plan item** with everything you need. The plan item contain
 The planner (Gemini) analyzed the full canvas and identified which prototype to revise and which
 feedback to address. The MCP resolved everything into the plan item you receive:
 
-- If there is a **source prototype** being revised, its content script was written to a temp file
-  at `content_script_path`. This is the starting point — Read it and Edit it directly.
+- If there is a **source prototype** being revised, its content script is provided inline in the
+  `content_script` field. Write it to a temp file and Edit it directly.
 - **Reference images** are mocks or designs from the canvas that the planner determined are
   relevant. They are NOT the source prototype — they are visual context.
 - **Feedback** is the user's comments, already resolved with screenshots, attached images, and
@@ -107,13 +106,12 @@ component style. Generic placeholder UI that ignores the reference images is not
 
 ### Step 1: Determine your mode and read relevant code
 
-Check the plan item's `content_script_path` field first — this determines everything:
+Check the plan item's `content_script` field first — this determines everything:
 
-- **`content_script_path` is set** → you are **editing** an existing prototype. Read the file
-  at that path immediately so you understand what's already built before reading anything else.
-- **`content_script_path` is null** → you are creating a **new** prototype from scratch. You must find an unsed content_script_path to write to. 
+- **`content_script` is set** → you are **editing** an existing prototype.
+- **`content_script` is null** → you are creating a **new** prototype from scratch.
 
-Then read the application source code relevant to the change and plan your approach. Figure out:
+Then read the existing content script (if any) and application source code relevant to the change and plan your approach. Figure out:
 - Which selectors to target (CSS class names, data attributes, component hierarchy)
 - Which design tokens to reuse (colors, spacing, fonts) so the result looks integrated
 - Which API endpoints the page calls and what shape mock data should take
@@ -124,9 +122,9 @@ of this step you should have a clear plan for what to modify in Step 2.
 
 ### Step 2: Write or edit the content script
 
-#### Mode A: New content script (`content_script_path` is null)
+#### Mode A: New content script (`content_script` is null)
 
-Write a new JavaScript file to the new file pathy you found earlier. Again, you are to find a new file path to write to: /tmp/content_script_UNIQUEID.js Follow this structure:
+Write a new JavaScript file to the output path you chose in Step 1. Follow this structure:
 
 ```javascript
 (function contentScript() {
@@ -168,12 +166,11 @@ Write a new JavaScript file to the new file pathy you found earlier. Again, you 
 })();
 ```
 
-#### Mode B: Iterate on existing content script (`content_script_path` is set)
+#### Mode B: Iterate on existing content script (`content_script` is set)
 
-Use the **Edit** tool for targeted modifications. Change only what the feedback asks for.
-Preserve everything else — working code, mock data, structure, unaffected mutations.
-
-Do not rewrite the script from scratch. The whole point is to make cheap, targeted edits.
+Apply the requested changes to the existing script and write the result to a new file at
+`/tmp/content_script_<slot_id>.js`. Change only what the feedback asks for. Preserve everything
+else — working code, mock data, structure, unaffected mutations.
 
 FOR BOTH MODES, FOLLOW THESE GUIDELINES:
 
@@ -221,5 +218,5 @@ Other techniques:
 
 ### Step 3: Return
 
-Return the **file path** of the content script — `content_script_path` for iterations, or the
-output path for new prototypes. The caller reads the file and handles placement.
+Return the **file path** of the content script you wrote or edited. The caller reads the file
+and handles placement.
