@@ -4,72 +4,79 @@ description: Generate content scripts for design directions and place them on th
 model: sonnet
 skills:
   - softlight:generate-content-script
-  - softlight:download-images
 ---
 
 # Generate Revision
 
-Your task is to generate content scripts that implement design directions, then place them on
-the Softlight canvas as iframe elements.
+Your task is to generate content scripts and place them on the Softlight canvas as iframe elements.
 
 You will receive:
-- A list of **design directions** (ideas to prototype)
 - A **tunnel URL** and **port** where the application is already running
 - **Project info** from preview-application (framework, source layout, styling, routing, etc.)
+- **Relevant project files** from conversation history that might be relevant to the changes
 - A **project_id** for the Softlight canvas
+
+And one of:
+- **A list of design directions** (ideas to prototype from scratch), OR
+- **A plan from `plan_prototype_revision`** — a list of plan items describing what to build or iterate
 
 ## Workflow
 
 ### Phase 1: Generate content scripts in parallel
 
-For each design direction, dispatch a Task subagent that uses the `generate-content-script` skill.
+For each direction or plan item, dispatch a Task subagent that uses the `generate-content-script`
+skill.
 
 **CRITICAL — parallel execution:**
-You MUST emit ALL Task tool calls in a **single message**. Send one Task call per direction so
+You MUST emit ALL Task tool calls in a **single message**. Send one Task call per item so
 they run concurrently. Do NOT send one Task, wait for it to finish, then send the next — that is
 sequential and wrong. All Task calls must appear together in one response.
 
-Example with 3 directions — your response must contain exactly 3 Task tool calls at once:
+Example with 3 items — your response must contain exactly 3 Task tool calls at once:
 
 ```
-[Task call 1: "Generate content script for direction 1" — includes direction 1 details + project info]
-[Task call 2: "Generate content script for direction 2" — includes direction 2 details + project info]
-[Task call 3: "Generate content script for direction 3" — includes direction 3 details + project info]
+[Task call 1: "Generate content script for item 1" — includes item 1 details + project info]
+[Task call 2: "Generate content script for item 2" — includes item 2 details + project info]
+[Task call 3: "Generate content script for item 3" — includes item 3 details + project info]
 ```
+
+Plan items that revise an existing prototype have a `content_script` field containing the current
+script source. The subagent will write it to a file and edit it. For new prototypes
+(no `content_script`), the subagent creates a script from scratch.
 
 Pass each subagent:
-- The design direction (what to change)
-- The project info (framework, source layout, entry point, styling approach, etc.) so it can
-  read the right source files and write selectors/styles that match the app
-- **Reference image URLs, design direction mock URLs, and comment image URLs.** Include every relevant image URL in the prompt: the problem screenshots (current app) and the specific relevant image URL(s) for this specific direction. Then explicitly instruct the subagent to download and view them:
 
-  > Before writing any code, download each image URL to a temp file and view it with Read:
-  >
-  > ```
-  > curl -sL "<url>" -o /tmp/ref_1.png
-  > ```
-  >
-  > Then use the Read tool on `/tmp/ref_1.png` to visually inspect the image. Repeat for
-  > each URL. These images are your ground truth — do not skip this step.
-
-  This is critical — it cannot see images from URLs in the prompt text alone.
-  It must download and Read them to view them visually.
+- The project info & relevant files (framework, source layout, entry point, styling approach, etc.)
+- **The full plan item as raw JSON** — paste the JSON exactly as you received it. Do not
+  rephrase, summarize, or convert it to prose. Every field must survive intact: `change_description`,
+  `content_script`, `feedback` (with `anchor_selectors`, `anchor_html`, `anchor_location`),
+  `reference_image_urls`, `title`, `slot_id`, all of it. Raw JSON in, raw JSON through.
 - Instruct it to read the `generate-content-script` skill file first, then follow it
 
-After sending all Task calls in one message, wait for every subagent to return, then collect
-each content script.
+The subagent handles everything else — writing the script to a file, editing it, creating new
+scripts, downloading images, reading source code. You are just a dispatcher.
 
-### Phase 2: Place iframes on the canvas
+After sending all Task calls in one message, wait for every subagent to return.
+
+### Phase 2: Collect content scripts
+
+Read each content script file back from the path the subagent returns. These are the final
+scripts to place on the canvas.
+
+### Phase 3: Place iframes on the canvas
+
+**You MUST call `generate_prototype_revision` before returning. Returning without placing
+prototypes on the canvas is a failure.**
 
 Call the `generate_prototype_revision` MCP tool with the project_id and one `IFrameElement` per
-direction:
+item:
 
 ```
 generate_prototype_revision(
   project_id="<project_id>",
   elements=[
-    {"url": "<tunnel_url>", "title": "<direction title>", "content_script": "<script>"},
-    {"url": "<tunnel_url>", "title": "<direction title>", "content_script": "<script>"},
+    {"url": "<tunnel_url>", "title": "<title>", "content_script": "<script>"},
+    {"url": "<tunnel_url>", "title": "<title>", "content_script": "<script>"},
     ...
   ]
 )
@@ -79,7 +86,7 @@ Every element uses the **same tunnel URL** (the app is only running once) but ea
 different `content_script` that implements its design direction. The canvas renders each iframe
 independently, so the user sees multiple variations of the same app side by side.
 
-### Phase 3: Return
+### Phase 4: Return
 
 - The **slot_ids** from generate_prototype_revision
-- A summary of each direction and what its content script does
+- A summary of each direction/plan item and what its content script does
