@@ -17,7 +17,8 @@ ready by the time prototypes are needed.
 
 ### Phase 1: Start the app
 
-Use the `start-application` skill to figure out how to serve the application on a free port.
+Use the `start-application` skill to find and use the project's own dev server on a free port.
+The skill must use the project's existing start command — never write custom server scripts.
 Note the port and the app PID.
 
 ### Phase 2: Create the tunnel
