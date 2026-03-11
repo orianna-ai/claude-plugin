@@ -1,61 +1,35 @@
 ---
 name: generate-content-script
-description: >
-  Generate a content script — a self-contained JavaScript file that can be injected into a running
-  application to prototype a design idea without rebuilding.
+description: Generate a content script — a self-contained JavaScript file that can be injected into a running application to prototype a design idea without rebuilding.
 ---
 
 # Generate Content Script
 
 Generate the content script fast — the user wants to see the direction ASAP.
 
-A content script is a self-contained JavaScript IIFE that gets injected into a running web app.
-It mutates the DOM, injects CSS, and patches behavior to prototype a design idea without
-touching the source or rebuilding.
+A content script is a self-contained JavaScript IIFE injected into a running web app. It mutates
+the DOM, injects CSS, and patches behavior to prototype a design idea without touching source or
+rebuilding.
 
-## Workflow
+You will receive:
+- A **design direction** (what to change)
+- An **application analysis** — selectors, design tokens, component structure, API shapes, routing
+- **Reference image URLs** for screenshots and/or design direction mocks
 
-### Step 0: Download and study the reference images
+## Step 1: Analyze reference images
 
-You will receive URLs for reference screenshots and/or design direction mocks. **Download
-each image and view it before doing anything else.** The URLs are text strings in your
-prompt — you cannot see the images without downloading them.
+Run the `analyze-images` skill on all provided image URLs. Study every image before writing code —
+they are ground truth for layout, visual style, content, and component patterns.
 
-For each image URL, run:
+Your content script must visually match these images with the design idea applied on top. Generic
+placeholder UI is not acceptable.
 
-```
-curl -sL "<url>" -o /tmp/ref_<N>.png
-```
+## Step 2: Write the content script
 
-Then use the **Read** tool on the downloaded file (e.g. `Read /tmp/ref_1.png`). The Read
-tool displays images visually so you can inspect them. Do this for every image URL — do not
-skip any.
+Use the application analysis for selectors, tokens, and API shapes. Read source files from the
+analysis only if you need more detail on a specific component.
 
-Study them carefully before writing any code. These images are your ground truth for:
-- **Layout**: how elements are arranged, spacing, alignment, visual hierarchy
-- **Visual style**: color palette, typography, backgrounds, light vs dark theme
-- **Content**: what kind of data is shown and how it's formatted
-- **Components**: which UI patterns are used (tables, cards, charts, nav bars, etc.)
-
-Your content script must produce output that **visually resembles these screenshots** with the
-design idea applied on top. Match the overall look and feel — theme, palette, density, and
-component style. Generic placeholder UI that ignores the reference images is not acceptable.
-
-### Step 1: Read the application source code
-
-Read the source code of the components and pages relevant to the design idea. From the source
-you can learn:
-- CSS class names and data attributes to use as selectors
-- Component hierarchy and how elements are nested
-- Stylesheets and design tokens (colors, spacing, fonts) to match the app's visual language
-- Which API endpoints the page calls and what shape the responses should be
-
-Focus on the specific area the design idea targets — don't read the whole codebase. Keep it
-minimal and focused. Don't refactor or "improve" unrelated parts of the app.
-
-### Step 2: Write the content script
-
-Write a single JavaScript file that follows this structure:
+Structure:
 
 ```javascript
 (function contentScript() {
@@ -66,7 +40,7 @@ Write a single JavaScript file that follows this structure:
   // -- setup: mock data, navigate, seed state --
   function setup() { ... }
 
-  // -- inject a <style> tag with all CSS --
+  // -- inject <style> with all CSS --
   var style = document.createElement("style");
   style.textContent = "...";
   document.head.appendChild(style);
@@ -97,48 +71,43 @@ Write a single JavaScript file that follows this structure:
 })();
 ```
 
-**Setting up initial conditions:**
+### setup()
 
-The `setup()` function runs before any mutations. It should always be included.
+The screenshot tool navigates to `/` and captures what renders — no clicks, no inputs, no query
+params. The content script must make the target screen render unconditionally at `/`, fully
+populated with realistic data.
 
-**Navigate to the right page — this is critical.** The design idea targets a specific page or
-view. The `setup()` function must navigate there before anything else runs. For SPAs, call
-`history.pushState(null, "", "/target/route")` and dispatch a `popstate` event so the
-client-side router picks it up. For multi-page apps, set `window.location.href`. If the app
-is already on the right page, skip this step.
+**Routing.** SPAs: `history.pushState(null, "", "/target/route")` + dispatch `popstate`. MPAs:
+`window.location.href`.
 
-**Mock API data when needed — this is critical.** The app may or may not have a working backend. If pages load
-blank or error out, intercept `fetch` to return realistic mock data for the failing endpoints.
-Read the source to find which API endpoints are used and what shape the responses should be.
-Store the original `fetch` and call through for requests you don't need to mock.
+**Mock API data.** Intercept `fetch` to return realistic mock data. Store the original and call
+through for unmocked requests.
 
-**Mock data must match the reference images.** Study the screenshots to understand what kind of
-data the app displays and how it's structured. Your mock data should feel like it belongs in the
-same app — same types of fields, realistic values, and appropriate volume. Generic "Lorem ipsum"
-or "Item 1, Item 2" placeholders are wrong.
+**Bypass auth.** Mock the auth endpoint, seed a token in localStorage, or set whatever state the
+app checks.
+
+**Satisfy rendering conditions.** Components gate on auth status, loaded data, flow steps,
+selected tabs. Use the application analysis to identify and satisfy every condition.
+
+**Match reference images.** Mock data must use realistic values and appropriate volume matching
+the screenshots. No "Lorem ipsum" or "Item 1, Item 2".
 
 Other techniques:
+- Seed localStorage/sessionStorage (feature flags, preferences, onboarding state)
+- Programmatic clicks/inputs via `waitForSelector`
 
-- **Seed localStorage / sessionStorage.** Set values the app reads on mount — feature flags,
-  user preferences, onboarding state.
-- **Programmatic interaction.** Click buttons, fill inputs, or toggle switches to drive the app
-  into the desired state. Use `waitForSelector` to wait for elements to mount first.
+Do NOT gate setup behind URL params, feature flags, or conditionals.
 
-**Rules:**
+### Rules
 
-- Wrap everything in an IIFE to avoid polluting the global scope.
-- All CSS goes in a single injected `<style>` tag. Prefix class names with `cs-` to avoid
-  collisions with the app's own styles.
-- Use `MutationObserver` when targeting elements rendered dynamically (e.g. React components
-  that mount after route changes).
-- Use `waitForSelector` with a timeout so the script doesn't hang if the structure changes.
-- Each distinct change should be its own function so it fails independently.
-- Log warnings to console on failure — never throw or break the host app.
-- Match the app's existing visual language (fonts, colors, spacing, border radii) so the
-  prototype looks integrated. Use the reference screenshots as the source of truth — if the
-  app has a dark theme, your injected CSS must use dark backgrounds. If it uses specific accent
-  colors, reuse them.
+- IIFE wrapper — no global pollution
+- All CSS in one injected `<style>` tag; prefix classes with `cs-`
+- `MutationObserver` for dynamically rendered elements
+- `waitForSelector` with timeout — never hang
+- One function per distinct change — fail independently
+- Log warnings on failure — never throw or break the host app
+- Match the app's visual language from the application analysis and reference images
 
-### Step 3: Return
+## Step 3: Return
 
-Return the content script as a string. The caller handles placement.
+Return the content script as a string.
