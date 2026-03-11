@@ -21,7 +21,11 @@ If not 2xx/3xx, fix the application first — do not proceed.
 
 ### 2. Create the tunnel
 
-Run `uname -sm`. Call the `create_tunnel` tool with `port` = `<port>` and `uname` = the output.
+**First**, run `uname -sm` in the shell and capture the output (e.g. `Linux aarch64`, `Darwin arm64`).
+Do NOT guess or hardcode the value — you must run the command.
+
+**Then**, call the `create_tunnel` tool with `port` = `<port>` and `uname` = the exact output from
+the command above.
 
 ### 3. Write the config
 

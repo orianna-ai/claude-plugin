@@ -2,7 +2,7 @@
   "mcpServers": {
     "softlight": {
       "type": "http",
-      "url": "https://softlight.orianna.ai/mcp/"
+      "url": "http://localhost:8080/mcp/"
     }
   }
 }

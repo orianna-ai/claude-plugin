@@ -20,7 +20,11 @@ and how the app accepts a port. Use these directly.
 
 ### 1. Find a free port
 
-Check what's in use with `ss -tlnp`. Start at 8080 and increment until you find a free one.
+You MUST find a free port to run the application. Always check available ports and find a free port.
+
+Check which ports are in use with `ss -tlnp`.
+
+Start at 8080 and increment until you find a free one.
 
 ### 2. Install dependencies
 
