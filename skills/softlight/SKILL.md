@@ -5,7 +5,7 @@ description: Setup a Softlight project and then continuously listen for created 
 
 # Softlight
 
-Orchestrate a Softlight design session. Delegate all design work to skills — never do it inline.
+Orchestrate a Softlight design session. Delegate all design work to skills — never do it inline. You MUST run through all phases. Do not stop or ask the user for anything (unless the phase specifies it) - keep going.
 
 ## Phase 1: Analysis
 
