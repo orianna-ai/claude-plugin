@@ -59,9 +59,9 @@ placeholders.
    for any reason (missing CLI, auth issues, etc.), that's fine — construct the GitHub
    compare URL instead: `https://github.com/<owner>/<repo>/compare/main...<branch>`.
    The user can open the PR from there.
-5. **Record the result** by calling the **softlight** MCP tool `generate_pr` with:
+5. **Record the result** by calling the **softlight** MCP tool `create_pull_request` with:
    - `project_id` — the Softlight project ID from the input
-   - `pr_url` — the PR URL if you created one, or the compare URL as a fallback
+   - `github_url` — the PR URL if you created one, or the compare URL as a fallback
    - `slot_id` — the slot ID from the input
 
    This posts the URL back to the Softlight canvas so the user can see it.

@@ -10,7 +10,7 @@ Produce a structured analysis of a web application so downstream agents can writ
 and start the application without re-reading source code. Run once per application — cached in
 memory.
 
-## Step 0: Find the app root and check memory
+## Step 0: Find the application root and check memory
 
 The **application root** is the directory that contains the application's entry point. To find it,
 begin at the repository root. If the repository root has a `package.json` file with a `dev` /
@@ -21,14 +21,14 @@ begin at the repository root. If the repository root has a `package.json` file w
 Once you have determined the application root, check memory. Memory mirrors the applications's 
 location relative to the working directory:
 
-| App root | Memory path |
-|----------|-------------|
-| `./` | `analysis.md` |
-| `./frontend` | `frontend/analysis.md` |
-| `./apps/web` | `apps/web/analysis.md` |
+| Application root | Memory path            |
+|------------------|------------------------|
+| `./`             | `analysis.md`          |
+| `./frontend`     | `frontend/analysis.md` |
+| `./apps/web`     | `apps/web/analysis.md` |
 
-If a cached analysis exists and the application has not changed substantially, return it. Otherwise 
-continue.
+If a cached analysis exists and the user has not specifically asked you to analyze the code again,
+return it. Otherwise continue.
 
 ## Step 1: Read source
 
