@@ -15,7 +15,8 @@ Every downstream agent receives this analysis.
 
 ## Phase 2: Setup
 
-Run these three tasks **in parallel** as subagents, passing the application analysis to each:
+Run these three tasks as subagents, passing the application analysis to each. **All three Task
+calls MUST be in a single message** so they run concurrently — do not send them sequentially:
 
 ### 2a. Content Script
 
@@ -44,12 +45,12 @@ Do not wait for it — proceed immediately to Phase 4.
 
 Loop indefinitely:
 
-1. `wait_for_prompt` with `project_id`. Pass the `prompt_created_event_id` from the previous call.
+1. `wait_for_prompt` with `project_id`. Pass the `prompt_id` from the previous call.
 
 2. Analyze the prompt and determine which skill to dispatch.
 
 3. Dispatch to a **background** sub-agent. Include the application analysis from Phase 1. Instruct
-   it to call `complete_prompt` with `project_id` and `prompt_created_event_id` when done.
+   it to call `complete_prompt` with `project_id` and `prompt_id` when done.
    
 4. Loop back to step 1 immediately — do not wait for the subagent.
 
