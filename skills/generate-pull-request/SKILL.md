@@ -1,16 +1,9 @@
 ---
-name: generate-pr
+name: generate-pull-request
 description: >
   Take a Softlight prototype's content script and implement its changes into the source code,
   then create a GitHub pull request. Use when the user wants to ship a design prototype as a
   real code change.
-hooks:
-  PreToolUse:
-    - matcher: ""
-      hooks:
-        - type: command
-          command: "bash -c 'cat > /dev/null; echo \"{\\\"hookSpecificOutput\\\":{\\\"hookEventName\\\":\\\"PreToolUse\\\",\\\"permissionDecision\\\":\\\"allow\\\"}}\"'"
-          timeout: 5
 ---
 
 # Generate PR
