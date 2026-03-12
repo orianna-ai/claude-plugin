@@ -12,30 +12,13 @@ clarifying questions for any reason.
 
 ## Phase 1: Setup
 
-<<<<<<< Updated upstream
-If the user hasn't described the challenge, ask first, then do the following:
-
-Run these three tasks as subagents. **All three Task calls MUST be in a single message** so they
-run concurrently — do not send them sequentially:
-
-### 1a. Content Script
-
-Run `generate-content-script` to get the app into the right state for screenshotting. Pass it the
-user's design problem so it can figure out which screen and state to show.
-
-### 1b. Application and Tunnel
-
-Run `start-application` to serve the app on a free port, then `start-tunnel` to expose it. Pass it the application that it should start that has the design challenge.
-
-### 1c. Problem Statement
-
-Run `generate-problem-statement`.
-=======
 Use the agent tool to run the setup tasks as **background** subagents **in parallel**.
 
 ### 1a. Content Script
 
-Run the `generate-content-script` skill in a **background** subagent.
+Run the `generate-content-script` skill in a **background** subagent to get the app into the right
+state for screenshotting. Pass it the user's design problem so it can figure out which screen and
+state to show.
 
 ### 1b. Application and Tunnel
 
@@ -48,43 +31,23 @@ Run the `generate-problem-statement` skill in a **background** subagent.
 Share the problem statement with the user when it is ready.
 
 ## Phase 2: Project Creation
->>>>>>> Stashed changes
 
 Call the `create_project` tool with the problem statement, content script, and tunnel URL from
 Phase 1. Share the `project_url` with the user (e.g., `[View in Softlight →](<project_url>)`) and
 remember the `project_id` for future interactions.
 
-<<<<<<< Updated upstream
-## Phase 2: Project Creation
-
-Call `create_project` with the problem statement, content script, and tunnel URL from Phase 1.
-
-Share the project URL: `[View in Softlight →](<project_url>)`.
-
-Dispatch `generate_mock_revision` in a **background** sub-agent to create the initial revision.
-Do not wait for it — proceed immediately to Phase 3.
-
-=======
 Call the `generate_mock_revision` tool in a **background** subagent and immediately proceed to
 Phase 3.
 
->>>>>>> Stashed changes
 ## Phase 3: Prompt Handling
 
 Loop indefinitely:
 
 1. Call the `wait_for_prompt` tool with `project_id`. Pass the `prompt_id` from the previous call.
 
-<<<<<<< Updated upstream
-2. Analyze the prompt and determine which skill to dispatch.
-
-3. Dispatch to a **background** sub-agent. Instruct it to call `complete_prompt` with
-   `project_id` and `prompt_id` when done.
-=======
 2. Analyze the prompt, determine which skill to dispatch, dispatch the skill in a **background**
    subagent. You must instruct the subagent to call the `complete_prompt` tool with the `project_id`
    and `prompt_id` when it is done handling the prompt.
->>>>>>> Stashed changes
    
 3. Loop back to step 1 immediately — do not wait for the subagent.
 
