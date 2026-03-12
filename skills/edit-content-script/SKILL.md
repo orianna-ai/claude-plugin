@@ -14,7 +14,7 @@ A content script is a self-contained JavaScript IIFE that gets injected into a r
 It mutates the DOM, injects CSS, and patches behavior to prototype a design idea without
 touching the source or rebuilding.
 
-## Understanding your inputs
+## Understanding your plan inputs
 
 You will receive a **plan item** with everything you need. The plan item contains:
 
@@ -24,13 +24,12 @@ You will receive a **plan item** with everything you need. The plan item contain
   Edit for targeted changes. If null, there is no existing prototype — create a new content
   script from scratch.
 - **`title`**: Title of the prototype.
-- **`slot_id`**: Slot ID of the existing prototype being revised (if any).
-- **`feedback`**: Array of user feedback comments, each with:
+- **`feedback`**: Array of user feedback comments that this protoype change addresses, each with:
   - `comment_text`: The user's feedback text.
   - `screenshot_url`: Screenshot with blue dot showing where the user clicked.
   - `image_urls`: Images the user attached (inspiration, desired outcomes).
   - `anchor_selectors`, `anchor_html`, `anchor_location`: DOM context where the comment was placed.
-- **`reference_image_urls`**: URLs of mocks/designs on the canvas relevant to this change.
+- **`reference_image_urls`**: URLs of mocks/designs on the canvas relevant to this change, that the change description might reference.
 
 ### How the plan item was resolved
 
@@ -63,12 +62,9 @@ You will receive several types of images. Download and view ALL of them before w
 
 3. **Reference mocks** (`reference_image_urls`) — design mocks from the canvas that the planner
    determined are relevant to this change. These are contextual references, not always targets to
-   match exactly. Depending on the feedback, a reference mock might be:
-   - A design the user wants the prototype to **look like** ("make it match this mock")
-   - A baseline the user is **giving feedback on** ("this is what we started from, here's what to change")
-   - Visual context for understanding the user's intent ("the nav in this mock shows what they mean")
+   match exactly.
 
-   The comments determine how to use the reference — read them together.
+   The comments and change_description determine how to use the reference — read them together.
 
 ### DOM context
 
@@ -78,7 +74,7 @@ they sometimes point to a sibling element, a wrapper div, or are overly nested. 
 
 ## Workflow
 
-### Step 0: Download and study the reference images
+### Step 0: Download and study the reference images and fully understand the proposed design change
 
 You will receive URLs for reference screenshots and/or design direction mocks. **Download
 each image and view it before doing anything else.** The URLs are text strings in your
@@ -94,15 +90,7 @@ Then use the **Read** tool on the downloaded file (e.g. `Read /tmp/ref_1.png`). 
 tool displays images visually so you can inspect them. Do this for every image URL — do not
 skip any.
 
-Study them carefully before writing any code. These images are your ground truth for:
-- **Layout**: how elements are arranged, spacing, alignment, visual hierarchy
-- **Visual style**: color palette, typography, backgrounds, light vs dark theme
-- **Content**: what kind of data is shown and how it's formatted
-- **Components**: which UI patterns are used (tables, cards, charts, nav bars, etc.)
-
-Your content script must produce output that **visually resembles these screenshots** with the
-design idea applied on top. Match the overall look and feel — theme, palette, density, and
-component style. Generic placeholder UI that ignores the reference images is not acceptable.
+After, use these images to fully understand the change description and what changes the user wants to make.
 
 ### Step 1: Determine your mode and read relevant code
 
@@ -169,37 +157,26 @@ Write a new JavaScript file to the output path you chose in Step 1. Follow this 
 #### Mode B: Iterate on existing content script (`content_script` is set)
 
 Apply the requested changes to the existing script and write the result to a new file at
-`/tmp/content_script_<slot_id>.js`. Change only what the feedback asks for. Preserve everything
-else — working code, mock data, structure, unaffected mutations.
+`/tmp/content_script_<slot_id>.js` (use the `slot_id` from the `<slot_id>` tag in your prompt).
 
 FOR BOTH MODES, FOLLOW THESE GUIDELINES:
 
 **Setting up initial conditions:**
 
-The `setup()` function runs before any mutations. It should always be included.
+**Think backward from what the updated prototype needs to show.** What conditions must be true
+for the target view to render correctly with the design change applied? Each condition is
+something `setup()` must satisfy — navigation to the right route, mock data for the right
+endpoints, the right app state.
 
-**Navigate to the right page — this is critical.** The design idea targets a specific page or
-view. The `setup()` function must navigate there before anything else runs. For SPAs, call
-`history.pushState(null, "", "/target/route")` and dispatch a `popstate` event so the
-client-side router picks it up. For multi-page apps, set `window.location.href`. If the app
-is already on the right page, skip this step.
+If you're editing an existing content script, re-evaluate its `setup()` given the new design
+change. Does it still navigate to the right page? Does it mock the right data? Does the change
+require new or different mock data, a different route, or different app state? Update `setup()`
+if needed, preserve it if it's already correct.
 
-**Mock API data when needed — this is critical.** The app may or may not have a working backend. If pages load
-blank or error out, intercept `fetch` to return realistic mock data for the failing endpoints.
-Read the source to find which API endpoints are used and what shape the responses should be.
-Store the original `fetch` and call through for requests you don't need to mock.
-
-**Mock data must match the reference images.** Study the screenshots to understand what kind of
-data the app displays and how it's structured. Your mock data should feel like it belongs in the
-same app — same types of fields, realistic values, and appropriate volume. Generic "Lorem ipsum"
-or "Item 1, Item 2" placeholders are wrong.
-
-Other techniques:
-
-- **Seed localStorage / sessionStorage.** Set values the app reads on mount — feature flags,
-  user preferences, onboarding state.
-- **Programmatic interaction.** Click buttons, fill inputs, or toggle switches to drive the app
-  into the desired state. Use `waitForSelector` to wait for elements to mount first.
+Mock data MUST match the shapes and types the app expects (plausible values, appropriate volume,
+correct types — no "Lorem ipsum" or "Item 1"). Additionally, add mock data to put the app in a
+state that is logical to show off the design change. If you are mocking images, please use
+placeholder images that will resolve and make sense.
 
 **Rules:**
 
@@ -216,7 +193,15 @@ Other techniques:
   app has a dark theme, your injected CSS must use dark backgrounds. If it uses specific accent
   colors, reuse them.
 
-### Step 3: Return
+### Step 3: Place on canvas
 
-Return the **file path** of the content script you wrote or edited. The caller reads the file
-and handles placement.
+Call the **softlight** MCP tool `update_iframe_slot` with:
+
+- `project_id` — from the `<project_id>` tag in your prompt
+- `slot_id` — from the `<slot_id>` tag in your prompt
+- `title` — the plan item's `title`
+- `content_script` — the full content of the script you wrote or edited
+
+### Step 4: Return
+
+Return the **file path** of the content script and confirm the slot was updated.
