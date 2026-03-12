@@ -18,6 +18,7 @@ the app showing the most relevant screen and state of the app for that problem �
 realistic data — so it can be screenshotted.
 
 ## Step 1: Quick orientation
+Determine the app that the user is making the design change for so the set up script targets the correct app.
 
 Quickly understand the app by reading at most a small handful of files — start with README,
 package.json, or the main entry point. If the user is redesigning a specific page or feature,
@@ -63,40 +64,21 @@ Structure:
 
 ### setup()
 
-The screenshot tool navigates to `/` and captures what renders — no clicks, no inputs, no query
-params. The content script must make the target screen render unconditionally at `/`, fully
-populated with realistic data.
+The screenshot tool loads `/` and captures what renders — no clicks, no inputs. Your content
+script must make the target screen and state appear at `/`, fully populated with realistic data.
 
-Routing to the right page is only half the job. The page also needs to be in the right **state**.
-Most components conditionally render based on app state — auth status, loaded data, completed
-flow steps, selected tabs, expanded panels. If any of these conditions aren't met, the component
-will show a loading spinner, empty state, or redirect instead of the actual content.
+**Think backward from the target view.** What is required before the target screen and state show the content you want? Each condition is something your content script must satisfy — pick the right technique for each one.
 
-**1. Intercept fetch and return mock data.**
-This is the most important step. Intercept `fetch` (or `XMLHttpRequest`) before any app code
-runs. Return realistic mock data for every endpoint the target page calls. Store the original
-`fetch` and call through for requests you don't need to mock. Your mock data must match the
-shape the app expects — wrong field names, wrong types, or missing fields will cause the
-component to crash or render blank. Use plausible values and appropriate volume (real-looking
-names, enough items to fill the screen). No "Lorem ipsum" or "Item 1, Item 2".
+You'll typically need two things working together: (1) mock every fetch/API call so data is available instantly with no real backend needed, and (2) get the app into the right state to trigger the view you want (navigate to the right route, use the app's own URL params/deep links, or programmatically interact).
 
-**2. Bypass auth.**
-Mock the auth endpoint, seed a token/session in localStorage, or set whatever state the app's
-auth guard checks. If the app wraps routes in an auth provider, make sure the provider resolves
-to an authenticated state.
+Mock data MUST match the shapes and types the app expects (plausible values, appropriate volume, correct types — no "Lorem ipsum" or "Item 1"). Additionally, add mock data to put the app in a state that is logical to show off the design problem. If you are mocking images, please use placeholder images that will resolve and make sense.
 
-**3. Satisfy every rendering condition.**
-If the component gates on selected tab, completed onboarding, feature flag, loaded state,
-expanded panel, or similar — seed the right value. Techniques:
-- Seed localStorage/sessionStorage (feature flags, preferences, onboarding state)
-- Intercept the specific fetch call that loads the gating data
-- Programmatic clicks/inputs via `waitForSelector` (e.g., clicking a tab)
+The content script must run unconditionally — don't add your own conditionals or feature flags
+that would skip setup.
 
-**4. Route to the target screen.**
-SPAs: `history.pushState(null, "", "/target/route")` + dispatch `popstate` so the client-side
-router picks it up. MPAs: `window.location.href`.
-
-Do NOT gate setup behind URL params, feature flags, or conditionals.
+**If the screenshot shows a landing page, empty state, or login screen instead of the target
+view with real data, the content script has failed.** The whole point is to show the design
+problem in context. Ensure all the coniditons to show the design problem are met.
 
 ### Rules
 
