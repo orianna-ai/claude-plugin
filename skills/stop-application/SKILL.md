@@ -1,8 +1,8 @@
 ---
 name: stop-application
-description: >-
-  Find and kill a running application server started by start-application. Identifies the process,
-  sends a graceful kill, verifies shutdown, and reports which port was freed.
+description: Find and kill a running application server started by start-application. Identifies the process, sends a graceful kill, verifies shutdown, and reports which port was freed.
+allowed-tools: Bash
+model: haiku
 ---
 
 # Stop Application

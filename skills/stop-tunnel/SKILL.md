@@ -1,6 +1,8 @@
 ---
 name: stop-tunnel
 description: Kill the frpc process for a Softlight tunnel started by start-tunnel. Cleans up the config file and verifies the process is gone.
+allowed-tools: Bash
+model: haiku
 ---
 
 # Stop Tunnel
