@@ -86,6 +86,7 @@ problem in context. Ensure all the coniditons to show the design problem are met
 - `waitForSelector` with timeout — never hang
 - Log warnings on failure — never throw or break the host app
 
-## Step 3: Return
+## Step 3: Upload and return
 
-Return the content script as a string.
+Write the content script to a temp file (e.g. `/tmp/content_script.js`), then use the
+`upload-file` skill to upload it to Drive. Return the URL as plain text.

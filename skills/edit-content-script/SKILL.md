@@ -19,9 +19,10 @@ touching the source or rebuilding.
 You will receive a **plan item** with everything you need. The plan item contains:
 
 - **`change_description`**: What to build or change.
-- **`content_script`**: The full source code of the existing content script as inline text.
-  **This is the key field that determines your mode.** If set, write it to a temp file and use
-  Edit for targeted changes. If null, there is no existing prototype — create a new content
+- **`content_script`**: An attachment object (`{name, url}`) pointing to the existing content
+  script file hosted on Drive. **This is the key field that determines your mode.** If set,
+  download the script from the URL (`curl -sL '<url>' -o /tmp/content_script_<slot_id>.js`) and
+  use Edit for targeted changes. If null, there is no existing prototype — create a new content
   script from scratch.
 - **`title`**: Title of the prototype.
 - **`feedback`**: Array of user feedback comments that this protoype change addresses, each with:
@@ -36,8 +37,8 @@ You will receive a **plan item** with everything you need. The plan item contain
 The planner (Gemini) analyzed the full canvas and identified which prototype to revise and which
 feedback to address. The MCP resolved everything into the plan item you receive:
 
-- If there is a **source prototype** being revised, its content script is provided inline in the
-  `content_script` field. Write it to a temp file and Edit it directly.
+- If there is a **source prototype** being revised, its content script is provided as an
+  attachment in the `content_script` field. Download it from the URL and Edit it directly.
 - **Reference images** are mocks or designs from the canvas that the planner determined are
   relevant. They are NOT the source prototype — they are visual context.
 - **Feedback** is the user's comments, already resolved with screenshots, attached images, and
@@ -96,10 +97,11 @@ After, use these images to fully understand the change description and what chan
 
 Check the plan item's `content_script` field first — this determines everything:
 
-- **`content_script` is set** → you are **editing** an existing prototype.
+- **`content_script` is set** (an `{name, url}` attachment) → you are **editing** an existing
+  prototype. Download it: `curl -sL '<url>' -o /tmp/content_script_<slot_id>.js`
 - **`content_script` is null** → you are creating a **new** prototype from scratch.
 
-Then read the existing content script (if any) and application source code relevant to the change and plan your approach. Figure out:
+Then read the existing content script (if downloaded) and application source code relevant to the change and plan your approach. Figure out:
 - Which selectors to target (CSS class names, data attributes, component hierarchy)
 - Which design tokens to reuse (colors, spacing, fonts) so the result looks integrated
 - Which API endpoints the page calls and what shape mock data should take
@@ -156,8 +158,9 @@ Write a new JavaScript file to the output path you chose in Step 1. Follow this 
 
 #### Mode B: Iterate on existing content script (`content_script` is set)
 
-Apply the requested changes to the existing script and write the result to a new file at
-`/tmp/content_script_<slot_id>.js` (use the `slot_id` from the `<slot_id>` tag in your prompt).
+The content script was downloaded from the attachment URL in Step 1. Apply the requested changes
+to the downloaded file at `/tmp/content_script_<slot_id>.js`. Change only what the feedback asks
+for. Preserve everything else — working code, mock data, structure, unaffected mutations.
 
 FOR BOTH MODES, FOLLOW THESE GUIDELINES:
 
