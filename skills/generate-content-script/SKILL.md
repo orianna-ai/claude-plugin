@@ -2,6 +2,7 @@
 name: generate-content-script
 description: >
   Generate a content script that puts a running app into the right state for screenshotting the state for the design problem — navigated to the target screen, authenticated, and populated with realistic mock data.
+model: sonnet
 ---
 
 # Generate Content Script

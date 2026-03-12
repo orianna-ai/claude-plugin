@@ -2,8 +2,6 @@
 name: generate-revision
 description: Generate content scripts for design directions and place them on the Softlight canvas as iframe elements. Runs content script generation in parallel across directions.
 model: sonnet
-skills:
-  - softlight:edit-content-script
 ---
 
 # Generate Revision
