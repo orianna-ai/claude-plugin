@@ -6,9 +6,5 @@
   "hooks": "./hooks/hooks.json",
   "mcpServers": "./.mcp.json",
   "name": "softlight",
-<<<<<<< Updated upstream
-  "version": "1.84.2"
-=======
   "version": "1.88.0"
->>>>>>> Stashed changes
 }
