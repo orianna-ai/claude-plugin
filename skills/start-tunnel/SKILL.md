@@ -8,7 +8,7 @@ model: haiku
 
 Create a tunnel to expose a local port. Follow these steps exactly in order.
 
-## Step 1 — Verify port
+## Step 1: Verify port
 
 Run this command, replacing `$PORT` with the port number:
 
@@ -18,13 +18,13 @@ curl -s -o /dev/null -w '%{http_code}' --max-time 5 http://localhost:$PORT
 
 If the status code is NOT between 200–399, STOP. Tell the user the port is not responding.
 
-## Step 2 — Get platform
+## Step 2: Get platform
 
 ```bash
 uname -sm
 ```
 
-## Step 3 — Create tunnel
+## Step 3: Create tunnel
 
 Call the `mcp__plugin_softlight_softlight__create_tunnel` tool with:
 - `port`: the port number (integer)
@@ -37,11 +37,11 @@ The response contains these fields — save all of them:
 - `tunnel_binary_url` — download URL for frpc
 - `tunnel_binary_name` — name of the extracted directory
 
-## Step 4 — Write config file
+## Step 4: Write config file
 
 Write `$tunnel_config` to `/tmp/frpc-$tunnel_id.toml`.
 
-## Step 5 — Download frpc (if needed)
+## Step 5: Download frpc (if needed)
 
 Only download if `/tmp/$tunnel_binary_name/frpc` does not exist:
 
@@ -49,7 +49,7 @@ Only download if `/tmp/$tunnel_binary_name/frpc` does not exist:
 curl -sL $tunnel_binary_url | tar xz -C /tmp/
 ```
 
-## Step 6 — Start frpc
+## Step 6: Start frpc
 
 ```bash
 /tmp/$tunnel_binary_name/frpc -c /tmp/frpc-$tunnel_id.toml &
@@ -57,7 +57,7 @@ frpc_pid=$!
 echo "$frpc_pid"
 ```
 
-## Step 7 — Verify tunnel
+## Step 7: Verify tunnel
 
 ```bash
 sleep 0.5

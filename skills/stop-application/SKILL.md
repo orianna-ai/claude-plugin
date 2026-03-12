@@ -7,9 +7,7 @@ model: haiku
 
 # Stop Application
 
-## Workflow
-
-### 1. Identify the process
+## Step 1: Identify the process
 
 If you have the **PID** from `start-application`, use that directly. Otherwise, find the process
 by looking for servers listening on the expected port:
@@ -18,15 +16,15 @@ by looking for servers listening on the expected port:
 ss -tlnp | grep <port>
 ```
 
-### 2. Stop the process
+## Step 2: Stop the process
 
 Kill the process: `kill <PID>`. If it doesn't exit within a few seconds, escalate to `kill -9`.
 
-### 3. Verify shutdown
+## Step 3: Verify shutdown
 
 Confirm the process is gone: `kill -0 <PID>` should fail.
 
-### 4. Report
+## Output
 
 Tell the user which application was stopped and which port was freed.
 
