@@ -67,7 +67,7 @@ Structure:
 The screenshot tool loads `/` and captures what renders — no clicks, no inputs. Your content
 script must make the target screen and state appear at `/`, fully populated with realistic data.
 
-**Think backward from the target view.** What is required before the target screen and state show the content you want? Each condition is something your content script must satisfy — pick the right technique for each one.
+**Think backwards from the target view. What are the full chain of conditions that must be true for the target screen and state to render?** What is required before the target screen and state show the content you want? Each condition is something your content script must satisfy — pick the right technique for each one. Be exhaustive.
 
 You'll typically need two things working together: (1) mock every fetch/API call so data is available instantly with no real backend needed, and (2) get the app into the right state to trigger the view you want (navigate to the right route, use the app's own URL params/deep links, or programmatically interact).
 
@@ -77,8 +77,7 @@ The content script must run unconditionally — don't add your own conditionals 
 that would skip setup.
 
 **If the screenshot shows a landing page, empty state, or login screen instead of the target
-view with real data, the content script has failed.** The whole point is to show the design
-problem in context. Ensure all the coniditons to show the design problem are met.
+screen and state with real data, the content script has failed.** The whole point is to show the designsign problem in context. Ensure all the coniditons to show the design problem are met.
 
 ### Rules
 
