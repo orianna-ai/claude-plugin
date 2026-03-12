@@ -1,7 +1,7 @@
 ---
 name: start-tunnel
 description: Create an frpc tunnel to expose a local port through a Softlight tunnel URL. Requires a port with an application already listening. Returns the tunnel URL and frpc PID.
-model: haiku
+model: sonnet
 ---
 
 # Start Tunnel

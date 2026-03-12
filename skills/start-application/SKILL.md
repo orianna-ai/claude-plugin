@@ -2,7 +2,7 @@
 name: start-application
 description: "Find and run a web app's dev server on a free port. Returns the port, PID, and start command."
 allowed-tools: Bash, Read, Glob, Grep
-model: haiku
+model: sonnet
 ---
 
 # Start Application
@@ -11,9 +11,10 @@ Start a web application on a free port. Never write your own scripts or scaffold
 
 ## Step 1: Find the start command
 
-Find the application's existing dev server command from its build/config files (e.g. `package.json`,
-`Makefile`, `BUILD.bazel`, `pyproject.toml`, etc.). Use the first one you find — do not keep
-searching after you have a working command.
+Find the command used to run the dev server for the application. Use the Glob and Grep tools to find
+it. You are looking for the command a developer would use to run the application locally. It's often
+mentioned in build files (`package.json`, `Makefile`, `BUILD.bazel`, `pyproject.toml`, etc.) or in
+documentation.
 
 ## Step 2: Find a free port
 
