@@ -7,26 +7,28 @@ description: >-
 
 # Start Application
 
-Start a web application on a free port using the build & start info from `code-analysis`.
+Start a web application on a free port using the build.
 
 **Core principle: use the application's own start command.** Never write your own server scripts,
 build scripts, or scaffolding. Never bypass the start command by running underlying binaries
 directly — it often handles invisible setup.
 
-You will receive an **application analysis** that includes the install command, start command,
-and how the app accepts a port. Use these directly.
+You will receive the application that you are to start.
 
 ## Steps
 
-### 1. Find a free port
+### 1. Figure out the run command
+Figure out the command to start the application. This is what developers run to start the app. Never write your own server scripts, build scripts, or scaffolding. Never bypass the start command by running underlying binaries directly — it often handles invisible setup.
+
+### 2. Find a free port
 
 You MUST find a free port to run the application. Always check available ports and find a free port.
 
 Check which ports are in use with `ss -tlnp`.
 
-Start at 8080 and increment until you find a free one.
+Start at 50000 and increment until you find a free one.
 
-### 2. Install dependencies
+### 3. Install dependencies
 
 Run the install command from the analysis (e.g. `npm install`, `pip install -e .`). Skip if
 already done (e.g. `node_modules` exists and lock file is unchanged).
