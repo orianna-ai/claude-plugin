@@ -195,7 +195,7 @@ placeholder images that will resolve and make sense.
 
 ### Step 3: Place on canvas
 
-Call the **softlight** MCP tool `update_iframe_slot` with:
+Call the **softlight** MCP tool `update_iframe_element` with:
 
 - `project_id` — from the `<project_id>` tag in your prompt
 - `slot_id` — from the `<slot_id>` tag in your prompt
