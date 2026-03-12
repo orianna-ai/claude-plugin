@@ -1,73 +1,81 @@
 ---
 name: start-tunnel
 description: Create an frpc tunnel to expose a local port through a Softlight tunnel URL. Requires a port with an application already listening. Returns the tunnel URL and frpc PID.
+model: haiku
 ---
 
 # Start Tunnel
 
-## Input
+Create a tunnel to expose a local port. Follow these steps exactly in order.
 
-A local port `<port>` where an application is already listening.
+## Step 1: Verify port
 
-## Steps
-
-### 1. Verify the port is accessible
+Run this command, replacing `$PORT` with the port number:
 
 ```bash
-curl -s -o /dev/null -w '%{http_code}' --max-time 5 http://localhost:<port>
+curl -s -o /dev/null -w '%{http_code}' --max-time 5 http://localhost:$PORT
 ```
 
-If not 2xx/3xx, fix the application first — do not proceed.
+If the status code is NOT between 200–399, STOP. Tell the user the port is not responding.
 
-### 2. Create the tunnel
-
-**First**, run `uname -sm` in the shell and capture the output (e.g. `Linux aarch64`, `Darwin arm64`).
-Do NOT guess or hardcode the value — you must run the command.
-
-**Then**, call the `create_tunnel` tool with `port` = `<port>` and `platform` = the exact output 
-from the command above.
-
-### 3. Write the config
-
-Write `tunnel_config` from the tool response to `/tmp/frpc-<tunnel_id>.toml`.
-
-### 4. Download frpc (if needed)
-
-Skip if `/tmp/<tunnel_binary_name>/frpc` already exists. Otherwise:
+## Step 2: Get platform
 
 ```bash
-curl -sL <tunnel_binary_url> | tar xz -C /tmp/
+uname -sm
 ```
 
-### 5. Start frpc
+## Step 3: Create tunnel
+
+Call the `mcp__plugin_softlight_softlight__create_tunnel` tool with:
+- `port`: the port number (integer)
+- `platform`: the output from `uname -sm`
+
+The response contains these fields — save all of them:
+- `tunnel_url` — the public URL
+- `tunnel_id` — unique ID
+- `tunnel_config` — full frpc config text
+- `tunnel_binary_url` — download URL for frpc
+- `tunnel_binary_name` — name of the extracted directory
+
+## Step 4: Write config file
+
+Write `$tunnel_config` to `/tmp/frpc-$tunnel_id.toml`.
+
+## Step 5: Download frpc (if needed)
+
+Only download if `/tmp/$tunnel_binary_name/frpc` does not exist:
 
 ```bash
-/tmp/<tunnel_binary_name>/frpc -c /tmp/frpc-<tunnel_id>.toml &
+curl -sL $tunnel_binary_url | tar xz -C /tmp/
 ```
 
-Note the **PID**.
+## Step 6: Start frpc
 
-### 6. Verify the tunnel is up
+```bash
+/tmp/$tunnel_binary_name/frpc -c /tmp/frpc-$tunnel_id.toml &
+frpc_pid=$!
+echo "$frpc_pid"
+```
+
+## Step 7: Verify tunnel
 
 ```bash
 sleep 0.5
-
 for i in 1 2 3 4 5; do
-  CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "<tunnel_url>/")
+  CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$tunnel_url/")
   echo "Attempt $i: HTTP $CODE"
-
   if [ "$CODE" -ge 200 ] && [ "$CODE" -lt 400 ]; then
     echo "Tunnel is up"
     break
   fi
-
   sleep 0.5
 done
 ```
 
 If all 5 attempts fail, check frpc logs for errors.
 
-## Return
+## Output
 
-- `tunnel_url` from step 2
-- frpc **PID** from step 5
+Return exactly two values:
+1. **Tunnel URL**: `$tunnel_url`
+2. **FRPC PID**: `$frpc_pid`
