@@ -48,7 +48,7 @@ Loop indefinitely:
 
 1. Call the `wait_for_prompt` tool with `project_id`. Pass the `prompt_id` from the previous call.
 
-2. Analyze the prompt, determine which skill to dispatch, dispatch the skill in a **background**
+2. Analyze the prompt, determine which skill to dispatch, and dispatch the skill in a **background**
    subagent. You must instruct the subagent to call the `complete_prompt` tool with the `project_id`
    and `prompt_id` when it is done handling the prompt.
    
