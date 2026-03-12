@@ -7,8 +7,7 @@ model: haiku
 # Softlight
 
 Orchestrate a Softlight design session. Delegate all design work to skills running as background
-subagents — never do it inline. You MUST run through all phases. Do not stop or ask the user
-clarifying questions for any reason.
+subagents — never do it inline. You MUST run through all phases and phases must complete before going to the next one. Do not stop or ask the user clarifying questions for any reason.
 
 ## Phase 1: Setup
 
@@ -22,7 +21,11 @@ state to show.
 
 ### 1b. Application and Tunnel
 
-Run the `start-application` skill and then the `start-tunnel` skill in a **background** subagent.
+Run `start-application` and then `start-tunnel` sequentially in the same **background** subagent. 
+
+Run the `start-application` skill first. Pass it the design problem and application that it should start that has the design problem. The start application skill must finish before calling the `start-tunnel` skill.
+
+Then run the `start-tunnel` skill.
 
 ### 1c. Problem Statement
 
