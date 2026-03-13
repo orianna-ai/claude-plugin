@@ -1,7 +1,7 @@
 ---
-name: softlight
+name: make-designs
 description: Setup a Softlight project and then continuously listen for created prompts and dispatch them to background subagents for completion.
-model: haiku
+model: sonnet
 ---
 
 # Softlight
@@ -16,14 +16,13 @@ Use the agent tool to run the setup tasks as **background** subagents **in paral
 ### 1a. Content Script
 
 Run the `generate-content-script` skill in a **background** subagent to get the app into the right
-state for screenshotting. Pass it the user's design problem so it can figure out which screen and
-state to show.
+state for screenshotting. Pass it the user's input so it knows what the design problem is.
 
 ### 1b. Application and Tunnel
 
 Run `start-application` and then `start-tunnel` sequentially in the same **background** subagent. 
 
-Run the `start-application` skill first. Pass it the design problem and application that it should start that has the design problem. The start application skill must finish before calling the `start-tunnel` skill.
+Run the `start-application` skill first. Pass it what the user input so it can figure out which application to start. The start application skill must finish before calling the `start-tunnel` skill.
 
 Then run the `start-tunnel` skill.
 
@@ -32,6 +31,8 @@ Then run the `start-tunnel` skill.
 Run the `generate-problem-statement` skill in a **background** subagent.
 
 Share the problem statement with the user when it is ready.
+
+Phase 1a - 1c subagents must all complete before going to phase 2. 
 
 ## Phase 2: Project Creation
 
