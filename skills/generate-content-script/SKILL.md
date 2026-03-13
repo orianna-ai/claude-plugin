@@ -9,9 +9,10 @@ model: sonnet
 
 Generate the content script fast — the user wants to see the direction ASAP.
 
-A content script is a self-contained JavaScript IIFE injected into a running web app. It runs
-before the app's own code renders, intercepting fetch calls, seeding storage, and pushing routes
-so the app's own components render the target screen in the right state.
+A content script is a self-contained JavaScript IIFE injected into a running web app via
+`Page.addScriptToEvaluateOnNewDocument`. It executes **before any of the page's own JavaScript**,
+so fetch/WebSocket mocks and route changes must be set up synchronously during evaluation, not
+deferred to `DOMContentLoaded`.
 
 You will receive context about the **design problem** the user is exploring. Your goal is to get
 the app showing the most relevant screen and state of the app for that problem — populated with
@@ -39,18 +40,23 @@ Structure:
 (function contentScript() {
   "use strict";
 
+  // setup() MUST run immediately — this script executes before any page JS,
+  // so mocks and routing need to be in place synchronously.
   function setup() {
     // 1. Intercept fetch — mock API responses
-    // 2. Seed localStorage/sessionStorage — auth, feature flags, preferences
-    // 3. Navigate to the target route
+    // 2. Mock WebSocket / EventSource if the app uses them
+    // 3. Seed localStorage/sessionStorage — auth, feature flags, preferences
+    // 4. Navigate to the target route (use history.replaceState, not pushState)
   }
+
+  setup();
 
   function waitForSelector(selector, root, timeout) {
     // helper: resolve when a selector appears in the DOM
   }
 
+  // DOM mutations that need elements to exist go here.
   function boot() {
-    setup();
     // optional: waitForSelector-based interactions (click a tab, expand a panel)
   }
 
