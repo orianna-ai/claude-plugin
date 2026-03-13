@@ -1,28 +1,31 @@
 ---
 name: edit-content-script
 description: >
-  Generate a content script — a self-contained JavaScript file that can be injected into a running
+  Edit a content script — a self-contained JavaScript file that can be injected into a running
   application to prototype a design idea without rebuilding.
 model: sonnet
 ---
 
-# Generate Content Script
+# Edit Content Script
 
-Generate the content script fast — the user wants to see the direction ASAP.
+Edit the content script fast — the user wants to see the direction ASAP.
 
-A content script is a self-contained JavaScript IIFE that gets injected into a running web app.
-It mutates the DOM, injects CSS, and patches behavior to prototype a design idea without
-touching the source or rebuilding.
+A content script is a self-contained JavaScript IIFE that gets injected into a running web app
+via `contentDocument` after the iframe has fully loaded (the page's own JS has already run).
+It can mutate the DOM, inject CSS, and override `window.fetch` — but the app's initial fetches
+have already completed by injection time. Fetch mocks intercept **subsequent** fetches triggered
+when the content script navigates to a new route and the SPA re-renders.
+
+You will receive a plan for changes to the UX design of an application and an existing content
+script to edit. Your task is to apply the requested design changes to that content script.
 
 ## Understanding your plan inputs
 
 You will receive a **plan item** with everything you need. The plan item contains:
 
 - **`change_description`**: What to build or change.
-- **`content_script`**: The full source code of the existing content script as inline text.
-  **This is the key field that determines your mode.** If set, write it to a temp file and use
-  Edit for targeted changes. If null, there is no existing prototype — create a new content
-  script from scratch.
+- **`content_script`**: The existing content script hosted on Drive. Download it from the `url`
+  field (`curl -sL '<url>' -o /tmp/content_script_<slot_id>.js`) and use Edit for targeted changes.
 - **`title`**: Title of the prototype.
 - **`feedback`**: Array of user feedback comments that this protoype change addresses, each with:
   - `comment_text`: The user's feedback text.
@@ -36,8 +39,8 @@ You will receive a **plan item** with everything you need. The plan item contain
 The planner (Gemini) analyzed the full canvas and identified which prototype to revise and which
 feedback to address. The MCP resolved everything into the plan item you receive:
 
-- If there is a **source prototype** being revised, its content script is provided inline in the
-  `content_script` field. Write it to a temp file and Edit it directly.
+- The content script is provided as an attachment in the `content_script` field. Download it
+  from the URL field and Edit it directly.
 - **Reference images** are mocks or designs from the canvas that the planner determined are
   relevant. They are NOT the source prototype — they are visual context.
 - **Feedback** is the user's comments, already resolved with screenshots, attached images, and
@@ -92,14 +95,15 @@ skip any.
 
 After, use these images to fully understand the change description and what changes the user wants to make.
 
-### Step 1: Determine your mode and read relevant code
+### Step 1: Download the content script and read relevant code
 
-Check the plan item's `content_script` field first — this determines everything:
+Download the content script from the plan item's `content_script` URL field:
 
-- **`content_script` is set** → you are **editing** an existing prototype.
-- **`content_script` is null** → you are creating a **new** prototype from scratch.
+```
+curl -sL '<url>' -o /tmp/content_script_<slot_id>.js
+```
 
-Then read the existing content script (if any) and application source code relevant to the change and plan your approach. Figure out:
+Then read the downloaded content script and application source code relevant to the change and plan your approach. Figure out:
 - Which selectors to target (CSS class names, data attributes, component hierarchy)
 - Which design tokens to reuse (colors, spacing, fonts) so the result looks integrated
 - Which API endpoints the page calls and what shape mock data should take
@@ -108,70 +112,32 @@ Then read the existing content script (if any) and application source code relev
 Focus on the specific area the design idea targets — don't read the whole codebase. By the end
 of this step you should have a clear plan for what to modify in Step 2.
 
-### Step 2: Write or edit the content script
+### Step 2: Edit the content script
 
-#### Mode A: New content script (`content_script` is null)
+Apply the requested design changes to the downloaded file at `/tmp/content_script_<slot_id>.js`.
+Change only what the feedback asks for. Preserve everything else — working code, mock data,
+structure, unaffected mutations.
 
-Write a new JavaScript file to the output path you chose in Step 1. Follow this structure:
+Read the existing content script to understand how it's structured before making changes.
+Preserve the patterns it already uses — add new behavior in the same style, edit existing
+behavior in place.
 
-```javascript
-(function contentScript() {
-  "use strict";
+**How the content script runs:** The script is injected after the page loads, so the DOM is
+already rendered. It typically: (1) overrides `window.fetch` to mock API responses, (2) seeds
+storage and navigates to a route so the SPA re-renders with mocked data, and (3) waits for
+specific elements to appear then mutates the DOM. Keep this execution model in mind — mocks
+must be in place before triggering the re-render that will use them.
 
-  // -- constants (colors, selectors, SVG icons) --
+Note: the existing content script may have been originally written for a different runtime where
+it ran before the page's JS. Adapt any patterns that assume pre-page execution to work in this
+post-load context.
 
-  // -- setup: mock data, navigate, seed state --
-  function setup() { ... }
+FOLLOW THESE GUIDELINES:
 
-  // -- inject a <style> tag with all CSS --
-  var style = document.createElement("style");
-  style.textContent = "...";
-  document.head.appendChild(style);
-
-  // -- helper: wait for a selector to appear --
-  function waitForSelector(selector, root, timeout) { ... }
-
-  // -- mutation functions (one per change) --
-  async function injectFeatureA() { ... }
-  async function injectFeatureB() { ... }
-
-  // -- boot --
-  function boot() {
-    setup();
-    injectFeatureA().catch(function(e) {
-      console.warn("[content_script]", e.message);
-    });
-    injectFeatureB().catch(function(e) {
-      console.warn("[content_script]", e.message);
-    });
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
-  } else {
-    boot();
-  }
-})();
-```
-
-#### Mode B: Iterate on existing content script (`content_script` is set)
-
-Apply the requested changes to the existing script and write the result to a new file at
-`/tmp/content_script_<slot_id>.js` (use the `slot_id` from the `<slot_id>` tag in your prompt).
-
-FOR BOTH MODES, FOLLOW THESE GUIDELINES:
-
-**Setting up initial conditions:**
-
-**Think backward from what the updated prototype needs to show.** What conditions must be true
-for the target view to render correctly with the design change applied? Each condition is
-something `setup()` must satisfy — navigation to the right route, mock data for the right
-endpoints, the right app state.
-
-If you're editing an existing content script, re-evaluate its `setup()` given the new design
-change. Does it still navigate to the right page? Does it mock the right data? Does the change
-require new or different mock data, a different route, or different app state? Update `setup()`
-if needed, preserve it if it's already correct.
+**Think backward from what the updated prototype needs to show.** Re-evaluate the existing
+`setup()` given the new design change. Does it still navigate to the right page? Does it mock
+the right data? Does the change require new or different mock data, a different route, or
+different app state? Update `setup()` if needed, preserve it if it's already correct.
 
 Mock data MUST match the shapes and types the app expects (plausible values, appropriate volume,
 correct types — no "Lorem ipsum" or "Item 1"). Additionally, add mock data to put the app in a
@@ -185,23 +151,22 @@ placeholder images that will resolve and make sense.
   collisions with the app's own styles.
 - Use `MutationObserver` when targeting elements rendered dynamically (e.g. React components
   that mount after route changes).
-- Use `waitForSelector` with a timeout so the script doesn't hang if the structure changes.
-- Each distinct change should be its own function so it fails independently.
+- Always use timeouts when waiting for elements — never hang if the structure changes.
 - Log warnings to console on failure — never throw or break the host app.
 - Match the app's existing visual language (fonts, colors, spacing, border radii) so the
   prototype looks integrated. Use the reference screenshots as the source of truth — if the
   app has a dark theme, your injected CSS must use dark backgrounds. If it uses specific accent
   colors, reuse them.
 
-### Step 3: Place on canvas
+### Step 3: Upload and place on canvas
 
-Call the **softlight** MCP tool `update_iframe_element` with:
-
-- `project_id` — from the `<project_id>` tag in your prompt
-- `slot_id` — from the `<slot_id>` tag in your prompt
-- `title` — the plan item's `title`
-- `content_script` — the full content of the script you wrote or edited
+1. Use the `upload-file` skill to upload `/tmp/content_script_<slot_id>.js` to Drive.
+2. Call the **softlight** MCP tool `update_iframe_element` with:
+   - `project_id` — from the `<project_id>` tag in your prompt
+   - `slot_id` — from the `<slot_id>` tag in your prompt
+   - `title` — the plan item's `title`
+   - `content_script_url` — the Drive URL returned by the upload
 
 ### Step 4: Return
 
-Return the **file path** of the content script and confirm the slot was updated.
+Return the **Drive URL** of the uploaded content script and confirm the slot was updated.

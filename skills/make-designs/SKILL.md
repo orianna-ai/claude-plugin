@@ -16,13 +16,13 @@ Use the agent tool to run the setup tasks as **background** subagents **in paral
 ### 1a. Content Script
 
 Run the `generate-content-script` skill in a **background** subagent to get the app into the right
-state for screenshotting. Pass it the user's input so it knows what the design problem is.
+state for screenshotting. Pass it the user's input so it knows which app to target.
 
 ### 1b. Application and Tunnel
 
 Run `start-application` and then `start-tunnel` sequentially in the same **background** subagent. 
 
-Run the `start-application` skill first. Pass it what the user input so it can figure out which application to start. The start application skill must finish before calling the `start-tunnel` skill.
+Run the `start-application` skill first. Pass it what the user input so it can figure out which app to start. The start application skill must finish before calling the `start-tunnel` skill.
 
 Then run the `start-tunnel` skill.
 

@@ -15,8 +15,8 @@ so fetch/WebSocket mocks and route changes must be set up synchronously during e
 deferred to `DOMContentLoaded`.
 
 You will receive context about the **design problem** the user is exploring. Your goal is to get
-the app showing the most relevant screen and state of the app for that problem — populated with
-realistic data — so it can be screenshotted.
+the app showing the most relevant screen and state of the app for that problem, populated with
+realistic data, so it can be screenshotted.
 
 ## Step 1: Quick orientation
 Determine the app that the user is making the design change for so the set up script targets the correct app.
@@ -91,6 +91,7 @@ screen and state with real data, the content script has failed.** The whole poin
 - `waitForSelector` with timeout — never hang
 - Log warnings on failure — never throw or break the host app
 
-## Step 3: Return
+## Step 3: Upload and return
 
-Return the content script as a string.
+Write the content script to `/tmp/cs_1.js` (increment the number if the file already exists).
+Then use the `upload-file` skill to upload it to Drive. Return the URL as plain text.
