@@ -8,7 +8,9 @@ model: sonnet
 
 # Edit Content Script
 
-Edit the content script fast — the user wants to see the direction ASAP.
+The user left feedback on design directions in a canvas and wants to see those designs in their working app.
+
+Your job is to write a content script that applies the requested design and functionality changes. Either create a new content script or edit an existing one from a previous prototype iteration.
 
 A content script is a self-contained JavaScript IIFE that gets injected into a running web app
 via `contentDocument` after the iframe has fully loaded (the page's own JS has already run).
@@ -16,18 +18,16 @@ It can mutate the DOM, inject CSS, and override `window.fetch` — but the app's
 have already completed by injection time. Fetch mocks intercept **subsequent** fetches triggered
 when the content script navigates to a new route and the SPA re-renders.
 
-You will receive a plan for changes to the UX design of an application and an existing content
-script to edit. Your task is to apply the requested design changes to that content script.
-
 ## Understanding your plan inputs
 
 You will receive a **plan item** with everything you need. The plan item contains:
 
 - **`change_description`**: What to build or change.
-- **`content_script`**: The existing content script that is hosted. Download it from the `url`
-  field (`curl -sL '<url>' -o /tmp/content_script_<slot_id>.js`) and use Edit for targeted changes.
+- **`content_script`**: Attachment with a `url` field pointing to the existing content script
+  from a previous prototype iteration. **This is the key field that determines your mode.** If
+  set, download it and use Edit for targeted design changes to address the feedback. If null, there is no existing prototype — create a new content script from scratch.
 - **`title`**: Title of the prototype.
-- **`feedback`**: Array of user feedback comments that this protoype change addresses, each with:
+- **`feedback`**: Array of user feedback comments that this prototype change addresses, each with:
   - `comment_text`: The user's feedback text.
   - `screenshot_url`: Screenshot with blue dot showing where the user clicked.
   - `image_urls`: Images the user attached (inspiration, desired outcomes).
@@ -39,16 +39,15 @@ You will receive a **plan item** with everything you need. The plan item contain
 The planner (Gemini) analyzed the full canvas and identified which prototype to revise and which
 feedback to address. The MCP resolved everything into the plan item you receive:
 
-- The content script is provided as an attachment in the `content_script` field. Download it
-  from the URL field and Edit it directly.
+- If there is a **source prototype** being revised, its content script is provided as an
+  attachment in the `content_script` field. Download it from the URL and Edit it directly.
+- If `content_script` is **null**, this is a new prototype with no prior content script to
+  build on. Create one from scratch.
 - **Reference images** are mocks or designs from the canvas that the planner determined are
   relevant. They are NOT the source prototype — they are visual context.
-- **Feedback** is the user's comments, already resolved with screenshots, attached images, and
-  DOM anchors.
+- **Feedback** is the user's comments that are being addressed, already resolved with screenshots, attached images, and DOM anchors.
 
-You do not need to figure out which prototype to edit or which comments to address — that has
-already been decided. Just follow the `change_description` and use the feedback + images to
-understand what the user wants.
+Follow the `change_description` and use the feedback + images to understand what the design changes ask for.
 
 ### Image types
 
@@ -56,18 +55,16 @@ You will receive several types of images. Download and view ALL of them before w
 
 1. **Comment screenshots** (`screenshot_url`) — a screenshot of the canvas with a **blue dot**
    (white outline) marking where the user clicked to place their comment. This is the **primary
-   ground truth** for what the user is referring to. Use it to understand *what part of the UI*
-   the feedback targets.
+   ground truth** for what the user is referring to when they left important feedback. Pay attention to the blue dot for the placement of the comment, the screenshot itself may contain multiple mocks, but the blue dot can show you where the user left the comment and what mock or part of the design they specifically they were referring to.
 
 2. **User-attached images** (`image_urls`) — images the user attached to their comment. These are
-   typically inspiration screenshots, desired outcomes, or examples. Treat them as the user saying
-   "make it look like this."
+   typically inspiration screenshots, desired outcomes, or examples.
 
 3. **Reference mocks** (`reference_image_urls`) — design mocks from the canvas that the planner
    determined are relevant to this change. These are contextual references, not always targets to
-   match exactly.
+   match exactly. If the comment screenshots show multiple mocks, the reference mocks here are usually the ones that are actually relevant to the change.
 
-   The comments and change_description determine how to use the reference — read them together.
+   The comments and change_description determine how to use the reference mocks — read them together.
 
 ### DOM context
 
@@ -93,56 +90,104 @@ Then use the **Read** tool on the downloaded file (e.g. `Read /tmp/ref_1.png`). 
 tool displays images visually so you can inspect them. Do this for every image URL — do not
 skip any.
 
-After, use these images to fully understand the change description and what changes the user wants to make.
+After, use these images and comment feedback to fully understand the change description and what changes the user wants to make.
 
-### Step 1: Download the content script and read relevant code
+**IMPORTANT:**
+The reference mocks show a design direction, but they were made without full
+knowledge of your app's actual UI. Don't replace the app's existing interface to match the mocks
+pixel-for-pixel — instead, integrate the design idea into the app as it already exists. Only
+build entirely new UI when the change truly requires a new surface (a new panel, modal, etc.).
 
-Download the content script from the plan item's `content_script` URL field:
+Additionally, strive to keep the app fully functional. A user should see our design change but still use the full functionality of the application.
 
-```
-curl -sL '<url>' -o /tmp/content_script_<slot_id>.js
-```
+### Step 1: Determine your mode and read relevant code
 
-Then read the downloaded content script and application source code relevant to the change and plan your approach. Figure out:
+Check the plan item's `content_script` field first — this determines everything:
+
+- **`content_script` is set** → you are **editing** an existing prototype. Download it to the /tmp/ directory:
+  ```
+  curl -sL '<url>' -o /tmp/content_script_<slot_id>.js
+  ```
+- **`content_script` is null** → you are creating a **new** prototype from scratch.
+
+Then read the existing content script (if any) and application source code relevant to the
+change. Figure out:
 - Which selectors to target (CSS class names, data attributes, component hierarchy)
 - Which design tokens to reuse (colors, spacing, fonts) so the result looks integrated
-- Which API endpoints the page calls and what shape mock data should take
 - What specific DOM mutations you need to make to implement the change
 
 Focus on the specific area the design idea targets — don't read the whole codebase. By the end
 of this step you should have a clear plan for what to modify in Step 2.
 
-### Step 2: Edit the content script
+### Step 2: Write or edit the content script
 
-Apply the requested design changes to the downloaded file at `/tmp/content_script_<slot_id>.js`.
-Change only what the feedback asks for. Preserve everything else — working code, mock data,
-structure, unaffected mutations.
+#### Mode A: New content script (`content_script` is null)
 
-Read the existing content script to understand how it's structured before making changes.
-Preserve the patterns it already uses — add new behavior in the same style, edit existing
-behavior in place.
+Write a new content script to the tmp directory: `/tmp/content_script_<slot_id>.js`. Follow this structure:
+
+```javascript
+(function contentScript() {
+  "use strict";
+
+  // -- constants (colors, selectors, SVG icons) --
+
+  // -- setup: navigate, seed state --
+  function setup() { ... }
+
+  // -- inject a <style> tag with all CSS --
+  var style = document.createElement("style");
+  style.textContent = "...";
+  document.head.appendChild(style);
+
+  // -- helper: wait for a selector to appear --
+  function waitForSelector(selector, root, timeout) { ... }
+
+  // -- mutation functions (one per change) --
+  async function injectFeatureA() { ... }
+  async function injectFeatureB() { ... }
+
+  // -- boot --
+  function boot() {
+    setup();
+    injectFeatureA().catch(function(e) {
+      console.warn("[content_script]", e.message);
+    });
+    injectFeatureB().catch(function(e) {
+      console.warn("[content_script]", e.message);
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
+```
+
+#### Mode B: Edit existing content script (`content_script` is set)
+
+Apply the requested design changes to the content script downloaded file at
+`/tmp/content_script_<slot_id>.js`. Change what the feedback asks for.
+
+
+#### Guidelines for both modes
 
 **How the content script runs:** The script is injected after the page loads, so the DOM is
-already rendered. It typically: (1) overrides `window.fetch` to mock API responses, (2) seeds
-storage and navigates to a route so the SPA re-renders with mocked data, and (3) waits for
-specific elements to appear then mutates the DOM. Keep this execution model in mind — mocks
-must be in place before triggering the re-render that will use them.
+already rendered. It can override `window.fetch`, seed storage, navigate to a route, and wait
+for elements to mutate the DOM. If you do mock fetches, mocks must be in place before
+triggering the re-render that will use them.
 
-Note: the existing content script may have been originally written for a different runtime where
-it ran before the page's JS. Adapt any patterns that assume pre-page execution to work in this
-post-load context.
+**Think backward from what the design change needs to touch.** Which DOM elements, selectors,
+and component structures must exist for your mutations to land? If the design change requires
+data that the app won't have on its own (e.g., a notification count, search results), update
+`setup()` to mock it.
 
-FOLLOW THESE GUIDELINES:
-
-**Think backward from what the updated prototype needs to show.** Re-evaluate the existing
-`setup()` given the new design change. Does it still navigate to the right page? Does it mock
-the right data? Does the change require new or different mock data, a different route, or
-different app state? Update `setup()` if needed, preserve it if it's already correct.
-
-Mock data MUST match the shapes and types the app expects (plausible values, appropriate volume,
-correct types — no "Lorem ipsum" or "Item 1"). Additionally, add mock data to put the app in a
-state that is logical to show off the design change. If you are mocking images, please use
-placeholder images that will resolve and make sense.
+**Keep the app fully functional.** Let the app run against its real backend. Only mock data when
+the design change depends on something the backend won't reliably provide (specific data shapes,
+search results, etc.). A user should be able to see the design change AND still use the rest of
+the app normally. When you do mock, data must match the shapes and types the app expects —
+no "Lorem ipsum" or placeholder text.
 
 **Rules:**
 
@@ -151,7 +196,8 @@ placeholder images that will resolve and make sense.
   collisions with the app's own styles.
 - Use `MutationObserver` when targeting elements rendered dynamically (e.g. React components
   that mount after route changes).
-- Always use timeouts when waiting for elements — never hang if the structure changes.
+- Use `waitForSelector` with a timeout so the script doesn't hang if the structure changes.
+- Each distinct change should be its own function so it fails independently.
 - Log warnings to console on failure — never throw or break the host app.
 - Match the app's existing visual language (fonts, colors, spacing, border radii) so the
   prototype looks integrated. Use the reference screenshots as the source of truth — if the
