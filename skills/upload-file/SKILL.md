@@ -1,11 +1,11 @@
 ---
 name: upload-file
-description: Upload a local file to drive.orianna.ai and return the URL.
+description: Upload a local file and return the URL.
 allowed-tools: Bash
 model: haiku
 ---
 
-Upload the file to drive.orianna.ai and return the URL.
+Upload the file and return the URL. Run the following:
 
 ```bash
 curl -sf -F "file=@<absolute_path>" https://drive.orianna.ai/api/upload | tr -d '"'

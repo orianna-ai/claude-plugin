@@ -1,17 +1,17 @@
 ---
-name: make-designs
+name: run-orchestrator
 description: Setup a Softlight project and then continuously listen for created prompts and dispatch them to background subagents for completion.
 model: sonnet
 ---
 
-# Softlight
+# Run Orchestrator
 
 Orchestrate a Softlight design session. Delegate all design work to skills running as background
 subagents — never do it inline. You MUST run through all phases and phases must complete before going to the next one. Do not stop or ask the user clarifying questions for any reason.
 
 ## Phase 1: Setup
 
-Use the agent tool to run the setup tasks as **background** subagents **in parallel**.
+Use the agent tool to run the setup steps as **background** subagents **in parallel**.
 
 ### 1a. Content Script
 

@@ -24,7 +24,7 @@ script to edit. Your task is to apply the requested design changes to that conte
 You will receive a **plan item** with everything you need. The plan item contains:
 
 - **`change_description`**: What to build or change.
-- **`content_script`**: The existing content script hosted on Drive. Download it from the `url`
+- **`content_script`**: The existing content script that is hosted. Download it from the `url`
   field (`curl -sL '<url>' -o /tmp/content_script_<slot_id>.js`) and use Edit for targeted changes.
 - **`title`**: Title of the prototype.
 - **`feedback`**: Array of user feedback comments that this protoype change addresses, each with:
@@ -160,13 +160,13 @@ placeholder images that will resolve and make sense.
 
 ### Step 3: Upload and place on canvas
 
-1. Use the `upload-file` skill to upload `/tmp/content_script_<slot_id>.js` to Drive.
+1. Use the `upload-file` skill to upload `/tmp/content_script_<slot_id>.js`.
 2. Call the **softlight** MCP tool `update_iframe_element` with:
    - `project_id` — from the `<project_id>` tag in your prompt
    - `slot_id` — from the `<slot_id>` tag in your prompt
    - `title` — the plan item's `title`
-   - `content_script_url` — the Drive URL returned by the upload
+   - `content_script_url` — the URL returned by the upload
 
 ### Step 4: Return
 
-Return the **Drive URL** of the uploaded content script and confirm the slot was updated.
+Return the **URL** of the uploaded content script and confirm the slot was updated.
