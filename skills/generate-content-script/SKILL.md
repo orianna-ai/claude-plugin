@@ -14,12 +14,10 @@ A content script is a self-contained JavaScript IIFE injected into a running web
 so fetch/WebSocket mocks and route changes must be set up synchronously during evaluation, not
 deferred to `DOMContentLoaded`.
 
-You will receive context about the **design problem** the user is exploring. Your goal is to get
-the app showing the most relevant screen and state of the app for that problem, populated with
-realistic data, so it can be screenshotted.
+You will receive context about the **design problem** the user is exploring. Your goal is to write a content script that makes the app show the CURRENT most relevant screen and state of the app for that problem, populated with realistic data, so it can be screenshotted.
 
 ## Step 1: Quick orientation
-Determine the app that the user is making the design change for so the set up script targets the correct app.
+Determine the app where the screen and state exists, so the set up script targets the correct app.
 
 Quickly understand the app by reading at most a small handful of files — start with README,
 package.json, or the main entry point. If the user is redesigning a specific page or feature,
