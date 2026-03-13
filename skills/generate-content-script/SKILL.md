@@ -7,6 +7,11 @@ model: sonnet
 
 # Generate Content Script
 
+You will receive context about a **design problem** the user wants to explore. Your goal is to
+write a content script that puts the app into the right screen and state to **see the problem**
+— NOT to solve it. Do not make any design changes. Just get the app showing the relevant page
+with realistic data so it can be screenshotted as a starting point.
+
 Generate the content script fast — the user wants to see the direction ASAP.
 
 A content script is a self-contained JavaScript IIFE injected into a running web app via
@@ -14,12 +19,8 @@ A content script is a self-contained JavaScript IIFE injected into a running web
 so fetch/WebSocket mocks and route changes must be set up synchronously during evaluation, not
 deferred to `DOMContentLoaded`.
 
-You will receive context about the **design problem** the user is exploring. Your goal is to get
-the app showing the most relevant screen and state of the app for that problem — populated with
-realistic data — so it can be screenshotted.
-
 ## Step 1: Quick orientation
-Determine the app that the user is making the design change for so the set up script targets the correct app.
+Determine the app where the screen and state exists, so the set up script targets the correct app.
 
 Quickly understand the app by reading at most a small handful of files — start with README,
 package.json, or the main entry point. If the user is redesigning a specific page or feature,
@@ -73,6 +74,9 @@ Structure:
 The screenshot tool loads `/` and captures what renders — no clicks, no inputs. Your content
 script must make the target screen and state appear at `/`, fully populated with realistic data.
 
+Remember: show the app's **current state** where the design problem exists — do not make design
+changes yourself.
+
 **Think backwards from the target view. What are the full chain of conditions that must be true for the target screen and state to render?** What is required before the target screen and state show the content you want? Each condition is something your content script must satisfy — pick the right technique for each one. Be exhaustive.
 
 You'll typically need two things working together: (1) mock every fetch/API call so data is available instantly with no real backend needed, and (2) get the app into the right state to trigger the view you want (navigate to the right route, use the app's own URL params/deep links, or programmatically interact).
@@ -83,7 +87,7 @@ The content script must run unconditionally — don't add your own conditionals 
 that would skip setup.
 
 **If the screenshot shows a landing page, empty state, or login screen instead of the target
-screen and state with real data, the content script has failed.** The whole point is to show the designsign problem in context. Ensure all the coniditons to show the design problem are met.
+screen and state to show off current app's design problem, with real data, the content script has failed. You must show the current app in a state where the design problem can be seen** The whole point is to show the design problem in context. Ensure all the conditions to show the design problem are met.
 
 ### Rules
 
@@ -91,6 +95,7 @@ screen and state with real data, the content script has failed.** The whole poin
 - `waitForSelector` with timeout — never hang
 - Log warnings on failure — never throw or break the host app
 
-## Step 3: Return
+## Step 3: Upload and return
 
-Return the content script as a string.
+Write the content script to `/tmp/cs_1.js` (increment the number if the file already exists).
+Then use the `upload-file` skill to upload it. Return the URL as plain text.
