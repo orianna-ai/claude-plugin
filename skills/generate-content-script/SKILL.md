@@ -36,6 +36,8 @@ content.
 
 Find what the screen, state, and component reads to decide what to render, and make that true. Don't simulate the user flow — inject the end state as directly as possible.
 
+The page must also have realistic mock data — enough that someone looking at the screenshot can immediately understand the design issue that is being presented.
+
 **If any condition is not met, the screenshot will show a landing page, empty state, or login
 screen — and the content script has failed.**
 
