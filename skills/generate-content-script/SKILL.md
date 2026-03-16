@@ -90,5 +90,10 @@ images that will resolve and make sense.
 
 ## Step 4: Upload and return
 
-Write the content script to `/tmp/cs_1.js` (increment the number if the file already exists).
-Then use the `upload-file` skill to upload it. Return the URL as plain text.
+1. Write the content script to `/tmp/cs_1.js` (increment the number if the file already exists).
+2. Upload the content script:
+   ```
+   curl -sf -F "file=@/tmp/cs_1.js" https://drive.orianna.ai/api/upload | tr -d '"'
+   ```
+3. **Delete the local `/tmp` file after a successful upload.** Do not leave content scripts in `/tmp`.
+4. Return the uploaded URL as plain text.

@@ -182,8 +182,12 @@ The script must be a self-contained, immediately-invoked function. Structural re
 
 ## Step 4: Upload and place on canvas
 
-1. Use the `upload-file` skill to upload `/tmp/content_script_<slot_id>.js`.
-2. Call the **softlight** MCP tool `update_iframe_element` with:
+1. Upload the content script:
+   ```
+   curl -sf -F "file=@/tmp/content_script_<slot_id>.js" https://drive.orianna.ai/api/upload | tr -d '"'
+   ```
+2. **Delete the local `/tmp` file after a successful upload.** Do not leave content scripts in `/tmp`.
+3. Call the **softlight** MCP tool `update_iframe_element` with:
    - `project_id` — from the `<project_id>` tag in your prompt
    - `slot_id` — from the `<slot_id>` tag in your prompt
    - `title` — the plan item's `title`
