@@ -40,8 +40,8 @@ Call the `create_project` tool with the problem statement, content script, and t
 Phase 1. Share the `project_url` with the user (e.g., `[View in Softlight →](<project_url>)`) and
 remember the `project_id` for future interactions.
 
-Call the `generate_mock_revision` tool in a **background** subagent and immediately proceed to
-Phase 3.
+Call the `generate_mock_revision` tool directly with the `project_id`. Do not spawn a subagent —
+this tool supports task execution and should be called inline. Proceed to Phase 3 after it returns.
 
 ## Phase 3: Prompt Handling
 
@@ -49,11 +49,17 @@ Loop indefinitely:
 
 1. Call the `wait_for_prompt` tool with `project_id`. Pass the `prompt_id` from the previous call.
 
-2. Analyze the prompt, determine which skill to dispatch, and dispatch the skill in a **background**
-   subagent. You must instruct the subagent to call the `complete_prompt` tool with the `project_id`
-   and `prompt_id` when it is done handling the prompt.
-   
-3. Loop back to step 1 immediately — do not wait for the subagent.
+2. If the returned prompt has `key` equal to `"cancel"`, the user clicked **Stop** in the UI.
+   **Break out of the loop immediately** and proceed to Phase 4 (Cleanup). Do not dispatch any
+   further subagents.
+
+3. If the prompt only requires calling a single Softlight MCP tool (e.g. `generate_mock_revision`,
+   `plan_prototype_revision`), call the tool **directly** — do not spawn a subagent. After the tool
+   returns, call `complete_prompt` with the `project_id` and `prompt_id`, then loop back to step 1.
+
+4. Otherwise, dispatch the skill in a **background** subagent. You must instruct the subagent to
+   call the `complete_prompt` tool with the `project_id` and `prompt_id` when it is done handling
+   the prompt. Loop back to step 1 immediately — do not wait for the subagent.
 
 ## Phase 4: Cleanup
 
