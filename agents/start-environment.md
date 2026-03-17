@@ -57,21 +57,19 @@ app build.
 
 While the app is building in the background, prepare the tunnel:
 
-**4a.** Get the platform:
+**4a.** Create the tunnel:
 
 ```bash
-uname -sm
+curl -s -X POST http://localhost:8080/api/tunnels \
+  -H 'Content-Type: application/json' \
+  -d '{"platform":"'"$(uname -sm)"'","port":'"$PORT"'}'
 ```
 
-**4b.** Call the `mcp__plugin_softlight_softlight__create_tunnel` tool with:
-- `port`: the port number (integer)
-- `platform`: the output from `uname -sm`
-
-Save all fields from the response: `tunnel_url`, `tunnel_id`, `tunnel_config`,
+Save all fields from the JSON response: `tunnel_url`, `tunnel_id`, `tunnel_config`,
 `tunnel_binary_url`, `tunnel_binary_name`.
 
-**4c.** Write the config and download the frpc binary in one command. Substitute the actual values
-from the `create_tunnel` response:
+**4b.** Write the config and download the frpc binary in one command. Substitute the actual values
+from the response:
 
 ```bash
 cat <<'FRPC_EOF' > /tmp/frpc-$TUNNEL_ID.toml
