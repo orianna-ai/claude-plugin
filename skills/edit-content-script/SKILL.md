@@ -192,7 +192,7 @@ The script must be a self-contained, immediately-invoked function. Structural re
    `<project_id>` tag, `<slot_id>` from the `<slot_id>` tag, `<title>` from the plan item's
    title, and `<content_script_url>` from the upload URL:
    ```
-   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
+   curl -s -X POST "https://softlight.orianna.ai/api/projects/<project_id>/events" \
      -H "Content-Type: application/json" \
      -d '[{"type":"slot_updated","slot_id":"<slot_id>","element":{"type":"iframe","title":"<title>","content_script":{"url":"<content_script_url>"}}}]'
    ```
