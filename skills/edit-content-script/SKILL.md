@@ -151,17 +151,33 @@ The script is structured like an E2E test with a setup phase and an interaction 
 (function contentScript() {
   "use strict";
 
-  // ── Synchronous setup (beforeEach) ─────────────────────────────
-  // Runs before the app's JS. This is your test fixture setup.
+  // ── Synchronous setup ─────────────────────────────────────────
+  // Runs before the app's JS. Fixtures, mocks, navigation.
 
-  // 1. Seed auth (localStorage/sessionStorage/cookies)
-  // 2. Navigate to the target route (history.replaceState)
-  // 3. Intercept fetch — mock every API endpoint the page hits
-  //    Match URLs carefully: check base URLs, path prefixes, query params.
-  //    Return responses matching the exact shape the app destructures.
-  // 4. Mock WebSocket / EventSource if needed
+  // 1. Seed auth
+  localStorage.setItem("token", "mock-jwt-token");
 
-  // ── Boot (test body) ───────────────────────────────────────────
+  // 2. Navigate to the target route
+  history.replaceState(null, "", "/target-route");
+
+  // 3. Intercept fetch
+  //    IMPORTANT: Always store the original fetch and pass through unmatched
+  //    requests. If you don't, every endpoint you didn't mock will break.
+  const _fetch = window.fetch;
+  window.fetch = async (url, opts) => {
+    const u = new URL(url, location.origin);
+
+    if (u.pathname === "/api/me") {
+      return new Response(JSON.stringify({ id: 1, name: "Jane Smith" }));
+    }
+
+    // ... other mocked endpoints ...
+
+    // Pass through everything else to the real server
+    return _fetch(url, opts);
+  };
+
+  // ── Boot ───────────────────────────────────────────────────────
   // Runs after DOMContentLoaded. Find elements, interact, apply changes.
 
   function boot() {

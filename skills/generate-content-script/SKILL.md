@@ -41,7 +41,7 @@ renders at `/` when the app starts is the screenshot.** Make what loads there th
 
 Before writing any code, list every condition the target screen checks before rendering its real content. Think of these as the **test preconditions** you'd set up in a `beforeEach` block. Common ones:
 
-- **Authentication** — token in localStorage/cookie, user profile endpoint returning a valid user. If you don't set this up, the app will redirect to login. Every E2E test mocks auth first; do the same here.
+- **Authentication** — token in localStorage/cookie, user profile endpoint returning a valid user. If you don't set this up, the app will redirect to login.
 - **Route/URL** — the path, query params, and hash the page expects.
 - **API data** — every `fetch`/`axios` call the page makes on mount. Check the component source for `useEffect`, `useQuery`, `useSWR`, `getServerSideProps`, loaders, etc. Each one is an endpoint you need to mock. **Mock every endpoint the page hits on load, not just the "main" one** — missing a single one causes loading spinners or error states.
 - **Flow/wizard state** — completed steps, selected tabs, expanded panels stored in state or URL params.
@@ -75,18 +75,35 @@ Prefer these libraries over raw `querySelector` and `dispatchEvent` — they que
 
   // ── Synchronous setup (runs before the app's JS) ──────────────
 
-  // 1. Seed auth state (localStorage/sessionStorage/cookies)
-  // 2. Navigate to the target route (use history.replaceState, not pushState)
-  // 3. Intercept fetch — mock every API endpoint the page hits on load
-  //    Match URLs carefully: check base URLs, path prefixes, query params.
-  //    Return responses matching the exact shape the app destructures.
+  // 1. Seed auth state
+  localStorage.setItem("token", "mock-jwt-token");
+
+  // 2. Navigate to the target route
+  history.replaceState(null, "", "/target-route");
+
+  // 3. Intercept fetch
+  //    IMPORTANT: Always store the original fetch and pass through unmatched
+  //    requests. If you don't, every endpoint you didn't mock will break.
+  const _fetch = window.fetch;
+  window.fetch = async (url, opts) => {
+    const u = new URL(url, location.origin);
+
+    if (u.pathname === "/api/me") {
+      return new Response(JSON.stringify({ id: 1, name: "Jane Smith" }));
+    }
+
+    // ... other mocked endpoints ...
+
+    // Pass through everything else to the real server
+    return _fetch(url, opts);
+  };
+
   // 4. Mock WebSocket / EventSource if the app uses them
 
   // ── Boot (runs after DOMContentLoaded) ─────────────────────────
 
   function waitForSelector(selector, root = document, timeout = 5000) {
-    // Resolve when a selector appears — like a Playwright locator with timeout.
-    // Never hang: reject after timeout so the app isn't blocked.
+    // Resolve when a selector appears in the DOM. Never hang.
   }
 
   function boot() {
