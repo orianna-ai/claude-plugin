@@ -1,7 +1,7 @@
 ---
 name: start-tunnel
 description: Create an frpc tunnel to expose a local port through a Softlight tunnel URL. Requires a port with an application already listening. Returns the tunnel URL and frpc PID.
-allowed-tools: Bash, Write
+allowed-tools: Bash
 model: sonnet
 ---
 
@@ -19,47 +19,60 @@ curl -s -o /dev/null -w '%{http_code}' --max-time 5 http://localhost:$PORT
 
 If the status code is NOT between 200–399, STOP. Tell the user the port is not responding.
 
-## Step 2: Create tunnel
+## Step 2: Setup tunnel
+
+Generate a tunnel ID, determine the frpc binary for this platform, write the config file, and
+download the binary:
 
 ```bash
-curl -s -X POST http://localhost:8080/api/tunnels \
-  -H 'Content-Type: application/json' \
-  -d '{"platform":"'"$(uname -sm)"'","port":'"$PORT"'}'
+TUNNEL_ID=$(python3 -c "import uuid; print(uuid.uuid4())")
+PLATFORM=$(uname -sm | tr '[:upper:]' '[:lower:]')
+case "$PLATFORM" in
+  "linux x86_64"|"linux amd64") FRPC_NAME=frp_0.61.1_linux_amd64 ;;
+  "linux aarch64"|"linux arm64") FRPC_NAME=frp_0.61.1_linux_arm64 ;;
+  "darwin x86_64"|"darwin amd64") FRPC_NAME=frp_0.61.1_darwin_amd64 ;;
+  "darwin arm64"|"darwin aarch64") FRPC_NAME=frp_0.61.1_darwin_arm64 ;;
+  *) echo "Unsupported platform: $PLATFORM" >&2; exit 1 ;;
+esac
+TUNNEL_URL="http://localhost:8080/api/tunnel/${TUNNEL_ID}/"
+FRPC_URL="https://github.com/fatedier/frp/releases/download/v0.61.1/${FRPC_NAME}.tar.gz"
+
+cat > /tmp/frpc-${TUNNEL_ID}.toml << EOF
+serverAddr = "frp.orianna.ai"
+serverPort = 443
+
+[transport]
+protocol = "wss"
+
+[[proxies]]
+name = "${TUNNEL_ID}"
+type = "http"
+localPort = ${PORT}
+customDomains = ["frp-gateway.orianna.ai"]
+httpUser = "${TUNNEL_ID}"
+routeByHTTPUser = "${TUNNEL_ID}"
+EOF
+
+[ -f /tmp/${FRPC_NAME}/frpc ] || curl -sL "$FRPC_URL" | tar xz -C /tmp/
+echo "TUNNEL_ID=$TUNNEL_ID TUNNEL_URL=$TUNNEL_URL FRPC_NAME=$FRPC_NAME"
 ```
 
-The JSON response contains these fields — save all of them:
-- `tunnel_url` — the public URL
-- `tunnel_id` — unique ID
-- `tunnel_config` — full frpc config text
-- `tunnel_binary_url` — download URL for frpc
-- `tunnel_binary_name` — name of the extracted directory
+Save the `TUNNEL_ID`, `TUNNEL_URL`, and `FRPC_NAME` from the output.
 
-## Step 3: Write config file
-
-Write `$tunnel_config` to `/tmp/frpc-$tunnel_id.toml`.
-
-## Step 4: Download frpc (if needed)
-
-Only download if `/tmp/$tunnel_binary_name/frpc` does not exist:
+## Step 3: Start frpc
 
 ```bash
-curl -sL $tunnel_binary_url | tar xz -C /tmp/
-```
-
-## Step 5: Start frpc
-
-```bash
-/tmp/$tunnel_binary_name/frpc -c /tmp/frpc-$tunnel_id.toml &
+/tmp/$FRPC_NAME/frpc -c /tmp/frpc-$TUNNEL_ID.toml &
 frpc_pid=$!
 echo "$frpc_pid"
 ```
 
-## Step 6: Verify tunnel
+## Step 4: Verify tunnel
 
 ```bash
 sleep 0.5
 for i in 1 2 3 4 5; do
-  CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$tunnel_url/")
+  CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$TUNNEL_URL/")
   echo "Attempt $i: HTTP $CODE"
   if [ "$CODE" -ge 200 ] && [ "$CODE" -lt 400 ]; then
     echo "Tunnel is up"
@@ -74,5 +87,5 @@ If all 5 attempts fail, check frpc logs for errors.
 ## Output
 
 Return exactly two values:
-1. **Tunnel URL**: `$tunnel_url`
+1. **Tunnel URL**: `$TUNNEL_URL`
 2. **FRPC PID**: `$frpc_pid`

@@ -1,6 +1,7 @@
 ---
 name: generate-problem-statement
 description: Understand a design challenge and distill it into a concise problem statement for Softlight. Use when you need to articulate the people problem before creating a project.
+allowed-tools: Read, Glob, Grep
 model: sonnet
 ---
 
