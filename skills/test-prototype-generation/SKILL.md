@@ -3,6 +3,7 @@ name: test-prototype-generation
 description: >
   Simulate prototype generation end-to-end. Sets up a tunnel, updates the project,
   creates placeholder slots, and dispatches hardcoded edit-content-script prompts.
+allowed-tools: Bash, Read, Write, Glob, Grep, mcp__plugin_softlight_softlight__wait_for_prompt
 model: sonnet
 ---
 
@@ -25,8 +26,8 @@ Run the `start-tunnel` skill to expose the app at `port`. This gives you a `tunn
 
 ## Phase 2: Update Project Problem
 
-The project needs a `tunnel_url` on its `problem` so that `update_iframe_element` can build
-iframes later. There is no MCP tool for this, so call the REST API directly.
+The project needs a `tunnel_url` on its `problem` so that iframe prototypes can load the
+tunneled application. Post a `project_updated` event via the REST API:
 
 **IMPORTANT:** The body must be a **bare JSON array** `[...]`, NOT an object like
 `{"events": [...]}`. The FastAPI endpoint expects `Sequence[Event]` as the body directly.
@@ -38,7 +39,11 @@ curl -s -X POST \
   -d '[{"type":"project_updated","problem":{"text":"Test prototype generation","tunnel_url":"'"${TUNNEL_URL}"'"}}]'
 ```
 
-After posting, verify with `get_project` MCP tool and confirm `problem.tunnel_url` is set.
+After posting, verify the project state and confirm `problem.tunnel_url` is set:
+
+```bash
+curl -s "http://localhost:8080/api/projects/${PROJECT_ID}"
+```
 
 ## Phase 3: Create Placeholders and Dispatch Subagents
 
@@ -93,9 +98,7 @@ post([
 # Batch 2: prompt events (drives loading spinners in the UI)
 def make_prompt(plan, slot_id):
     plan_json = json.dumps(plan)
-    return f"""Run the edit-content-script skill to generate a content script for this plan item. Read the skill file first, then follow it.
-
-When the content script is ready, call the update_iframe_element MCP tool to place it on the canvas.
+    return f"""Run the edit-content-script skill to generate a content script for this plan item. Read the skill file first, then follow it. The skill's Step 4 handles uploading and placing the content script on the canvas.
 
 CRITICAL: Pass this ENTIRE prompt to the subagent verbatim — every character of the <plan_item> JSON and every <tag> below must survive intact. Do not rephrase, summarize, or convert any part to prose.
 
@@ -133,16 +136,14 @@ Immediately after step 3b, dispatch **two background subagents in parallel**. Do
 Each subagent must receive:
 
 1. The full prompt text (same as what was posted in the `prompt_created` event)
-2. An instruction to call `complete_prompt` with `project_id` and `prompt_id` when done
+2. An instruction to mark the prompt as done via curl when finished
 
 **Subagent 1** — pass verbatim:
 
 ```
 You are handling a Softlight prompt for project_id: <PROJECT_ID>, prompt_id: <PROMPT_ID_1>.
 
-Run the edit-content-script skill to generate a content script for this plan item. Read the skill file first at /workspaces/orianna/claude-plugin/skills/edit-content-script/SKILL.md, then follow it.
-
-When the content script is ready, call the update_iframe_element MCP tool to place it on the canvas.
+Run the edit-content-script skill to generate a content script for this plan item. Read the skill file first at /workspaces/orianna/claude-plugin/skills/edit-content-script/SKILL.md, then follow it. The skill's Step 4 handles uploading and placing the content script on the canvas.
 
 CRITICAL: The ENTIRE prompt content below must be passed verbatim — every character of the plan_item JSON and every tag must survive intact.
 
@@ -152,9 +153,10 @@ CRITICAL: The ENTIRE prompt content below must be passed verbatim — every char
 <project_id><PROJECT_ID></project_id>
 <slot_id><SLOT_ID_1></slot_id>
 
-After completing all work, call mcp__plugin_softlight_softlight__complete_prompt with:
-- project_id: "<PROJECT_ID>"
-- prompt_id: "<PROMPT_ID_1>"
+After completing all work, mark the prompt as done:
+curl -s -X POST "http://localhost:8080/api/projects/<PROJECT_ID>/events" \
+  -H "Content-Type: application/json" \
+  -d '[{"type":"prompt_completed","prompt_id":"<PROMPT_ID_1>"}]'
 ```
 
 **Subagent 2** — same structure but with `PLAN_2_JSON`, `SLOT_ID_2`, and `PROMPT_ID_2`.
@@ -168,8 +170,13 @@ After dispatching both subagents, enter the standard prompt-handling loop for an
 user interactions from the canvas:
 
 1. Call `wait_for_prompt` with the `project_id`. On the first call, omit `prompt_id`.
-2. When a prompt arrives, dispatch it to a **background** subagent. Instruct the subagent to call
-   `complete_prompt` with `project_id` and `prompt_id` when done.
+2. When a prompt arrives, dispatch it to a **background** subagent. Instruct the subagent to
+   mark the prompt as done when finished by running:
+   ```
+   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
+     -H "Content-Type: application/json" \
+     -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
+   ```
 3. Loop back to step 1 immediately — do not wait for the subagent.
 
 ## Output

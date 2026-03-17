@@ -3,6 +3,7 @@ name: edit-content-script
 description: >
   Edit a content script — a self-contained JavaScript file that can be injected into a running
   application to prototype a design idea without rebuilding.
+allowed-tools: Bash, Read, Write, Glob, Grep
 model: sonnet
 ---
 
@@ -187,11 +188,14 @@ The script must be a self-contained, immediately-invoked function. Structural re
    curl -sf -F "file=@/tmp/content_script_<slot_id>.js" https://drive.orianna.ai/api/upload | tr -d '"'
    ```
 2. **Delete the local `/tmp` file after a successful upload.** Do not leave content scripts in `/tmp`.
-3. Call the **softlight** MCP tool `update_iframe_element` with:
-   - `project_id` — from the `<project_id>` tag in your prompt
-   - `slot_id` — from the `<slot_id>` tag in your prompt
-   - `title` — the plan item's `title`
-   - `content_script_url` — the URL returned by the upload
+3. Place on the canvas by posting a `slot_updated` event. Substitute `<project_id>` from the
+   `<project_id>` tag, `<slot_id>` from the `<slot_id>` tag, `<title>` from the plan item's
+   title, and `<content_script_url>` from the upload URL:
+   ```
+   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
+     -H "Content-Type: application/json" \
+     -d '[{"type":"slot_updated","slot_id":"<slot_id>","element":{"type":"iframe","title":"<title>","content_script":{"url":"<content_script_url>"}}}]'
+   ```
 
 ## Step 5: Return
 

@@ -56,28 +56,43 @@ app build.
 
 ## Step 4: Prep the tunnel (while app builds)
 
-While the app is building in the background, prepare the tunnel:
-
-**4a.** Create the tunnel:
-
-```bash
-curl -s -X POST http://localhost:8080/api/tunnels \
-  -H 'Content-Type: application/json' \
-  -d '{"platform":"'"$(uname -sm)"'","port":'"$PORT"'}'
-```
-
-Save all fields from the JSON response: `tunnel_url`, `tunnel_id`, `tunnel_config`,
-`tunnel_binary_url`, `tunnel_binary_name`.
-
-**4b.** Write the config and download the frpc binary in one command. Substitute the actual values
-from the response:
+While the app is building in the background, generate a tunnel ID, determine the frpc binary for
+this platform, write the config file, and download the binary:
 
 ```bash
-cat <<'FRPC_EOF' > /tmp/frpc-$TUNNEL_ID.toml
-$TUNNEL_CONFIG
-FRPC_EOF
-[ -f /tmp/$TUNNEL_BINARY_NAME/frpc ] || curl -sL "$TUNNEL_BINARY_URL" | tar xz -C /tmp/
+TUNNEL_ID=$(python3 -c "import uuid; print(uuid.uuid4())")
+PLATFORM=$(uname -sm | tr '[:upper:]' '[:lower:]')
+case "$PLATFORM" in
+  "linux x86_64"|"linux amd64") FRPC_NAME=frp_0.61.1_linux_amd64 ;;
+  "linux aarch64"|"linux arm64") FRPC_NAME=frp_0.61.1_linux_arm64 ;;
+  "darwin x86_64"|"darwin amd64") FRPC_NAME=frp_0.61.1_darwin_amd64 ;;
+  "darwin arm64"|"darwin aarch64") FRPC_NAME=frp_0.61.1_darwin_arm64 ;;
+  *) echo "Unsupported platform: $PLATFORM" >&2; exit 1 ;;
+esac
+TUNNEL_URL="http://localhost:8080/api/tunnel/${TUNNEL_ID}/"
+FRPC_URL="https://github.com/fatedier/frp/releases/download/v0.61.1/${FRPC_NAME}.tar.gz"
+
+cat > /tmp/frpc-${TUNNEL_ID}.toml << EOF
+serverAddr = "frp.orianna.ai"
+serverPort = 443
+
+[transport]
+protocol = "wss"
+
+[[proxies]]
+name = "${TUNNEL_ID}"
+type = "http"
+localPort = ${PORT}
+customDomains = ["frp-gateway.orianna.ai"]
+httpUser = "${TUNNEL_ID}"
+routeByHTTPUser = "${TUNNEL_ID}"
+EOF
+
+[ -f /tmp/${FRPC_NAME}/frpc ] || curl -sL "$FRPC_URL" | tar xz -C /tmp/
+echo "TUNNEL_ID=$TUNNEL_ID TUNNEL_URL=$TUNNEL_URL FRPC_NAME=$FRPC_NAME"
 ```
+
+Save the `TUNNEL_ID`, `TUNNEL_URL`, and `FRPC_NAME` from the output.
 
 ## Step 5: Poll for app readiness
 
@@ -133,7 +148,7 @@ Health check: `GET /` returns 200 when ready.
 Start the tunnel client and verify it is reachable in one command:
 
 ```bash
-/tmp/$TUNNEL_BINARY_NAME/frpc -c /tmp/frpc-$TUNNEL_ID.toml &
+/tmp/$FRPC_NAME/frpc -c /tmp/frpc-$TUNNEL_ID.toml &
 FRPC_PID=$!
 sleep 1
 for i in 1 2 3 4 5; do

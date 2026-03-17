@@ -1,6 +1,7 @@
 ---
 name: run-orchestrator
 description: Setup a Softlight project and then continuously listen for created prompts and dispatch them to background subagents for completion.
+allowed-tools: Bash, Read, Write, Glob, Grep, mcp__plugin_softlight_softlight__create_project, mcp__plugin_softlight_softlight__generate_mock_revision, mcp__plugin_softlight_softlight__wait_for_prompt, mcp__plugin_softlight_softlight__plan_prototype_revision, mcp__plugin_softlight_softlight__create_comment, mcp__plugin_softlight_softlight__generate_prototype_revision
 model: sonnet
 ---
 
@@ -52,11 +53,21 @@ Loop indefinitely:
 
 3. If the prompt only requires calling a single Softlight MCP tool (e.g. `generate_mock_revision`,
    `plan_prototype_revision`), call the tool **directly** — do not spawn a subagent. After the tool
-   returns, call `complete_prompt` with the `project_id` and `prompt_id`, then loop back to step 1.
+   returns, mark the prompt as done and loop back to step 1:
+   ```
+   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
+     -H "Content-Type: application/json" \
+     -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
+   ```
 
 4. Otherwise, dispatch the skill in a **background** subagent. You must instruct the subagent to
-   call the `complete_prompt` tool with the `project_id` and `prompt_id` when it is done handling
-   the prompt. Loop back to step 1 immediately — do not wait for the subagent.
+   mark the prompt as done when it is finished by running:
+   ```
+   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
+     -H "Content-Type: application/json" \
+     -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
+   ```
+   Loop back to step 1 immediately — do not wait for the subagent.
 
 ## Phase 4: Cleanup
 

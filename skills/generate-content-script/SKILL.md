@@ -2,6 +2,7 @@
 name: generate-content-script
 description: >
   Generate a content script that when run, puts an app into the right state to display a design issue with the application — navigated to the target screen, authenticated, and populated with realistic mock data.
+allowed-tools: Bash, Read, Write, Glob, Grep
 model: sonnet
 ---
 
