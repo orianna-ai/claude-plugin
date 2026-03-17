@@ -11,26 +11,35 @@ model: sonnet
 You are the world's best product designer and software engineer. A PM you work with left feedback
 on previous design work, and wants to see that feedback addressed via a content script that changes the running application. You will be passed that design feedback / plan.
 
-Your task is to write out the full implementation and then convert into a content script that modifies a running application to address the feedback. You will do this in three stages:
+Your task is to implement the design feedback as a content script — a self-contained JavaScript file that modifies the running application. You will do this in three stages:
 
 1. **Interpret the design intent** — Determine what design change to make by analyzing the
    feedback and the design sketches. The sketches are rough and were made without full knowledge
-   of the app. Interpret everything and come up with the right design change to make. Focus on
-   the UX outcome they're pointing at, not the specific implementation they show.
-2. **Write the implementation** — Read the app's source code and determine how to implement a
-   content script that best achieves the design change.
-3. **Write the content script** — Implement the content script.
+   of the app. Focus on the UX outcome they're pointing at, not the specific implementation they show.
+2. **Explore the source code** — Read the app's source code to understand how the target screen works, then plan how to implement the change.
+3. **Write the content script** — Implement the design change as a content script: mock APIs, set up state, and modify the DOM.
 
-Think of the content script like a browser extension or userscript — it finds specific elements
-in the live app's DOM and patches them. The app must remain fully functional; a user should be
-able to interact with the rest of the app exactly as before. Never create a full-screen element
-that covers or replaces the app — always modify the app's own DOM in place.
+## How to think about content scripts
+
+Think of a content script as **a UI test that makes assertions by changing the app instead of checking it.** Like a Playwright or Cypress test, you mock API responses, set up state, navigate to the right page, find elements, and interact with them. The difference is that instead of asserting what's on screen, you *change* what's on screen.
+
+The same skills that make E2E tests reliable make content scripts reliable:
+- **Mock every endpoint** the page hits, not just the obvious one (like writing thorough `page.route()` / `cy.intercept()` / MSW handlers)
+- **Wait for conditions**, never arbitrary timeouts (like using Playwright locators or `findByRole` instead of `setTimeout`)
+- **Interact through the framework**, not around it (like using `userEvent.click()` instead of `el.click()` so React/Vue state updates fire correctly)
+- **Scope changes tightly** so the rest of the app keeps working (like a well-isolated test that doesn't pollute global state)
+
+The script is injected as a `<script>` tag at the top of the app's `<head>` and executes **before any of the app's own JavaScript**. This is equivalent to setting up `page.route()` handlers before `page.goto()`.
+
+The app must remain fully functional; a user should be able to interact with the rest of the app
+exactly as before. Never create a full-screen element that covers or replaces the app — always
+modify the app's own DOM in place.
 
 ## Step 1: Interpret the design intent
 
 In this step, you must determine what UI and app functionality to change. To do this, analyze the the feedback and relevant design sketches from the canvas.
 
-**IMPORTANT** It is important to note that the `change_description` and `design_mocks` were made without context of our application. So, they may point to making illogical changes (e.g. creating a new modal for something that fits into an existing one, etc.). Ensure you interpret the feedback, change_description, and mocks to create a true design change spec. 
+**IMPORTANT** It is important to note that the `change_description` and `design_mocks` were made without context of our application. So, they may point to making illogical changes (e.g. creating a new modal for something that fits into an existing one, etc.). Ensure you interpret the feedback, change_description, and mocks to create a true design change spec.
 
 This step is about understanding the desired UX outcome — not planning code changes or thinking
 about implementation.
@@ -90,46 +99,115 @@ This is a *what*, not a *how*. Only then proceed to Step 2.
 
 ## Step 2: Explore the source code and write out a plan
 
-This is the most important step. Before creating the content scripts, you need to understand the
+This is the most important step. Before writing the content script, you need to understand the
 app deeply and write the implementation plan.
 
 The design mocks were created without knowledge of the app's real structure, so adapt the design
 intent to work naturally within the app as it actually is — your changes should feel like they
 belong in the app, not like they were bolted on from an outside sketch.
 
-Read the app's source code for the relevant screen — components, routing, state management, data
-fetching, and API response shapes. Then determine how you need to use the content script to implement the design change as real, working code with full functionality, frontend and backend.
+### What to read in the source code
+
+Read the app's source code for the relevant screen with the same rigor you'd use to write an E2E test for it. Specifically, find:
+
+1. **Component tree** — Which components render the target screen? What's the hierarchy? This tells you where to inject changes and what elements are framework-managed vs static.
+2. **Data flow** — How does data get from API responses to rendered UI? Trace the path: fetch/axios call → state/store → component props → rendered elements. This tells you whether to intercept at the data layer (mock fetch responses) or the DOM layer.
+3. **State management** — What drives the UI state? React state/context, Redux, Vuex, URL params? If a tab is selected via React state, you need to trigger a state update, not just add an `active` CSS class.
+4. **CSS approach** — CSS modules, Tailwind, styled-components, plain CSS? This determines how you style injected elements to match the app's look and feel.
+5. **API response shapes** — Read the actual fetch calls or API client code. What URLs are called? What does the response look like? What fields does the component destructure?
+
+### Write the implementation plan
+
+Based on your source code reading, determine how to implement the design change. For each change, decide:
+
+- **Data layer vs DOM layer** — Can you achieve this by changing what the API returns (intercept fetch), or do you need to modify DOM elements directly? Data layer changes are more robust because the framework re-renders naturally. DOM changes risk being overwritten by React/Vue re-renders.
+- **Framework-cooperative vs direct mutation** — If you must change DOM, will you work with the framework (simulate clicks via userEvent, trigger state updates) or replace elements entirely? Framework-cooperative changes preserve event handlers and state bindings. Direct replacement is simpler but can break interactivity.
 
 ## Step 3: Write or edit the content script
 
 Now, generate the content script to achieve the design change.
 
-If `content_script` is set then edit that content script. If there was no source content script
-provided, write a new one.
+### If editing an existing content script
 
-The content script is a self-contained JavaScript file injected as a `<script>` tag at the top of
-the app's `<head>`. It executes **before any of the app's own JavaScript**, so `window.fetch`
-overrides and route changes set up synchronously in the script will intercept the app's initial
-fetches and navigation.
+If `content_script` is set, download it first:
+```
+curl -sL '<url>' -o /tmp/content_script_<slot_id>.js
+```
+
+**Read and understand the existing script before modifying it.** Summarize what it already does — its fetch mocks, auth setup, route navigation, and DOM mutations. Then make targeted changes to address the feedback without breaking the existing setup.
+
+### If creating from scratch
+
+If `content_script` is **null**, create a new content script from scratch. Do NOT download or
+reuse any other content script from the project context — start fresh.
+
+Write the content script to `/tmp/content_script_<slot_id>.js`.
+
+### Structuring the content script
+
+The script is structured like an E2E test with a setup phase and an interaction phase:
+
+```javascript
+(function contentScript() {
+  "use strict";
+
+  // ── Synchronous setup ─────────────────────────────────────────
+  // Runs before the app's JS. Fixtures, mocks, navigation.
+
+  // 1. Seed auth
+  localStorage.setItem("token", "mock-jwt-token");
+
+  // 2. Navigate to the target route
+  history.replaceState(null, "", "/target-route");
+
+  // 3. Intercept fetch
+  //    IMPORTANT: Always store the original fetch and pass through unmatched
+  //    requests. If you don't, every endpoint you didn't mock will break.
+  const _fetch = window.fetch;
+  window.fetch = async (url, opts) => {
+    const u = new URL(url, location.origin);
+
+    if (u.pathname === "/api/me") {
+      return new Response(JSON.stringify({ id: 1, name: "Jane Smith" }));
+    }
+
+    // ... other mocked endpoints ...
+
+    // Pass through everything else to the real server
+    return _fetch(url, opts);
+  };
+
+  // ── Boot ───────────────────────────────────────────────────────
+  // Runs after DOMContentLoaded. Find elements, interact, apply changes.
+
+  function boot() {
+    // Use testing-library queries to find elements by role/text/label.
+    // Use userEvent for interactions that need to trigger framework state.
+    // For direct DOM changes, scope tightly — don't touch unrelated elements.
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
+```
+
+### Key requirements
+
+- **Synchronous setup at evaluation time** — fetch overrides, localStorage seeding, and route
+  changes (`history.replaceState`) must happen synchronously before the app's JS runs. Do not
+  defer these to `DOMContentLoaded`.
+- **DOM changes after DOMContentLoaded** — any DOM mutations, element injection, or click
+  simulation must wait for the DOM to be ready.
+- **Never throw** — catch errors and log warnings. The content script must not break the host app.
 
 Include mock data where needed so the design change is logical. When mocking data, use realistic data that matches the shapes and types the app expects. Only mock what is necessary for the design change — do not replace or interfere with data the app already has from its real backend.
 
-Your script is a patch, not a replacement. Scope changes tightly to the elements you're
-modifying — the rest of the app's DOM, styles, event handlers, routing, and data fetching
-should continue working exactly as before.
+### Querying and interacting with the DOM
 
-### Key considerations
-
-**Framework state.** Most apps use React, Vue, or similar frameworks where UI elements (tabs,
-modals, toggles, forms) are driven by framework state. Be deliberate about how your content script
-interacts with this — direct DOM replacement of framework-controlled elements destroys their event
-handlers and state bindings. Think about whether to work with the framework's state (intercepting
-fetch, simulating clicks, letting the framework re-render) or replace elements entirely, and make
-sure the app stays functional either way.
-
-**Querying the DOM.** `@testing-library/dom` and `@testing-library/user-event` are available as
-runtime dependencies. They are framework-agnostic and work on any website. Import them dynamically
-via `esm.sh`:
+`@testing-library/dom` and `@testing-library/user-event` are available as runtime dependencies. Import them dynamically via `esm.sh`:
 
 ```javascript
 await import("https://esm.sh/@testing-library/dom");
@@ -140,45 +218,17 @@ Prefer these libraries over raw `querySelector` and `dispatchEvent` — they que
 sees (roles, text, labels) rather than class names that may be generated or unstable, and they
 simulate real user interactions that properly trigger framework state updates.
 
-### Writing the content script
+### Common mistakes to avoid
 
-Check the plan item's `content_script` field. If it has a URL, download it and edit it:
-```
-curl -sL '<url>' -o /tmp/content_script_<slot_id>.js
-```
-If `content_script` is **null**, create a new content script from scratch. Do NOT download or
-reuse any other content script from the project context — start fresh.
+These are flaky test anti-patterns — avoid them:
 
-Write the content script to `/tmp/content_script_<slot_id>.js`.
-
-The script must be a self-contained, immediately-invoked function. Structural requirements:
-
-- **Synchronous setup at evaluation time** — fetch overrides, localStorage seeding, and route
-  changes (`history.replaceState`) must happen synchronously before the app's JS runs. Do not
-  defer these to `DOMContentLoaded`.
-- **DOM changes after DOMContentLoaded** — any DOM mutations, element injection, or click
-  simulation must wait for the DOM to be ready.
-- **Never throw** — catch errors and log warnings. The content script must not break the host app.
-
-```javascript
-(function contentScript() {
-  "use strict";
-
-  // Synchronous setup — runs before the app's JS
-  // (fetch overrides, route changes, localStorage)
-
-  // DOM changes — runs after the document is ready
-  function boot() {
-    // ...
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
-  } else {
-    boot();
-  }
-})();
-```
+- **Incomplete mocks** — Missing an endpoint the page calls on mount. The page shows a spinner or error because you forgot to mock `/api/me` or a feature flags endpoint.
+- **Wrong URL matching** — The app fetches `/api/v2/users?page=1` but you mock `/api/users`. Check how the app constructs URLs (base URL env vars, path prefixes, query params).
+- **Wrong response shape** — The component destructures `data.items` but your mock returns `{ results: [...] }`. Read the component code to see what fields it accesses.
+- **Missing auth setup** — The app checks auth on load and redirects before your route change takes effect. Seed auth state synchronously before anything else.
+- **Arbitrary timeouts** — Using `setTimeout(2000)` instead of waiting for a condition. Use `waitForSelector` or MutationObserver.
+- **Direct DOM replacement of framework-managed elements** — Replacing a React-controlled `<div>` destroys its event handlers. It "works" visually but breaks interactivity. Either intercept at the data layer (let the framework re-render) or replace elements you fully own.
+- **Re-render clobbering** — You mutate the DOM, but then React/Vue re-renders and wipes your changes. Use a MutationObserver to re-apply, or work at the data layer so the framework renders what you want natively.
 
 ## Step 4: Upload and place on canvas
 

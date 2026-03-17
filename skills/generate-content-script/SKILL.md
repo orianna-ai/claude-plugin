@@ -9,12 +9,21 @@ model: sonnet
 
 You will receive context about a **design issue with an existing application** that the user wants to solve. Your goal is to write a content script that puts the app into the right screen and state to **see the problem with the app's design** — NOT to solve it. That state will later be screenshot.
 
-Do not make any design changes. Just get the app showing the relevant page/state with realistic data so it can LATER be screenshot (you just write the content script).
+Do not make any design changes. Just get the app showing the relevant page/state with realistic data so it can later be screenshot.
 
-The content script is a self-contained JavaScript IIFE injected into a running web app via
-`Page.addScriptToEvaluateOnNewDocument`. It executes **before any of the page's own JavaScript**,
-so fetch/WebSocket mocks and route changes must be set up synchronously during evaluation, not
-deferred to `DOMContentLoaded`.
+## How to think about content scripts
+
+Think of a content script as **the `beforeEach` setup of a Playwright or Cypress E2E test — but running inline in the page instead of from an external test runner.** You are writing test fixtures, API mocks, and navigation setup — the same things you'd write to get an app into a specific state for a UI test.
+
+The script is injected via `Page.addScriptToEvaluateOnNewDocument` and executes **before any of the page's own JavaScript**. This is equivalent to setting up `page.route()` handlers and `page.goto()` before the app loads.
+
+| What you need to do | E2E test equivalent |
+|---|---|
+| Intercept `fetch` with mock responses | `page.route()` / `cy.intercept()` / MSW handlers |
+| Seed localStorage/sessionStorage | Test fixtures / `beforeEach` setup |
+| Navigate to target route | `page.goto('/dashboard')` |
+| Wait for elements then interact | `await screen.findByRole(...)` / Playwright locators |
+| "Never throw, never hang" | "Don't write flaky tests" |
 
 ## Step 1: Identify the target app state
 
@@ -25,48 +34,81 @@ Don't explore beyond what you need to answer: **what does the user need to see?*
 
 ## Step 2: Determine what the app needs to show this state
 
-The screenshot tool navigates to `/` and captures what renders immediately. **Whatever 
+The screenshot tool navigates to `/` and captures what renders immediately. **Whatever
 renders at `/` when the app starts is the screenshot.** Make what loads there the app screen and state that displays the design problem, unconditionally.
 
-Routing to the right page is only half the job. The page also needs to be in the right
-**state**. Most components conditionally render based on app state — auth status, loaded data,
-completed flow steps, selected tabs, expanded panels, etc. If any of these conditions aren't met,
-the component will show a loading spinner, empty state, or redirect instead of the actual
-content.
+### Enumerate every state dependency
 
-Find what the screen, state, and component reads to decide what to render, and make that true. Don't simulate the user flow — inject the end state as directly as possible.
+Before writing any code, list every condition the target screen checks before rendering its real content. Think of these as the **test preconditions** you'd set up in a `beforeEach` block. Common ones:
 
-The page must also have realistic mock data — enough that someone looking at the screenshot can immediately understand the design issue that is being presented.
+- **Authentication** — token in localStorage/cookie, user profile endpoint returning a valid user. If you don't set this up, the app will redirect to login.
+- **Route/URL** — the path, query params, and hash the page expects.
+- **API data** — every `fetch`/`axios` call the page makes on mount. Check the component source for `useEffect`, `useQuery`, `useSWR`, `getServerSideProps`, loaders, etc. Each one is an endpoint you need to mock. **Mock every endpoint the page hits on load, not just the "main" one** — missing a single one causes loading spinners or error states.
+- **Flow/wizard state** — completed steps, selected tabs, expanded panels stored in state or URL params.
+- **Feature flags / preferences** — anything read from localStorage, cookies, or a flags endpoint.
 
-**If any condition is not met, the screenshot will show a landing page, empty state, or login
-screen — and the content script has failed.**
+If any condition is not met, the screenshot will show a landing page, empty state, loading spinner, or login screen — and the content script has failed.
+
+### Plan your mocks like MSW handlers
+
+For each API endpoint the target screen calls, determine:
+- The exact URL pattern (including query params, trailing slashes, base URL prefixes)
+- The expected response shape (read the component code to see what fields it destructures)
+- Realistic mock data (correct types, plausible values, appropriate volume — no "Lorem ipsum" or "Item 1")
 
 ## Step 3: Write the content script
 
-The content script runs via `Page.addScriptToEvaluateOnNewDocument` — it executes before any of
-the app's own JavaScript. `setup()` runs synchronously at evaluation time to install mocks and
-set state. `boot()` runs after DOMContentLoaded for any DOM mutations that need elements to
-exist.
+The synchronous portion is your fixture/mock setup (`beforeEach`); the `boot()` function is your post-load interactions.
+
+`@testing-library/dom` and `@testing-library/user-event` are available as runtime dependencies. Import them dynamically via `esm.sh`:
+
+```javascript
+await import("https://esm.sh/@testing-library/dom");
+await import("https://esm.sh/@testing-library/user-event");
+```
+
+Prefer these libraries over raw `querySelector` and `dispatchEvent` — they query by what the user sees (roles, text, labels) rather than class names that may be generated or unstable, and they simulate real user interactions that properly trigger framework state updates.
 
 ```javascript
 (function contentScript() {
   "use strict";
 
-  function setup() {
-    // 1. Intercept fetch — mock API responses with realistic data
-    // 2. Mock WebSocket / EventSource if the app uses them
-    // 3. Seed localStorage/sessionStorage — auth, feature flags, preferences
-    // 4. Navigate to the target route (use history.replaceState, not pushState)
-  }
+  // ── Synchronous setup (runs before the app's JS) ──────────────
 
-  setup();
+  // 1. Seed auth state
+  localStorage.setItem("token", "mock-jwt-token");
 
-  function waitForSelector(selector, root, timeout) {
-    // helper: resolve when a selector appears in the DOM
+  // 2. Navigate to the target route
+  history.replaceState(null, "", "/target-route");
+
+  // 3. Intercept fetch
+  //    IMPORTANT: Always store the original fetch and pass through unmatched
+  //    requests. If you don't, every endpoint you didn't mock will break.
+  const _fetch = window.fetch;
+  window.fetch = async (url, opts) => {
+    const u = new URL(url, location.origin);
+
+    if (u.pathname === "/api/me") {
+      return new Response(JSON.stringify({ id: 1, name: "Jane Smith" }));
+    }
+
+    // ... other mocked endpoints ...
+
+    // Pass through everything else to the real server
+    return _fetch(url, opts);
+  };
+
+  // 4. Mock WebSocket / EventSource if the app uses them
+
+  // ── Boot (runs after DOMContentLoaded) ─────────────────────────
+
+  function waitForSelector(selector, root = document, timeout = 5000) {
+    // Resolve when a selector appears in the DOM. Never hang.
   }
 
   function boot() {
-    // optional: waitForSelector-based interactions (click a tab, expand a panel)
+    // Optional: waitForSelector-based interactions (click a tab, expand a panel)
+    // Use testing-library queries (findByRole, findByText) when possible.
   }
 
   if (document.readyState === "loading") {
@@ -77,9 +119,15 @@ exist.
 })();
 ```
 
-Mock data MUST match the shapes and types the app expects (plausible values, appropriate volume,
-correct types — no "Lorem ipsum" or "Item 1"). If you are mocking images, use placeholder
-images that will resolve and make sense.
+### Common mistakes to avoid
+
+These are flaky test anti-patterns — avoid them:
+
+- **Incomplete mocks** — Missing an endpoint the page calls on mount. The page shows a spinner or error because you forgot to mock `/api/me` or a feature flags endpoint. Mock every endpoint, not just the main data one.
+- **Wrong URL matching** — The app fetches `/api/v2/users?page=1` but you mock `/api/users`. Check how the app constructs URLs (base URL env vars, path prefixes, query params).
+- **Wrong response shape** — The component destructures `data.items` but your mock returns `{ results: [...] }`. Read the component code to see what fields it accesses.
+- **Missing auth** — The app checks auth on load and redirects before your route change takes effect. Seed auth state synchronously before anything else.
+- **Arbitrary timeouts** — Using `setTimeout(2000)` instead of waiting for a condition. Use `waitForSelector` or MutationObserver.
 
 **Rules:**
 
