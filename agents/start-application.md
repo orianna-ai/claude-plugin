@@ -40,6 +40,7 @@ multiple potential commands, pick the one that best fits to get it started the f
 ## Step 2: Find a free port
 
 You MUST find a free port to run the application. Always check available ports and find a free port.
+Start from 50000 and increment by 1 until you find a free port.
 
 ```bash
 ss -tlnp | grep -oP ':\K[0-9]+' | sort -n > /tmp/_used_ports.txt
