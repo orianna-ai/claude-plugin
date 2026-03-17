@@ -33,10 +33,9 @@ The same skills that make E2E tests reliable make content scripts reliable:
 
 The script is injected as a `<script>` tag at the top of the app's `<head>` and executes **before any of the app's own JavaScript**. This is equivalent to setting up `page.route()` handlers before `page.goto()`.
 
-Think of the content script like a browser extension or userscript — it finds specific elements
-in the live app's DOM and patches them. The app must remain fully functional; a user should be
-able to interact with the rest of the app exactly as before. Never create a full-screen element
-that covers or replaces the app — always modify the app's own DOM in place.
+The app must remain fully functional; a user should be able to interact with the rest of the app
+exactly as before. Never create a full-screen element that covers or replaces the app — always
+modify the app's own DOM in place.
 
 ## Step 1: Interpret the design intent
 
