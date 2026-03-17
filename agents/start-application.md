@@ -1,7 +1,7 @@
 ---
 name: start-application
 description: "Find and run a web app's dev server on a free port. Returns the port, PID, and start command."
-allowed-tools: Bash, Read, Write, Glob, Grep
+tools: Bash, Read, Write, Glob, Grep
 model: sonnet
 ---
 
@@ -40,7 +40,6 @@ multiple potential commands, pick the one that best fits to get it started the f
 ## Step 2: Find a free port
 
 You MUST find a free port to run the application. Always check available ports and find a free port.
-Start from 50000 and increment by 1 until you find a free port.
 
 ```bash
 ss -tlnp | grep -oP ':\K[0-9]+' | sort -n > /tmp/_used_ports.txt
@@ -74,7 +73,7 @@ app it has been asked to start — even if the repo contains multiple similar ap
   homepage" vs "the authenticated dashboard")
 - The directory path where the app lives in the repo
 - If there are other similar apps in the repo that could be confused with this one, explicitly call
-  them out
+  them out (e.g. "Not to be confused with `server/inspiration` which is the logged-in version")
 - The exact start command
 - How the port is configured (environment variable, CLI flag, etc.)
 - Any prerequisites (install steps, environment variables, services that need to be running)
