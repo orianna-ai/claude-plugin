@@ -9,7 +9,7 @@ model: sonnet
 
 You will receive context about a **design issue with an existing application** that the user wants to solve. Your goal is to write a content script that puts the app into the right screen and state to **see the problem with the app's design** — NOT to solve it. That state will later be screenshot.
 
-Do not make any design changes. Just get the app showing the relevant page/state with realistic data so it can LATER be screenshot (you just write the content script).
+Do not make any design changes. Just get the app showing the relevant page/state with realistic data so it can later be screenshot.
 
 ## How to think about content scripts
 
@@ -58,7 +58,7 @@ For each API endpoint the target screen calls, determine:
 
 ## Step 3: Write the content script
 
-The content script is structurally identical to E2E test setup code. The synchronous portion is your fixture/mock setup; the `boot()` function is your test interactions.
+The synchronous portion is your fixture/mock setup (`beforeEach`); the `boot()` function is your post-load interactions.
 
 `@testing-library/dom` and `@testing-library/user-event` are available as runtime dependencies. Import them dynamically via `esm.sh`:
 
@@ -74,23 +74,15 @@ Prefer these libraries over raw `querySelector` and `dispatchEvent` — they que
   "use strict";
 
   // ── Synchronous setup (runs before the app's JS) ──────────────
-  // This is your beforeEach: fixtures, mocks, navigation.
 
   // 1. Seed auth state (localStorage/sessionStorage/cookies)
-  //    → Like setting up auth fixtures in a test
-
-  // 2. Navigate to the target route
-  //    → Like page.goto() — use history.replaceState, not pushState
-
+  // 2. Navigate to the target route (use history.replaceState, not pushState)
   // 3. Intercept fetch — mock every API endpoint the page hits on load
-  //    → Like page.route() or cy.intercept() or MSW handlers
   //    Match URLs carefully: check base URLs, path prefixes, query params.
   //    Return responses matching the exact shape the app destructures.
-
   // 4. Mock WebSocket / EventSource if the app uses them
 
   // ── Boot (runs after DOMContentLoaded) ─────────────────────────
-  // This is your test body: find elements, interact, verify state.
 
   function waitForSelector(selector, root = document, timeout = 5000) {
     // Resolve when a selector appears — like a Playwright locator with timeout.
@@ -112,13 +104,13 @@ Prefer these libraries over raw `querySelector` and `dispatchEvent` — they que
 
 ### Common mistakes to avoid
 
-These are the content script equivalents of flaky test anti-patterns:
+These are flaky test anti-patterns — avoid them:
 
-- **Incomplete mocks** — Missing an endpoint the page calls on mount. The page shows a spinner or error. Mock every endpoint, not just the main data one. Check for user/profile, feature flags, config, and analytics endpoints too.
+- **Incomplete mocks** — Missing an endpoint the page calls on mount. The page shows a spinner or error because you forgot to mock `/api/me` or a feature flags endpoint. Mock every endpoint, not just the main data one.
 - **Wrong URL matching** — The app fetches `/api/v2/users?page=1` but you mock `/api/users`. Check how the app constructs URLs (base URL env vars, path prefixes, query params).
 - **Wrong response shape** — The component destructures `data.items` but your mock returns `{ results: [...] }`. Read the component code to see what fields it accesses.
 - **Missing auth** — The app checks auth on load and redirects before your route change takes effect. Seed auth state synchronously before anything else.
-- **Arbitrary timeouts** — Using `setTimeout(2000)` instead of waiting for a condition. Use `waitForSelector` or MutationObserver, just like you'd use `waitFor` in a test.
+- **Arbitrary timeouts** — Using `setTimeout(2000)` instead of waiting for a condition. Use `waitForSelector` or MutationObserver.
 
 **Rules:**
 
