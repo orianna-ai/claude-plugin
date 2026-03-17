@@ -63,7 +63,7 @@ placeholders.
 5. **Record the result** by posting a `pull_request_created` event. Substitute the actual
    values for `<project_id>`, `<github_url>`, `<slot_id>`, and `<git_branch>`:
    ```
-   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
+   curl -s -X POST "https://softlight.orianna.ai/api/projects/<project_id>/events" \
      -H "Content-Type: application/json" \
      -d '[{"type":"pull_request_created","github_url":"<github_url>","slot_id":"<slot_id>","git_branch":"<git_branch>"}]'
    ```

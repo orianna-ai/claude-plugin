@@ -12,6 +12,8 @@ subagents — never do it inline. You MUST run through all phases and phases mus
 
 ## Phase 1: Setup
 
+If a user has not input a design problem yet, ask them what design challenge they want to work on.
+
 Use the agent tool to run the setup steps as **background** subagents **in parallel**.
 
 ### 1a. Content Script
@@ -55,7 +57,7 @@ Loop indefinitely:
    `plan_prototype_revision`), call the tool **directly** — do not spawn a subagent. After the tool
    returns, mark the prompt as done and loop back to step 1:
    ```
-   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
+   curl -s -X POST "https://softlight.orianna.ai/api/projects/<project_id>/events" \
      -H "Content-Type: application/json" \
      -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
    ```
@@ -63,7 +65,7 @@ Loop indefinitely:
 4. Otherwise, dispatch the skill in a **background** subagent. You must instruct the subagent to
    mark the prompt as done when it is finished by running:
    ```
-   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
+   curl -s -X POST "https://softlight.orianna.ai/api/projects/<project_id>/events" \
      -H "Content-Type: application/json" \
      -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
    ```
