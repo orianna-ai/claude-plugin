@@ -1,6 +1,7 @@
 ---
 name: start-environment
 description: "Start a web app's dev server and create a tunnel, with tunnel prep overlapping the app build. Returns the port, tunnel URL, PIDs, and start command."
+tools: Bash, Read, Write, Glob, Grep
 model: sonnet
 ---
 
