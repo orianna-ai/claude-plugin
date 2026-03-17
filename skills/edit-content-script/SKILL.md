@@ -47,6 +47,8 @@ You will receive a **plan item** with everything you need:
   - `comment_screenshot`: Screenshot of the canvas with a blue dot showing where the user clicked.
   - `user_attached_images`: Images the user attached (inspiration, desired outcomes, examples).
   - `anchor_selectors`, `anchor_html`, `anchor_location`: DOM context where the comment was placed.
+  - `position`: How the comment thread is positioned — `auto`, `relative`, or `absolute`.
+  - `x`, `y`: Absolute coordinates of the comment thread on the canvas (used when position is `absolute`).
 - **`design_mocks`**: URLs of design mocks from the canvas relevant to this change.
 
 ### How to interpret the feedback
@@ -61,6 +63,15 @@ Feedback are comments left on a canvas (think of these as Figma comments the PM 
 - **`user_attached_images`**: Images the user attached to comments.
 - **DOM context** (`anchor_selectors`, `anchor_html`, `anchor_location`): These are parts of prototypes that users attached the comment to. Use it as a hint for where in the
   code to make changes, but be cautious - it can be unreliable (may point to a sibling, wrapper, or wrong nesting level). ALWAYS trust the screenshot first.
+- **Comment thread position** (`position`, `x`, `y`): Comment threads can be positioned in
+  three modes:
+  - `auto` — uses `relative` positioning if an anchor is available, otherwise falls back to
+    `absolute`.
+  - `relative` — the thread is positioned relative to its anchor element.
+  - `absolute` — the thread is positioned at the exact `x` / `y` coordinates on the canvas.
+  Once a user manually moves a comment thread, its position becomes `absolute`. When the
+  position is `relative`, use the anchor to locate the relevant element. When `absolute`, use the
+  `x` / `y` coordinates and the screenshot to determine what the comment refers to.
 
 Another teammate without context took that feedback and wrote the `change_description`, which is meant to synthesize the feedback into what to change. Reminder: This was written without context of our app. You should generate a real final say on what the changes should be.
 
