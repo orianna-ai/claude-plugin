@@ -48,12 +48,13 @@ serverPort = 443
 protocol = "wss"
 
 [[proxies]]
-name = "${TUNNEL_ID}"
-type = "http"
-localPort = ${PORT}
 customDomains = ["frp-gateway.orianna.ai"]
+hostHeaderRewrite = "localhost"
 httpUser = "${TUNNEL_ID}"
+localPort = ${PORT}
+name = "${TUNNEL_ID}"
 routeByHTTPUser = "${TUNNEL_ID}"
+type = "http"
 TOML
 
 "$BINARY" -c "$CONFIG_FILE" &>"/tmp/frpc-${TUNNEL_ID}.log" &
