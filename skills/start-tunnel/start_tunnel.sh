@@ -38,12 +38,15 @@ fi
 
 # run frpc in the background and capture the pid
 CONFIG_FILE="/tmp/frpc-${TUNNEL_ID}.toml"
+PROXY_URL="${HTTPS_PROXY:-${HTTP_PROXY:-${https_proxy:-${http_proxy:-}}}}"
+
 cat > "$CONFIG_FILE" <<TOML
 serverAddr = "frp.orianna.ai"
 serverPort = 443
 
 [transport]
 protocol = "wss"
+${PROXY_URL:+proxyURL = \"${PROXY_URL}\"}
 
 [[proxies]]
 customDomains = ["frp-gateway.orianna.ai"]
