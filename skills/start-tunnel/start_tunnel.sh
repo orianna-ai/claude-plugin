@@ -11,10 +11,8 @@ if [[ "$HTTP_CODE" -lt 200 || "$HTTP_CODE" -ge 400 ]] 2>/dev/null; then
 fi
 
 # configure the script
-FRPC_VERSION="0.61.1"
-BASE_URL="http://localhost:8080"
+FRPC_VERSION="0.67.0"
 TUNNEL_ID="$(python3 -c "import uuid; print(uuid.uuid4())")"
-TUNNEL_URL="${BASE_URL}/api/tunnel/${TUNNEL_ID}/"
 PLATFORM="$(uname -sm)"
 
 # locate the frpc binary
@@ -63,7 +61,7 @@ PID=$!
 # verify the tunnel is accessible
 sleep 0.5
 for i in 1 2 3 4 5; do
-  HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$TUNNEL_URL" || true)
+  HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "https://softlight.orianna.ai/api/tunnel/$TUNNEL_ID/" || true)
   if [[ "$HTTP_CODE" -ge 200 && "$HTTP_CODE" -lt 400 ]] 2>/dev/null; then
     break
   fi
@@ -77,5 +75,5 @@ for i in 1 2 3 4 5; do
 done
 
 # print the tunnel details
-echo "TUNNEL_URL=${TUNNEL_URL}"
+echo "TUNNEL_ID=${TUNNEL_ID}"
 echo "PID=${PID}"
