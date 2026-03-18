@@ -1,100 +1,126 @@
 ---
 name: generate-content-script
-description: >
-  Generate a content script that when run, puts an app into the right state to display a design issue with the application — navigated to the target screen, authenticated, and populated with realistic mock data.
-allowed-tools: Bash, Read, Write, Glob, Grep
-model: sonnet
+description: Generate a content script — a self-contained JavaScript file that can be injected into a running application to prototype a design idea without rebuilding.
 ---
 
 # Generate Content Script
 
-You will receive context about a **design issue with an existing application** that the user wants to solve. Your goal is to write a content script that puts the app into the right screen and state to **see the problem with the app's design** — NOT to solve it. That state will later be screenshot.
+You are implementing design feedback as a **content script** — a self-contained JavaScript file
+injected into a running app that modifies its UI without rebuilding. The script is injected
+**before any app JS runs**. Synchronous code (mocks, auth, route) runs at evaluation time. DOM
+interactions run after `DOMContentLoaded`.
 
-Do not make any design changes. Just get the app showing the relevant page/state with realistic data so it can LATER be screenshot (you just write the content script).
+## Input
 
-The content script is a self-contained JavaScript IIFE injected into a running web app via
-`Page.addScriptToEvaluateOnNewDocument`. It executes **before any of the page's own JavaScript**,
-so fetch/WebSocket mocks and route changes must be set up synchronously during evaluation, not
-deferred to `DOMContentLoaded`.
+### `<project_id>`
 
-## Step 1: Identify the target app state
+Softlight project UUID.
 
-Figure out the **exact screen and state** that shows the app's design issue the user wants to solve. You should be able to describe it in one sentence (e.g. "the dashboard with three active projects and a notification badge" or "the checkout flow on the shipping step with items in the cart").
+### `<slot_id>`
 
-Read a small number of files to understand which screen is most relevant and how routing works.
-Don't explore beyond what you need to answer: **what does the user need to see?**
+Canvas slot UUID.
 
-## Step 2: Determine what the app needs to show this state
+### `<spec>`
 
-The screenshot tool navigates to `/` and captures what renders immediately. **Whatever 
-renders at `/` when the app starts is the screenshot.** Make what loads there the app screen and state that displays the design problem, unconditionally.
+A text description of the desired change to the application. May contain image URLs (design mocks,
+screenshots) — download and examine these for additional visual context. To view images, use `curl`
+to download them to a local file (e.g., `/tmp/mock.webp`) and then use the **Read** tool to view
+the file. Do **not** use WebFetch for images — it returns binary data as text and cannot render them.
+If `<spec>` includes a base content script URL, download it and edit from there.
 
-Routing to the right page is only half the job. The page also needs to be in the right
-**state**. Most components conditionally render based on app state — auth status, loaded data,
-completed flow steps, selected tabs, expanded panels, etc. If any of these conditions aren't met,
-the component will show a loading spinner, empty state, or redirect instead of the actual
-content.
+### `<context>`
 
-Find what the screen, state, and component reads to decide what to render, and make that true. Don't simulate the user flow — inject the end state as directly as possible.
+Pre-explored source code and analysis for the target application. The caller builds this by
+exploring the app's source tree before invoking this skill. It covers:
 
-The page must also have realistic mock data — enough that someone looking at the screenshot can immediately understand the design issue that is being presented.
+1. **Routing & auth** — how the app picks which screen to show, and what auth state it checks
+2. **Data fetching** — which endpoints the target screen calls on mount (URL patterns, query params)
+3. **Response shapes** — the TypeScript types or destructured fields each component expects
+4. **Styling** — CSS variables, theme tokens, or class naming patterns used by the app
 
-**If any condition is not met, the screenshot will show a landing page, empty state, or login
-screen — and the content script has failed.**
+If something critical is missing you may read additional source files within the application's root
+directory — but do not explore unrelated services. **Always read local source files** — never `curl`
+the tunnel URL to fetch HTML, JS bundles, CSS, or API responses. The source code is in the repo and
+is faster and more informative than compiled output. The tunnel exists for the iframe to load the
+app at runtime, not for you to explore.
 
-## Step 3: Write the content script
+## Phase 1: Write the content script
 
-The content script runs via `Page.addScriptToEvaluateOnNewDocument` — it executes before any of
-the app's own JavaScript. `setup()` runs synchronously at evaluation time to install mocks and
-set state. `boot()` runs after DOMContentLoaded for any DOM mutations that need elements to
-exist.
+Write a content script that modifies the running app to implement `<spec>`. The app has its own
+routing, components, data fetching, and design system — use them. Mock routes, auth, and API
+responses so the app renders the desired state itself.
 
-```javascript
-(function contentScript() {
-  "use strict";
+### Script structure
 
-  function setup() {
-    // 1. Intercept fetch — mock API responses with realistic data
-    // 2. Mock WebSocket / EventSource if the app uses them
-    // 3. Seed localStorage/sessionStorage — auth, feature flags, preferences
-    // 4. Navigate to the target route (use history.replaceState, not pushState)
-  }
+Wrap everything in a strict-mode IIFE. The script is injected before the app's own JavaScript, so
+synchronous code at the top level (auth, routing, fetch mocks) takes effect before the app boots.
+Any code that touches the DOM should wait for `DOMContentLoaded`. DOM overlays are injected into a
+live application that continues to render after your script loads. Never assume the DOM is stable
+after `DOMContentLoaded`. Wait for your target container to appear, and use a `MutationObserver` to
+re-inject your elements if the application removes or replaces them.
 
-  setup();
+### Fetch mocking
 
-  function waitForSelector(selector, root, timeout) {
-    // helper: resolve when a selector appears in the DOM
-  }
+- Save the original `window.fetch` and fall through to it for URLs you don't mock.
 
-  function boot() {
-    // optional: waitForSelector-based interactions (click a tab, expand a panel)
-  }
+- Handle `url` being a `Request` object — use `url instanceof Request ? url.url : String(url)`.
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", boot);
-  } else {
-    boot();
-  }
-})();
-```
+- Mock every endpoint the target screen fetches on mount.
 
-Mock data MUST match the shapes and types the app expects (plausible values, appropriate volume,
-correct types — no "Lorem ipsum" or "Item 1"). If you are mocking images, use placeholder
-images that will resolve and make sense.
+- Always provide realistic mock data — never rely on the app's live database having enough
+  (or any) data. Seed enough rows to make the prototype visually convincing (8–15 records
+  with varied, realistic values). This ensures the prototype works regardless of database state.
 
-**Rules:**
+- Match response shapes to what the components actually use, including nesting and array wrappers.
 
-- IIFE wrapper — no global pollution
-- `waitForSelector` with timeout — never hang
-- Log warnings on failure — never throw or break the host app
-- Run unconditionally — no conditionals or feature flags that skip setup
+- Check how the app builds URLs — fetch clients may prepend env vars like `VITE_API_URL`.
 
-## Step 4: Upload and return
+- Seed auth before changing the route — the app may redirect to login without it.
 
-1. Write the content script to `/tmp/cs_1.js` (increment the number if the file already exists).
-2. Upload the content script:
-   ```
-   curl -sf -F "file=@/tmp/cs_1.js" https://drive.orianna.ai/api/upload | tr -d '"'
-   ```
-3. **Delete the local `/tmp` file after a successful upload.** Do not leave content scripts in `/tmp`.
-4. Return the uploaded URL as plain text.
+### Working with the DOM
+
+- **Data layer is the default** — mock fetch so the framework re-renders natively. Only touch the
+  DOM when there is no data-layer alternative (e.g., injecting a new UI element that doesn't exist
+  in the app).
+
+- **Never hide or replace the app's root** — no `root.style.display = "none"`, no `innerHTML = ""`,
+  no `replaceChildren()`. You are a guest in the app's page.
+
+- **Never rebuild existing UI** — work with the app's own components through data or interactions.
+  Do not create a parallel version of UI the app already provides (navigation, tables, grids, etc.).
+
+- **DOM overlays for new features are fine** — if the design calls for UI that doesn't exist in the
+  app (a sidebar panel, a grouping overlay, a new toolbar), building it with `createElement` is the
+  right approach. The key distinction: use the app's components for things the app already renders,
+  and build DOM only for genuinely new additions.
+
+- If you must mutate the DOM, use `MutationObserver` to re-apply after framework re-renders. No
+  fixed timeouts.
+
+- **Watch for `overflow: hidden` ancestors** — many apps use `overflow: hidden` on flex containers
+  to let grids/tables handle their own scrolling. If you insert a new element (e.g., a search bar)
+  into one of these containers, it will be clipped. Before inserting, walk up the ancestor chain
+  and check for `overflow: hidden` on any parent that uses `flex: 1` or a fixed height. Either
+  insert your element *above* the `overflow: hidden` boundary, or temporarily adjust the container
+  to `overflow: visible` / add space for your element.
+
+- **Reuse existing CSS classes** — when building DOM overlays, apply the app's own CSS classes
+  (e.g., `.ag-row`, `.ag-cell`, `.ag-header-row` for AG Grid apps, or the framework's utility
+  classes) instead of writing inline styles. This inherits the app's theme (dark/light mode, colors,
+  typography) automatically. Only fall back to CSS variables or inline styles for genuinely new
+  elements that have no app equivalent.
+
+- **Preserve the app's design system** — any new UI elements must match the app's existing
+  aesthetics. Use the app's CSS variables, theme tokens, or class patterns — never hardcode
+  approximate color values. Never load external CSS frameworks or component libraries (AG Grid,
+  Bootstrap, etc.) when the app already has its own.
+
+- You can import third-party libraries at runtime via `esm.sh`, e.g.:
+  - `await import("https://esm.sh/@testing-library/dom")` for querying elements
+  - `await import("https://esm.sh/@testing-library/user-event")` for simulating interactions
+
+
+## Phase 2: Upload the content script
+
+Upload the content script via multipart form POST to `https://drive.orianna.ai/api/upload`.
+The response is the public URL of the uploaded file (e.g., `https://drive.orianna.ai/<hash>.js`).
