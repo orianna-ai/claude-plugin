@@ -1,10 +1,10 @@
 ---
 name: start-tunnel
-description: Create a tunnel between a local port and Softlight. Requires an application to already be listening on the port. Returns the tunnel URL and PID.
+description: Create a tunnel between a local port and Softlight. Requires an application to already be listening on the port. Returns the tunnel ID and PID.
 ---
 
 # Start Tunnel
 
 Run `start_tunnel.sh $PORT` with the port number of the running application.
 
-The script prints `TUNNEL_URL=...` and `PID=...`. Return those two values to the caller.
+The script prints `TUNNEL_ID=...` and `PID=...`. Return those two values to the caller.
