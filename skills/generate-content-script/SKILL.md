@@ -104,16 +104,13 @@ re-inject your elements if the application removes or replaces them.
   insert your element *above* the `overflow: hidden` boundary, or temporarily adjust the container
   to `overflow: visible` / add space for your element.
 
-- **Reuse existing CSS classes** — when building DOM overlays, apply the app's own CSS classes
-  (e.g., `.ag-row`, `.ag-cell`, `.ag-header-row` for AG Grid apps, or the framework's utility
-  classes) instead of writing inline styles. This inherits the app's theme (dark/light mode, colors,
+- **Reuse existing CSS classes** — when building DOM overlays, apply the app's own CSS classes instead of writing inline styles. This inherits the app's theme (dark/light mode, colors,
   typography) automatically. Only fall back to CSS variables or inline styles for genuinely new
   elements that have no app equivalent.
 
 - **Preserve the app's design system** — any new UI elements must match the app's existing
   aesthetics. Use the app's CSS variables, theme tokens, or class patterns — never hardcode
-  approximate color values. Never load external CSS frameworks or component libraries (AG Grid,
-  Bootstrap, etc.) when the app already has its own.
+  approximate color values. Never load external CSS frameworks or component libraries when the app already has its own.
 
 - You can import third-party libraries at runtime via `esm.sh`, e.g.:
   - `await import("https://esm.sh/@testing-library/dom")` for querying elements
@@ -124,3 +121,10 @@ re-inject your elements if the application removes or replaces them.
 
 Upload the content script via multipart form POST to `https://drive.orianna.ai/api/upload`.
 The response is the public URL of the uploaded file (e.g., `https://drive.orianna.ai/<hash>.js`).
+
+## Phase 3: Place the content script on the canvas
+
+Call the `update_iframe_element` MCP tool with `project_id`, `slot_id`, and `content_script_url`
+(the URL from Phase 2). This replaces the placeholder slot with an iframe that loads the app with
+your content script injected. All other iframe fields (`git_commit`, `tunnel_id`, `git_patch`)
+are inherited from `problem.baseline` automatically so you don't have to full them in.

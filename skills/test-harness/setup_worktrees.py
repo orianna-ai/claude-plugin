@@ -47,7 +47,7 @@ def _list_worktrees(
     for event in events:
         match event["type"]:
             case "project_updated":
-                if baseline := event.get("problem", {}).get("baseline"):
+                if baseline := (event.get("problem") or {}).get("baseline"):
                     worktrees.add(
                         Worktree(
                             tunnel_id=baseline["tunnel_id"],
