@@ -1,7 +1,7 @@
 ---
 name: run-orchestrator
 description: Setup a Softlight project and then continuously listen for created prompts and dispatch them to background subagents for completion.
-allowed-tools: Bash, Read, Write, Glob, Grep, mcp__plugin_softlight_softlight__create_project, mcp__plugin_softlight_softlight__generate_mock_revision, mcp__plugin_softlight_softlight__wait_for_prompt, mcp__plugin_softlight_softlight__plan_prototype_revision, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_comment, mcp__plugin_softlight_softlight__generate_prototype_revision
+allowed-tools: Bash, Read, Write, Glob, Grep, mcp__plugin_softlight_softlight__create_project, mcp__plugin_softlight_softlight__generate_mock_revision, mcp__plugin_softlight_softlight__wait_for_prompt, mcp__plugin_softlight_softlight__plan_prototype_revision, mcp__plugin_softlight_softlight__create_comment, mcp__plugin_softlight_softlight__generate_prototype_revision
 model: sonnet
 ---
 
@@ -53,19 +53,46 @@ Loop indefinitely:
    **Break out of the loop immediately** and proceed to Phase 4 (Cleanup). Do not dispatch any
    further subagents.
 
-3. If the prompt only requires calling a single Softlight MCP tool (e.g. `generate_mock_revision`),
-   call the tool **directly** — do not spawn a subagent. After the tool
+3. If the returned prompt has `key` equal to `"ai_review"`, run the evaluation sub-flow:
+
+   **3a. PM review** — Dispatch the `evaluate-prototypes` skill in a **background** subagent.
+   Pass it:
+   - The path to the skill:
+     `/workspaces/orianna/claude-plugin/skills/evaluate-prototypes/SKILL.md`
+   - The `project_id`
+   - The problem statement from Phase 1
+   - The user's original prompt
+
+   **Wait for the PM subagent to complete** before proceeding to 3b.
+
+   **3b. Designer review** — Dispatch the `evaluate-prototypes-designer` skill in a **background**
+   subagent. Pass it:
+   - The path to the skill:
+     `/workspaces/orianna/claude-plugin/skills/evaluate-prototypes-designer/SKILL.md`
+   - The `project_id`
+   - The problem statement from Phase 1
+   - The user's original prompt
+
+   **Wait for the designer subagent to complete** before proceeding to 3c.
+
+   **3c. Generate next revision** — Call `plan_prototype_revision` directly with the `project_id`.
+   It reads the PM and designer comment threads from the canvas and plans the next set of
+   prototypes. Mark the `ai_review` prompt as done and loop back to step 1 — the per-slot prompts
+   from `plan_prototype_revision` will arrive as subsequent prompts.
+
+4. If the prompt only requires calling a single Softlight MCP tool (e.g. `generate_mock_revision`,
+   `plan_prototype_revision`), call the tool **directly** — do not spawn a subagent. After the tool
    returns, mark the prompt as done and loop back to step 1:
    ```
-   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
+   curl -s -X POST "https://softlight.orianna.ai/api/projects/<project_id>/events" \
      -H "Content-Type: application/json" \
      -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
    ```
 
-4. Otherwise, dispatch the skill in a **background** subagent. You must instruct the subagent to
+5. Otherwise, dispatch the skill in a **background** subagent. You must instruct the subagent to
    mark the prompt as done when it is finished by running:
    ```
-   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
+   curl -s -X POST "https://softlight.orianna.ai/api/projects/<project_id>/events" \
      -H "Content-Type: application/json" \
      -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
    ```
