@@ -53,3 +53,32 @@ Print the project URL:
 ```
 http://localhost:8080/projects/<project_id>
 ```
+
+## Step 5: Prompt Handling
+
+Loop indefinitely:
+
+1. Call the `wait_for_prompt` tool with `project_id`. On the first call, omit `prompt_id`.
+   On subsequent calls, pass the `prompt_id` from the previous result.
+
+2. If the prompt only requires calling a single Softlight MCP tool (e.g. `generate_mock_revision`),
+   call the tool **directly** — do not spawn a subagent. After the tool
+   returns, mark the prompt as done and loop back to step 1:
+   ```
+   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
+     -H "Content-Type: application/json" \
+     -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
+   ```
+
+3. Otherwise, dispatch the skill in a **background** subagent. You must instruct the subagent to
+   mark the prompt as done when it is finished by running:
+   ```
+   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
+     -H "Content-Type: application/json" \
+     -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
+   ```
+   Loop back to step 1 immediately — do not wait for the subagent.
+
+## Step 6: Cleanup
+
+Run the `stop-tunnel` skill and then the `stop-application` skill to kill background processes.
