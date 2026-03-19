@@ -93,45 +93,29 @@ Phase 4 until every prototype has been generated.
 
 ## Phase 4: Evaluate
 
-This is the core of the test — you are acting as an automated design critic.
+### 4a. PM review
 
-### 4a. Screenshot each prototype
+Dispatch the `evaluate-prototypes` skill in a **background** subagent. Pass it:
 
-Call `get_project` with the `project_id`. Find all slots with `element.type === "iframe"` in the
-latest revision. For each one, call `screenshot_prototype` with the `project_id` and `slot_id`.
-Save the returned URLs.
+1. The path to the skill:
+   `/workspaces/orianna/claude-plugin/skills/evaluate-prototypes/SKILL.md`
+2. The `project_id`
+3. The problem statement from Phase 1
+4. The user's original prompt
 
-### 4b. View the screenshots
+Wait for the PM subagent to complete before proceeding to 4b.
 
-Download each screenshot and view it:
+### 4b. Designer review
 
-```bash
-curl -sL "<screenshot_url>" -o /tmp/eval_proto_<N>.png
-```
+Dispatch the `evaluate-prototypes-designer` skill in a **background** subagent. Pass it:
 
-Then use the **Read** tool on each downloaded file to see the prototype visually. Do this for every
-screenshot — do not skip any.
+1. The path to the skill:
+   `/workspaces/orianna/claude-plugin/skills/evaluate-prototypes-designer/SKILL.md`
+2. The `project_id`
+3. The problem statement from Phase 1
+4. The user's original prompt
 
-### 4c. Give design feedback
-
-Now evaluate each prototype against the problem statement from Phase 1. Think critically about:
-
-- **Does this solve the user's problem?** Does the design address the core pain point?
-- **Visual hierarchy.** Is the most important information prominent? Can the user scan quickly?
-- **Interaction design.** Are the controls intuitive? Is the flow logical?
-- **Information density.** Too cluttered? Too sparse? Is the content well-organized?
-- **Consistency.** Does it feel integrated with the rest of the app?
-
-For each prototype, call `create_comment_thread` with:
-
-- `project_id`
-- `text` — specific, actionable feedback (e.g., "The search bar is too small relative to the data
-  grid — make it more prominent and add a clear filter indicator so users know what's active")
-- `prototype_slot_id` — the slot ID of the prototype you're commenting on
-- `screenshot_url` — the screenshot URL from step 4a (provides visual context for the planner)
-
-Give 1-2 comments per prototype. Be specific — reference concrete UI elements, not abstract
-concepts. Each comment should suggest a clear direction for improvement.
+Wait for the designer subagent to complete before proceeding to Phase 5.
 
 ## Phase 5: Second Prototype Generation
 
