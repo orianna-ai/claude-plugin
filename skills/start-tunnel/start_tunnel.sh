@@ -3,11 +3,16 @@ set -euo pipefail
 
 PORT="${1:?Usage: start_tunnel.sh <port>}"
 
-# verify $PORT is accessible
-HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "http://localhost:$PORT" || true)
+# verify $PORT is accessible (try IPv4 first, then IPv6)
+LOCAL_IP="127.0.0.1"
+HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "http://127.0.0.1:$PORT" || true)
 if [[ "$HTTP_CODE" -lt 200 || "$HTTP_CODE" -ge 400 ]] 2>/dev/null; then
-  echo "ERROR: Port $PORT returned HTTP $HTTP_CODE (expected 2xx/3xx)" >&2
-  exit 1
+  HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "http://[::1]:$PORT" || true)
+  if [[ "$HTTP_CODE" -lt 200 || "$HTTP_CODE" -ge 400 ]] 2>/dev/null; then
+    echo "ERROR: Port $PORT not reachable on 127.0.0.1 or ::1 (last HTTP $HTTP_CODE)" >&2
+    exit 1
+  fi
+  LOCAL_IP="::1"
 fi
 
 # configure the script
@@ -52,6 +57,7 @@ ${PROXY_URL:+proxyURL = \"${PROXY_URL}\"}
 customDomains = ["frp-gateway.orianna.ai"]
 hostHeaderRewrite = "localhost"
 httpUser = "${TUNNEL_ID}"
+localIP = "${LOCAL_IP}"
 localPort = ${PORT}
 name = "${TUNNEL_ID}"
 routeByHTTPUser = "${TUNNEL_ID}"
@@ -64,7 +70,7 @@ PID=$!
 # verify the tunnel is accessible
 sleep 0.5
 for i in 1 2 3 4 5; do
-  HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "https://softlight.orianna.ai/api/tunnel/$TUNNEL_ID/" || true)
+  HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "http://localhost:8080/api/tunnel/$TUNNEL_ID/" || true)
   if [[ "$HTTP_CODE" -ge 200 && "$HTTP_CODE" -lt 400 ]] 2>/dev/null; then
     break
   fi
@@ -79,4 +85,5 @@ done
 
 # print the tunnel details
 echo "TUNNEL_ID=${TUNNEL_ID}"
+echo "TUNNEL_URL=http://localhost:8080/api/tunnel/${TUNNEL_ID}/"
 echo "PID=${PID}"

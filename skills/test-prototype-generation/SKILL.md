@@ -34,7 +34,7 @@ tunneled application. Post a `project_updated` event via the REST API:
 
 ```bash
 curl -s -X POST \
-  "https://softlight.orianna.ai/api/projects/${PROJECT_ID}/events" \
+  "http://localhost:8080/api/projects/${PROJECT_ID}/events" \
   -H "Content-Type: application/json" \
   -d '[{"type":"project_updated","problem":{"text":"Test prototype generation","tunnel_url":"'"${TUNNEL_URL}"'"}}]'
 ```
@@ -42,7 +42,7 @@ curl -s -X POST \
 After posting, verify the project state and confirm `problem.tunnel_url` is set:
 
 ```bash
-curl -s "https://softlight.orianna.ai/api/projects/${PROJECT_ID}"
+curl -s "http://localhost:8080/api/projects/${PROJECT_ID}"
 ```
 
 ## Phase 3: Create Placeholders and Dispatch Subagents
@@ -74,7 +74,7 @@ import urllib.request
 PROJECT_ID = "<substitute>"
 SLOT_ID_1 = "<substitute>"
 SLOT_ID_2 = "<substitute>"
-API = f"https://softlight.orianna.ai/api/projects/{PROJECT_ID}/events"
+API = f"http://localhost:8080/api/projects/{PROJECT_ID}/events"
 
 PLAN_1 = {"slot_id":None,"content_script":None,"title":None,"change_description":"Implement an interactive data grid with a global search input field positioned above it. The search bar should filter the table in real-time. Typing a domain string (e.g., '@acme.com') must instantly filter the grid to show only rows where the account email contains that string. Ensure the Account column displays both user name and email address.","feedback":[{"comment_text":"make this as a prototype","comment_screenshot":"https://drive.orianna.ai/bafbb4bf68411fe443da6ef9535311ee.png","user_attached_images":[],"anchor_selectors":[],"anchor_html":None,"anchor_location":None}],"design_mocks":["https://drive.orianna.ai/7e35031a31af5d4b0ddf7fee20edd89d.webp"]}
 
@@ -154,7 +154,7 @@ CRITICAL: The ENTIRE prompt content below must be passed verbatim — every char
 <slot_id><SLOT_ID_1></slot_id>
 
 After completing all work, mark the prompt as done:
-curl -s -X POST "https://softlight.orianna.ai/api/projects/<PROJECT_ID>/events" \
+curl -s -X POST "http://localhost:8080/api/projects/<PROJECT_ID>/events" \
   -H "Content-Type: application/json" \
   -d '[{"type":"prompt_completed","prompt_id":"<PROMPT_ID_1>"}]'
 ```
@@ -173,7 +173,7 @@ user interactions from the canvas:
 2. When a prompt arrives, dispatch it to a **background** subagent. Instruct the subagent to
    mark the prompt as done when finished by running:
    ```
-   curl -s -X POST "https://softlight.orianna.ai/api/projects/<project_id>/events" \
+   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
      -H "Content-Type: application/json" \
      -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
    ```
@@ -181,4 +181,4 @@ user interactions from the canvas:
 
 ## Output
 
-Share the project URL with the user: `https://softlight.orianna.ai/projects/{project_id}`
+Share the project URL with the user: `http://localhost:8080/projects/{project_id}`
