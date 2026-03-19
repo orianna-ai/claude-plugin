@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# configure the script
 PORT="${1:?Usage: start_tunnel.sh <port>}"
+TUNNEL_ID="${2:-$(python3 -c "import uuid; print(uuid.uuid4())")}"
+FRPC_VERSION="0.67.0"
+PLATFORM="$(uname -sm)"
 
 # verify $PORT is accessible
 HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "http://localhost:$PORT" || true)
@@ -9,11 +13,6 @@ if [[ "$HTTP_CODE" -lt 200 || "$HTTP_CODE" -ge 400 ]] 2>/dev/null; then
   echo "ERROR: Port $PORT returned HTTP $HTTP_CODE (expected 2xx/3xx)" >&2
   exit 1
 fi
-
-# configure the script
-FRPC_VERSION="0.67.0"
-TUNNEL_ID="$(python3 -c "import uuid; print(uuid.uuid4())")"
-PLATFORM="$(uname -sm)"
 
 # locate the frpc binary
 case "$PLATFORM" in
