@@ -3,7 +3,7 @@ name: evaluate-prototypes-designer
 description: >
   Review design prototypes as the product designer — see your own work for the first time,
   respond to PM feedback, advocate for promising ideas, and give craft-level feedback.
-allowed-tools: Bash, Read, Glob, Grep, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__screenshot_prototype, mcp__plugin_softlight_softlight__create_comment_thread
+allowed-tools: Bash, Read, Glob, Grep, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_comment_thread
 model: sonnet
 ---
 
@@ -25,6 +25,7 @@ You will receive:
 - **`project_id`** — the Softlight project to evaluate
 - **`problem_statement`** — the design problem the prototypes are trying to solve
 - **`user_prompt`** — the original prompt the user gave when starting the session
+- **`screenshot_manifest`** — path to a JSON file mapping each prototype slot to its screenshots
 
 ## Step 1: Build your understanding
 
@@ -85,24 +86,29 @@ Before looking at the latest prototypes, be clear on:
 
 ## Step 2: See your work
 
-### Screenshot and view each prototype
+### View the baseline
 
-From the `get_project` response, find all slots with `element.type === "iframe"` in the latest
-revision.
+The screenshot manifest includes a **`baseline`** section — screenshots of the unmodified app as
+it exists in production today, with no content script applied. **View the baseline screenshots
+first.** This is your reference point for visual quality.
 
-For each prototype slot, call `screenshot_prototype` with the `project_id` and `slot_id`. Download
-and view every screenshot:
+Study the baseline carefully — its spacing, typography, colors, layout rhythm, whitespace. This
+is the bar. Your prototypes should be at least as polished as this, or you need to flag where
+they fall short.
 
-```bash
-curl -sL "<screenshot_url>" -o /tmp/eval_proto_<N>.png
-```
+### View the prototype screenshots
 
-Use the **Read** tool on each file. Do not skip any.
+Read the manifest to get the list of screenshots for each prototype slot. For each slot, use the
+**Read** tool on every screenshot `.png` file. Do not skip any — you need to see every captured
+state of every prototype.
 
 ### First impressions
 
 Look at your own work. Before reconciling with the PM's feedback, form your own read:
 
+- **Compare to the baseline.** Does each prototype look at least as clean and polished as the
+  unmodified app? Where does the visual quality hold up, and where did your blind generation
+  degrade it?
 - What's working? What catches your eye as promising — as a design, not just as an idea?
 - What's not working? Where did the blind generation produce something that doesn't hold up
   visually or experientially?
@@ -133,11 +139,18 @@ in the details of the actual user experience. If you see that, call it out.
 
 ### Craft and visual quality
 
-This is your domain. Evaluate:
+This is your domain. **Use the baseline as your yardstick** — the unmodified app is the minimum
+bar for visual polish. If a prototype is less clean than what's already in production, that's a
+regression and you must call it out, no matter how strong the idea is.
+
+Evaluate:
 
 - **Does it look good?** Honest gut reaction. Does it feel polished, intentional, considered?
   Or does it feel thrown together? You don't need to justify aesthetics with frameworks — if
   it doesn't look right, say so.
+- **Is it at least as polished as the baseline?** Compare spacing, alignment, typography, and
+  whitespace against the production app. If the prototype introduced visual noise, awkward
+  gaps, or misaligned elements that the baseline doesn't have, flag each one explicitly.
 - **Does the visual design serve the idea?** A beautiful design that makes the solution harder
   to understand is failing. The visuals should make the idea clearer, not compete with it.
 - **Visual hierarchy** — is the most important thing the most prominent? Can a user scan this
@@ -180,7 +193,6 @@ For each piece of feedback, call `create_comment_thread` with:
 - `text` — your feedback
 - `prototype_slot_id` — the slot ID of the prototype you're commenting on (omit for
   cross-cutting feedback)
-- `screenshot_url` — the screenshot URL from Step 2
 
 ### How to write comments
 

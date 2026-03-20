@@ -1,14 +1,16 @@
 ---
 name: run-orchestrator
-description: Setup a Softlight project and then continuously listen for created prompts and dispatch them to background subagents for completion.
-allowed-tools: Bash, Read, Write, Glob, Grep, mcp__plugin_softlight_softlight__create_project, mcp__plugin_softlight_softlight__generate_mock_revision, mcp__plugin_softlight_softlight__wait_for_prompt, mcp__plugin_softlight_softlight__plan_prototype_revision, mcp__plugin_softlight_softlight__create_comment, mcp__plugin_softlight_softlight__generate_prototype_revision
+description: Setup a Softlight project, generate prototypes, auto-evaluate with PM and designer feedback, generate a revised set of prototypes, and loop.
+allowed-tools: Bash, Read, Write, Glob, Grep, mcp__plugin_softlight_softlight__create_project, mcp__plugin_softlight_softlight__plan_prototype_revision, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__screenshot_prototype, mcp__plugin_softlight_softlight__create_comment_thread
 model: sonnet
 ---
 
 # Run Orchestrator
 
-Orchestrate a Softlight design session. Delegate all design work to skills running as background
-subagents — never do it inline. You MUST run through all phases and phases must complete before going to the next one. Do not stop or ask the user clarifying questions for any reason.
+Orchestrate a fully autonomous Softlight design session. Generate prototypes, have them reviewed
+by a PM and designer, generate a revised set incorporating that feedback, and loop. All design
+work is delegated to skills running as background subagents — never do it inline. You MUST run
+through all phases in order. Do not stop or ask the user clarifying questions for any reason.
 
 ## Phase 1: Setup
 
@@ -32,7 +34,7 @@ Run the `generate-problem-statement` skill in a **background** subagent.
 
 Share the problem statement with the user when it is ready.
 
-Phase 1a - 1c subagents must all complete before going to phase 2. 
+Phase 1a - 1c subagents must all complete before going to phase 2.
 
 ## Phase 2: Project Creation
 
@@ -40,64 +42,109 @@ Call the `create_project` tool with the problem statement, content script, and t
 Phase 1. Share the `project_url` with the user (e.g., `[View in Softlight →](<project_url>)`) and
 remember the `project_id` for future interactions.
 
-Call the `generate_mock_revision` tool directly with the `project_id`. Do not spawn a subagent —
-this tool supports task execution and should be called inline. Proceed to Phase 3 after it returns.
+## Phase 3: Generate Prototypes
 
-## Phase 3: Prompt Handling
+### 3a. Plan and fire prompts
 
-Loop indefinitely:
+Call `plan_prototype_revision` directly with the `project_id`. It creates placeholder slots and
+returns a **`prompt`** string (planning instructions) plus `slot_ids`.
 
-1. Call the `wait_for_prompt` tool with `project_id`. Pass the `prompt_id` from the previous call.
+Dispatch a **background** subagent to execute the returned `prompt` in full. The subagent must
+follow the planning instructions to produce the JSON plan and post `prompt_created` events (and
+delete unused placeholder slots) exactly as described in the prompt. Use the **same API host as
+the Softlight MCP server** for `curl` (e.g. `http://localhost:8080` when MCP is local, not a
+hard-coded production URL). **Wait** for this subagent to finish.
 
-2. If the returned prompt has `key` equal to `"cancel"`, the user clicked **Stop** in the UI.
-   **Break out of the loop immediately** and proceed to Phase 4 (Cleanup). Do not dispatch any
-   further subagents.
+### 3b. Extract per-item prompts
 
-3. If the returned prompt has `key` equal to `"ai_review"`, run the evaluation sub-flow:
+Read the per-item prompts from the event history:
 
-   **3a. PM review** — Dispatch the `evaluate-prototypes` skill in a **background** subagent.
-   Pass it:
-   - The path to the skill:
-     `/workspaces/orianna/claude-plugin/skills/evaluate-prototypes/SKILL.md`
-   - The `project_id`
-   - The problem statement from Phase 1
-   - The user's original prompt
+```bash
+curl -s "http://localhost:8080/api/projects/${PROJECT_ID}/events" | python3 -c "
+import json, sys
+events = json.load(sys.stdin)
+for event in events:
+    if event.get('type') == 'prompt_created':
+        prompt = event.get('prompt', {})
+        key = prompt.get('key', '')
+        if key.startswith('slot:'):
+            pid = prompt.get('metadata', {}).get('id', '')
+            print(f'PROMPT_ID={pid} KEY={key}')
+            print('---TEXT_START---')
+            print(prompt.get('text', ''))
+            print('---TEXT_END---')
+"
+```
 
-   **Wait for the PM subagent to complete** before proceeding to 3b.
+This gives you the prompt text and prompt_id for each per-item prompt. Only process `slot:*`
+prompts that have **not** already been completed (check the event history for a matching
+`prompt_completed` event). This matters on second+ revisions where older slot prompts are already
+done.
 
-   **3b. Designer review** — Dispatch the `evaluate-prototypes-designer` skill in a **background**
-   subagent. Pass it:
-   - The path to the skill:
-     `/workspaces/orianna/claude-plugin/skills/evaluate-prototypes-designer/SKILL.md`
-   - The `project_id`
-   - The problem statement from Phase 1
-   - The user's original prompt
+### 3c. Dispatch subagents
 
-   **Wait for the designer subagent to complete** before proceeding to 3c.
+For each per-item prompt, dispatch a **background** subagent. Pass it:
 
-   **3c. Generate next revision** — Call `plan_prototype_revision` directly with the `project_id`.
-   It reads the PM and designer comment threads from the canvas and plans the next set of
-   prototypes. Mark the `ai_review` prompt as done and loop back to step 1 — the per-slot prompts
-   from `plan_prototype_revision` will arrive as subsequent prompts.
-
-4. If the prompt only requires calling a single Softlight MCP tool (e.g. `generate_mock_revision`,
-   `plan_prototype_revision`), call the tool **directly** — do not spawn a subagent. After the tool
-   returns, mark the prompt as done and loop back to step 1:
+1. The full prompt text verbatim (including the `<project_id>` and `<slot_id>` tags)
+2. The path to the edit-content-script skill:
+   `/workspaces/orianna/claude-plugin/skills/edit-content-script/SKILL.md`
+3. Instructions to mark the prompt as done when finished:
    ```
-   curl -s -X POST "https://softlight.orianna.ai/api/projects/<project_id>/events" \
+   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
      -H "Content-Type: application/json" \
      -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
    ```
 
-5. Otherwise, dispatch the skill in a **background** subagent. You must instruct the subagent to
-   mark the prompt as done when it is finished by running:
-   ```
-   curl -s -X POST "https://softlight.orianna.ai/api/projects/<project_id>/events" \
-     -H "Content-Type: application/json" \
-     -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
-   ```
-   Loop back to step 1 immediately — do not wait for the subagent.
+### 3d. Wait for completion
 
-## Phase 4: Cleanup
+Wait for **all** background subagents from step 3c to complete before proceeding. Do not move to
+Phase 4 until every prototype has been generated.
 
-Run the `stop-tunnel` skill and then the `stop-application` skill to kill background processes.
+## Phase 4: Evaluate
+
+### 4a. Screenshot prototypes
+
+Dispatch the `screenshot-prototypes` skill in a **background** subagent. Pass it:
+
+1. The path to the skill:
+   `/workspaces/orianna/claude-plugin/skills/screenshot-prototypes/SKILL.md`
+2. The `project_id`
+
+Wait for the screenshot subagent to complete. It returns the path to a manifest file
+(e.g. `/tmp/eval_screenshots/manifest.json`). Pass this manifest path to both reviewers below.
+
+### 4b. PM review
+
+Dispatch the `evaluate-prototypes` skill in a **background** subagent. Pass it:
+
+1. The path to the skill:
+   `/workspaces/orianna/claude-plugin/skills/evaluate-prototypes/SKILL.md`
+2. The `project_id`
+3. The problem statement from Phase 1
+4. The user's original prompt
+5. The `screenshot_manifest` path from step 4a
+
+Wait for the PM subagent to complete before proceeding to 4c.
+
+### 4c. Designer review
+
+Dispatch the `evaluate-prototypes-designer` skill in a **background** subagent. Pass it:
+
+1. The path to the skill:
+   `/workspaces/orianna/claude-plugin/skills/evaluate-prototypes-designer/SKILL.md`
+2. The `project_id`
+3. The problem statement from Phase 1
+4. The user's original prompt
+5. The `screenshot_manifest` path from step 4a
+
+Wait for the designer subagent to complete before proceeding.
+
+## Phase 5: Loop
+
+Repeat from Phase 3. `plan_prototype_revision` will pick up the PM and designer comment threads
+from Phase 4 and use them to plan the next set of prototypes. Continue looping (Phase 3 → Phase 4
+→ Phase 3 → …) until the user stops the session.
+
+## Phase 6: Cleanup
+
+Run the `stop-tunnel` skill and the `stop-application` skill to kill background processes.

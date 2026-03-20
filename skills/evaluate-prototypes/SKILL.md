@@ -3,7 +3,7 @@ name: evaluate-prototypes
 description: >
   Review design prototypes as a senior product manager — evaluate ideas against project context,
   flag what's promising and what's not, suggest new directions, and give visual design feedback.
-allowed-tools: Bash, Read, Glob, Grep, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__screenshot_prototype, mcp__plugin_softlight_softlight__create_comment_thread
+allowed-tools: Bash, Read, Glob, Grep, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_comment_thread
 model: sonnet
 ---
 
@@ -23,6 +23,7 @@ You will receive:
 - **`project_id`** — the Softlight project to evaluate
 - **`problem_statement`** — the design problem the prototypes are trying to solve
 - **`user_prompt`** — the original prompt the user gave when starting the session
+- **`screenshot_manifest`** — path to a JSON file mapping each prototype slot to its screenshots
 
 ## Step 1: Build your understanding
 
@@ -74,23 +75,25 @@ is to know the context well enough to recognize when something unexpected is act
 
 ## Step 2: Review the prototypes
 
-### Screenshot and view each prototype
+### View the baseline
 
-From the `get_project` response, find all slots with `element.type === "iframe"` in the
-latest revision.
+The screenshot manifest includes a **`baseline`** section — screenshots of the unmodified app
+as it exists in production today, with no content script applied. **View the baseline screenshots
+first.** This is your reference point. Every prototype should be evaluated against this — not
+in isolation.
 
-For each prototype slot, call `screenshot_prototype` with the `project_id` and `slot_id`. Download
-and view every screenshot:
+Study the baseline carefully. Internalize its layout, spacing, typography, and visual rhythm.
+When you evaluate prototypes, you are asking: "Is this better than what we already have?"
 
-```bash
-curl -sL "<screenshot_url>" -o /tmp/eval_proto_<N>.png
-```
+### View the prototype screenshots
 
-Use the **Read** tool on each file. Do not skip any.
+Read the manifest to get the list of screenshots for each prototype slot. For each slot, use the
+**Read** tool on every screenshot `.png` file. Do not skip any — you need to see every captured
+state of every prototype.
 
 ### Evaluate
 
-Look at all the prototypes together. Then work through these three questions.
+Look at all the prototypes together. Then work through these four questions.
 
 A prototype is not one idea — it's a bundle of decisions at different levels of fidelity. The
 high-level concept might be strong, but a specific decision within it might be bad. Or the overall
@@ -150,6 +153,11 @@ If you don't have ideas right now, that's fine. Don't suggest something just to 
 Now consider the visual execution — but only on the directions you think are worth pursuing.
 Don't spend time critiquing visuals on decisions you've already flagged as bad.
 
+**Compare every prototype against the baseline.** You saw the unmodified app. Does the prototype
+look *at least as polished* as the original? A prototype that solves the right problem but
+degrades the visual quality of the page is not ready. Flag regressions explicitly — "This is
+visually worse than the current production app because..."
+
 **3a. What visual design work is good?**
 
 Good means: it feels simple, it's aesthetically sound, and — most importantly — the visual design
@@ -164,6 +172,22 @@ On the ideas you think are interesting, flag visual design that:
 - Doesn't look good — sometimes that's just the honest answer.
 - Doesn't serve the problem, even if it looks polished.
 - Makes the solution harder to understand rather than easier.
+- Is a visual regression from the baseline — worse spacing, more cluttered, less polished than
+  what's already in production.
+
+#### Question 4: Feasibility
+
+Every prototype runs on mocked data. The content script can fabricate anything — assets, data,
+content, third-party integrations. That's useful for exploring ideas, but it means prototypes
+can look shippable when they aren't.
+
+For each prototype, ask: **does this design depend on things we don't actually have?** Check the
+codebase. If an asset, data source, or piece of content doesn't exist in the product today, it's
+fabricated. Flag it.
+
+Don't kill an otherwise strong idea over a feasibility issue — but clearly separate the idea
+from its dependencies. If the concept is right but the execution relies on something we can't
+deliver, say so and suggest what we could use instead.
 
 ## Step 3: Write and post feedback
 
@@ -175,7 +199,6 @@ For each piece of feedback, call `create_comment_thread` with:
 - `text` — your feedback
 - `prototype_slot_id` — the slot ID of the prototype you're commenting on (omit for
   cross-cutting feedback or new ideas that aren't tied to a specific prototype)
-- `screenshot_url` — the screenshot URL from Step 2
 
 ### How to write comments
 
