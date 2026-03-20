@@ -46,8 +46,29 @@ remember the `project_id` for future interactions.
 
 ### 3a. Plan and fire prompts
 
-Call `plan_prototype_revision` directly with the `project_id`. It returns `slot_ids` — one per
-prototype it plans to generate. It also fires a `PromptCreatedEvent` per slot into the event bus.
+Call `plan_prototype_revision` directly with the `project_id`. It creates placeholder slots and
+returns:
+
+- `new_ideas_prompt` (always present) + `new_ideas_slot_ids`
+- `refine_prompt` (present from round 2 onward, `null` on round 1) + `refine_slot_ids`
+
+Dispatch planner subagents using the Agent tool. For each planner, use these parameters:
+
+```
+description: "New ideas planner" (or "Refine planner")
+model: "sonnet"
+run_in_background: true
+prompt: <the full prompt text from plan_prototype_revision, plus the additions below>
+```
+
+For each planner subagent prompt, remind the subagent to use `http://localhost:8080` as the API
+host for all `curl` commands (the same host as the Softlight MCP server).
+
+Dispatch rules:
+
+1. **Always** dispatch `new_ideas_prompt`.
+2. If `refine_prompt` is not null, dispatch it **in parallel** (same message, two Agent calls).
+3. **Wait** for all planner subagents to finish before proceeding to 3b.
 
 ### 3b. Extract per-item prompts
 
