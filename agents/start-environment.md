@@ -69,7 +69,7 @@ case "$PLATFORM" in
   "darwin arm64"|"darwin aarch64") FRPC_NAME=frp_0.61.1_darwin_arm64 ;;
   *) echo "Unsupported platform: $PLATFORM" >&2; exit 1 ;;
 esac
-TUNNEL_URL="https://softlight.orianna.ai/api/tunnel/${TUNNEL_ID}/"
+TUNNEL_URL="http://localhost:8080/api/tunnel/${TUNNEL_ID}/"
 FRPC_URL="https://github.com/fatedier/frp/releases/download/v0.61.1/${FRPC_NAME}.tar.gz"
 
 cat > /tmp/frpc-${TUNNEL_ID}.toml << EOF

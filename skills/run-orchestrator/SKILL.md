@@ -84,7 +84,7 @@ Loop indefinitely:
    `plan_prototype_revision`), call the tool **directly** — do not spawn a subagent. After the tool
    returns, mark the prompt as done and loop back to step 1:
    ```
-   curl -s -X POST "https://softlight.orianna.ai/api/projects/<project_id>/events" \
+   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
      -H "Content-Type: application/json" \
      -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
    ```
@@ -92,7 +92,7 @@ Loop indefinitely:
 5. Otherwise, dispatch the skill in a **background** subagent. You must instruct the subagent to
    mark the prompt as done when it is finished by running:
    ```
-   curl -s -X POST "https://softlight.orianna.ai/api/projects/<project_id>/events" \
+   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
      -H "Content-Type: application/json" \
      -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
    ```

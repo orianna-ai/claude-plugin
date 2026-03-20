@@ -63,7 +63,7 @@ PID=$!
 # verify the tunnel is accessible
 sleep 0.5
 for i in 1 2 3 4 5; do
-  HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "https://softlight.orianna.ai/api/tunnel/$TUNNEL_ID/" || true)
+  HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "http://localhost:8080/api/tunnel/$TUNNEL_ID/" || true)
   if [[ "$HTTP_CODE" -ge 200 && "$HTTP_CODE" -lt 400 ]] 2>/dev/null; then
     break
   fi
