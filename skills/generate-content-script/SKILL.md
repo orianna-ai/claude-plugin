@@ -53,6 +53,8 @@ responses so the app renders the desired state itself.
 
 ### Script structure
 
+Write the script to `/tmp/content_script_<slot_id>.js` — multiple agents run in parallel so it needs a unique file path.
+
 Wrap everything in a strict-mode IIFE. The script is injected before the app's own JavaScript, so
 synchronous code at the top level (auth, routing, fetch mocks) takes effect before the app boots.
 Any code that touches the DOM should wait for `DOMContentLoaded`. DOM overlays are injected into a
@@ -119,6 +121,11 @@ re-inject your elements if the application removes or replaces them.
 
 
 ## Phase 2: Upload the content script
+
+You MUST save the content script to a **unique file path** that includes the slot ID — e.g.,
+`/tmp/content_script_<slot_id>.js`. Multiple content scripts may be generated in parallel, so
+using a generic path like `/tmp/content_script.js` will cause race conditions where agents
+overwrite each other's files.
 
 Upload the content script via multipart form POST to `https://drive.orianna.ai/api/upload`.
 The response is the public URL of the uploaded file (e.g., `https://drive.orianna.ai/<hash>.js`).
