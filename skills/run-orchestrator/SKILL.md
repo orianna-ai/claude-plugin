@@ -47,15 +47,33 @@ remember the `project_id` for future interactions.
 ### 3a. Plan and fire prompts
 
 Call `plan_prototype_revision` directly with the `project_id`. It creates placeholder slots and
-returns a **`prompt`** string (planning instructions) plus `slot_ids`.
+returns:
 
-Dispatch a **background** subagent to execute the returned `prompt` in full. If a
-`screenshot_manifest` path is available from a previous Phase 4, pass it to the subagent so the
-planner can view the prototypes alongside the reviewer feedback. The subagent must follow the
-planning instructions to produce the JSON plan and post `prompt_created` events (and delete
-unused placeholder slots) exactly as described in the prompt. Use the **same API host as the
-Softlight MCP server** for `curl` (e.g. `http://localhost:8080` when MCP is local, not a
-hard-coded production URL). **Wait** for this subagent to finish.
+- `new_ideas_prompt` (always present) + `new_ideas_slot_ids`
+- `refine_prompt` (present from round 2 onward, `null` on round 1) + `refine_slot_ids`
+
+Dispatch planner subagents **in parallel** using the Agent tool. For each planner, use these parameters:
+
+```
+description: "New ideas planner" (or "Refine planner")
+model: "sonnet"
+run_in_background: true
+prompt: <the full prompt text from plan_prototype_revision, plus the additions below>
+```
+
+For each planner subagent prompt, append the following context after the prompt text returned by
+`plan_prototype_revision`:
+
+- If a `screenshot_manifest` path is available from a previous Phase 4:
+  `<screenshot_manifest>/path/to/manifest.json</screenshot_manifest>`
+- Remind the subagent to use `http://localhost:8080` as the API host for all `curl` commands
+  (the same host as the Softlight MCP server, not a hard-coded production URL).
+
+Dispatch rules:
+
+1. **Always** dispatch `new_ideas_prompt`.
+2. If `refine_prompt` is not null, dispatch it **in parallel**
+3. **Wait** for all planner subagents to finish before proceeding to 3b.
 
 ### 3b. Extract per-item prompts
 
