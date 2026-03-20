@@ -49,10 +49,12 @@ remember the `project_id` for future interactions.
 Call `plan_prototype_revision` directly with the `project_id`. It creates placeholder slots and
 returns a **`prompt`** string (planning instructions) plus `slot_ids`.
 
-Dispatch a **background** subagent to execute the returned `prompt` in full. The subagent must
-follow the planning instructions to produce the JSON plan and post `prompt_created` events (and
-delete unused placeholder slots) exactly as described in the prompt. Use the **same API host as
-the Softlight MCP server** for `curl` (e.g. `http://localhost:8080` when MCP is local, not a
+Dispatch a **background** subagent to execute the returned `prompt` in full. If a
+`screenshot_manifest` path is available from a previous Phase 4, pass it to the subagent so the
+planner can view the prototypes alongside the reviewer feedback. The subagent must follow the
+planning instructions to produce the JSON plan and post `prompt_created` events (and delete
+unused placeholder slots) exactly as described in the prompt. Use the **same API host as the
+Softlight MCP server** for `curl` (e.g. `http://localhost:8080` when MCP is local, not a
 hard-coded production URL). **Wait** for this subagent to finish.
 
 ### 3b. Extract per-item prompts

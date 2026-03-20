@@ -22,10 +22,11 @@ Canvas slot UUID.
 
 ### `<spec>`
 
-A text description of the desired change to the application. May contain image URLs (design mocks,
-screenshots) — download and examine these for additional visual context. To view images, use `curl`
-to download them to a local file (e.g., `/tmp/mock.webp`) and then use the **Read** tool to view
-the file. Do **not** use WebFetch for images — it returns binary data as text and cannot render them.
+A text description of the desired change to the application. May contain image URLs or local file
+paths (design mocks, screenshots of the current prototype or baseline) — examine these for
+additional visual context. For local file paths (e.g., `/tmp/eval_screenshots/...`), use the
+**Read** tool directly. For URLs, use `curl` to download to a local file first, then **Read** it.
+Do **not** use WebFetch for images — it returns binary data as text and cannot render them.
 If `<spec>` includes a base content script URL, download it and edit from there.
 
 ### `<context>`
