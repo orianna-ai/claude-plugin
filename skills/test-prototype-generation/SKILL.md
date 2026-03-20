@@ -21,13 +21,13 @@ The user must provide:
 
 ## Phase 1: Tunnel Setup
 
-Run the `start-tunnel` skill to expose the app at `port`. This gives you a `tunnel_url` and
-`frpc_pid`.
+Run the `start-tunnel` skill to expose the app at `port`. This gives you a `TUNNEL_ID` and
+`PID` (the frpc process ID).
 
 ## Phase 2: Update Project Problem
 
-The project needs a `tunnel_url` on its `problem` so that iframe prototypes can load the
-tunneled application. Post a `project_updated` event via the REST API:
+The project needs a baseline `tunnel_id` on its `problem` so that iframe prototypes can load
+the tunneled application. Post a `project_updated` event via the REST API:
 
 **IMPORTANT:** The body must be a **bare JSON array** `[...]`, NOT an object like
 `{"events": [...]}`. The FastAPI endpoint expects `Sequence[Event]` as the body directly.
@@ -36,10 +36,10 @@ tunneled application. Post a `project_updated` event via the REST API:
 curl -s -X POST \
   "http://localhost:8080/api/projects/${PROJECT_ID}/events" \
   -H "Content-Type: application/json" \
-  -d '[{"type":"project_updated","problem":{"text":"Test prototype generation","tunnel_url":"'"${TUNNEL_URL}"'"}}]'
+  -d '[{"type":"project_updated","problem":{"text":"Test prototype generation","baseline":{"type":"iframe","tunnel_id":"'"${TUNNEL_ID}"'","git_commit":"'"$(git rev-parse HEAD)"'"}}}]'
 ```
 
-After posting, verify the project state and confirm `problem.tunnel_url` is set:
+After posting, verify the project state and confirm `problem.baseline.tunnel_id` is set:
 
 ```bash
 curl -s "http://localhost:8080/api/projects/${PROJECT_ID}"

@@ -148,8 +148,7 @@ Glob calls MUST be within your worktree directory, not the main repo's working d
      [[ "$CODE" -ge 200 && "$CODE" -lt 400 ]] 2>/dev/null && break
      sleep 1
    done
-   TUNNEL_URL="http://localhost:8080/api/tunnel/${TUNNEL_ID}/"
-   echo "TUNNEL_ID=$TUNNEL_ID TUNNEL_URL=$TUNNEL_URL"
+   echo "TUNNEL_ID=$TUNNEL_ID"
    ```
 
 10. **Add to canvas** — post an iframe slot:
@@ -164,7 +163,7 @@ Glob calls MUST be within your worktree directory, not the main repo's working d
 11. **Return** the results in this exact format:
     ```
     WORKTREE_PATH=<output of pwd>
-    TUNNEL_URL=<tunnel url>
+    TUNNEL_ID=<tunnel id>
     CHANGES_SUMMARY=<one paragraph describing what you changed and which files>
     ```
 ```
@@ -179,12 +178,11 @@ After **all** agents complete, collect their outputs and print a final summary:
 Canvas: http://localhost:8080/projects/{project_id}
 
 **Variant 1:** <variant description>
-  tunnel: <tunnel_url>
+  tunnel_id: <tunnel_id>
 
 **Variant 2:** <variant description>
-  tunnel: <tunnel_url>
+  tunnel_id: <tunnel_id>
 ```
 
-Tell the user they can view all variants side-by-side on the canvas, or click individual
-tunnel URLs to see each design variant live. The design change should be immediately visible
-with mock data — no navigation required.
+Tell the user they can view all variants side-by-side on the canvas. The design change should
+be immediately visible with mock data — no navigation required.

@@ -108,8 +108,7 @@ Glob calls MUST be within your worktree directory, not the main repo's working d
      [[ "$CODE" -ge 200 && "$CODE" -lt 400 ]] 2>/dev/null && break
      sleep 1
    done
-   TUNNEL_URL="http://localhost:8080/api/tunnel/${TUNNEL_ID}/"
-   echo "TUNNEL_ID=$TUNNEL_ID TUNNEL_URL=$TUNNEL_URL"
+   echo "TUNNEL_ID=$TUNNEL_ID"
    ```
 
 10. **Update the placeholder slot** with the live iframe:
@@ -133,7 +132,7 @@ Glob calls MUST be within your worktree directory, not the main repo's working d
 12. **Return** the results in this exact format:
     ```
     WORKTREE_PATH=<output of pwd>
-    TUNNEL_URL=<tunnel url>
+    TUNNEL_ID=<tunnel id>
     CHANGES_SUMMARY=<one paragraph describing what you changed and which files>
     ```
 ```

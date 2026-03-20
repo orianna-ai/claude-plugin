@@ -1,6 +1,6 @@
 ---
 name: start-environment
-description: "Start a web app's dev server and create a tunnel, with tunnel prep overlapping the app build. Returns the port, tunnel URL, PIDs, and start command."
+description: "Start a web app's dev server and create a tunnel, with tunnel prep overlapping the app build. Returns the port, tunnel ID, PIDs, and start command."
 tools: Bash, Read, Write, Glob, Grep
 model: sonnet
 ---
@@ -69,7 +69,6 @@ case "$PLATFORM" in
   "darwin arm64"|"darwin aarch64") FRPC_NAME=frp_0.61.1_darwin_arm64 ;;
   *) echo "Unsupported platform: $PLATFORM" >&2; exit 1 ;;
 esac
-TUNNEL_URL="http://localhost:8080/api/tunnel/${TUNNEL_ID}/"
 FRPC_URL="https://github.com/fatedier/frp/releases/download/v0.61.1/${FRPC_NAME}.tar.gz"
 
 cat > /tmp/frpc-${TUNNEL_ID}.toml << EOF
@@ -89,10 +88,10 @@ routeByHTTPUser = "${TUNNEL_ID}"
 EOF
 
 [ -f /tmp/${FRPC_NAME}/frpc ] || curl -sL "$FRPC_URL" | tar xz -C /tmp/
-echo "TUNNEL_ID=$TUNNEL_ID TUNNEL_URL=$TUNNEL_URL FRPC_NAME=$FRPC_NAME"
+echo "TUNNEL_ID=$TUNNEL_ID FRPC_NAME=$FRPC_NAME"
 ```
 
-Save the `TUNNEL_ID`, `TUNNEL_URL`, and `FRPC_NAME` from the output.
+Save the `TUNNEL_ID` and `FRPC_NAME` from the output.
 
 ## Step 5: Poll for app readiness
 
@@ -152,7 +151,7 @@ Start the tunnel client and verify it is reachable in one command:
 FRPC_PID=$!
 sleep 1
 for i in 1 2 3 4 5; do
-  CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$TUNNEL_URL/")
+  CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "http://localhost:8080/api/tunnel/$TUNNEL_ID/")
   echo "Attempt $i: HTTP $CODE"
   [ "$CODE" -ge 200 ] && [ "$CODE" -lt 400 ] && echo "Tunnel is up" && break
   sleep 0.5
@@ -169,5 +168,5 @@ Return all of the following:
 - The **port** the application is listening on
 - The **app PID** of the background process
 - The **start command** used
-- The **tunnel URL** (`$TUNNEL_URL`)
+- The **tunnel ID** (`$TUNNEL_ID`)
 - The **frpc PID** (`$FRPC_PID`)

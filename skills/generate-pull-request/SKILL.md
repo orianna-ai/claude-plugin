@@ -21,7 +21,6 @@ This skill **must** be called with the following context. Do not proceed without
 - `content_script` — the JavaScript content script from the prototype
 - `project_id` — the Softlight project ID
 - `slot_id` — the slot ID of the prototype iframe
-- `tunnel-url` — the URL where the application is running
 
 These are provided in the prompt inside a `<prototype>` tag. Parse them from there.
 

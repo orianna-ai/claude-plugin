@@ -36,7 +36,7 @@ Phase 1a - 1c subagents must all complete before going to phase 2.
 
 ## Phase 2: Project Creation
 
-Call the `create_project` tool with the problem statement, content script, and tunnel URL from
+Call the `create_project` tool with the problem statement, content script, and `tunnel_id` from
 Phase 1. Share the `project_url` with the user (e.g., `[View in Softlight →](<project_url>)`) and
 remember the `project_id` for future interactions.
 

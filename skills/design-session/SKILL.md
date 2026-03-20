@@ -45,7 +45,7 @@ GIT_COMMIT=$(git rev-parse HEAD)
 
 ### 3b. Create app and then run `start-tunnel`
 
-Run the baseline app on a free port, then run the `start-tunnel` skill to create a tunnel. Save the `TUNNEL_ID` and `TUNNEL_URL` from the tunnel output.
+Run the baseline app on a free port, then run the `start-tunnel` skill to create a tunnel. Save the `TUNNEL_ID` from the tunnel output.
 
 ### 3c. Create the project
 
@@ -86,8 +86,10 @@ Save the port for each idea.
 
 ## Phase 5: Launch Worktree Agents
 
-Launch all 5 agents **in parallel** as **background** agents, each with **worktree isolation**.
-Send all Agent tool calls in a single message. They MUST run with **worktree isolation**.
+Launch all 5 agents as **background** agents, each with **worktree isolation**. Launch them
+**one at a time** — send one Agent tool call, wait for it to confirm it is running in the
+background, then send the next. Do NOT send all 5 in a single message (simultaneous launches
+cause resource contention and failures). Once launched, they all run concurrently.
 
 For each variant, use the Agent tool with these parameters:
 
@@ -113,7 +115,7 @@ Each agent will read the `generate-app` skill instructions and follow them auton
 ### Proceed immediately
 
 Do NOT wait for the agents to finish. Each agent independently updates its slot and marks its
-prompt done via curl. Proceed to Phase 6 right away.
+prompt done via curl. Once all 5 are launched, proceed to Phase 6 right away.
 
 ## Phase 6: Prompt Handling
 

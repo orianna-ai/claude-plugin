@@ -24,7 +24,7 @@ PLATFORM="$(uname -sm)"
 case "$PLATFORM" in
   "Linux x86_64")  BINARY_NAME="frp_${FRPC_VERSION}_linux_amd64" ;;
   "Linux aarch64") BINARY_NAME="frp_${FRPC_VERSION}_linux_arm64" ;;
-  "Darwin x86_64") BINARY_NAME="frp_${FRPC_VERSION}_darwin_amd64" ;;
+  "Darwin x86_64") BINARY_NAME="frp_${FRPC_VERSION}_darwin_a dddmd64" ;;
   "Darwin arm64")  BINARY_NAME="frp_${FRPC_VERSION}_darwin_arm64" ;;
   *)
     echo "ERROR: Unsupported platform '$PLATFORM'. Run 'uname -sm' to verify." >&2
@@ -85,5 +85,4 @@ done
 
 # print the tunnel details
 echo "TUNNEL_ID=${TUNNEL_ID}"
-echo "TUNNEL_URL=http://localhost:8080/api/tunnel/${TUNNEL_ID}/"
 echo "PID=${PID}"
