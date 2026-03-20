@@ -93,7 +93,18 @@ Phase 4 until every prototype has been generated.
 
 ## Phase 4: Evaluate
 
-### 4a. PM review
+### 4a. Screenshot prototypes
+
+Dispatch the `screenshot-prototypes` skill in a **background** subagent. Pass it:
+
+1. The path to the skill:
+   `/workspaces/orianna/claude-plugin/skills/screenshot-prototypes/SKILL.md`
+2. The `project_id`
+
+Wait for the screenshot subagent to complete. It returns the path to a manifest file
+(e.g. `/tmp/eval_screenshots/manifest.json`). Pass this manifest path to all reviewers below.
+
+### 4b. PM review
 
 Dispatch the `evaluate-prototypes` skill in a **background** subagent. Pass it:
 
@@ -102,20 +113,33 @@ Dispatch the `evaluate-prototypes` skill in a **background** subagent. Pass it:
 2. The `project_id`
 3. The problem statement from Phase 1
 4. The user's original prompt
+5. The `screenshot_manifest` path from step 4a
 
-Wait for the PM subagent to complete before proceeding to 4b.
+Wait for the PM subagent to complete before proceeding to 4c.
 
-### 4b. Designer review
+### 4c. Designer review and visual design review (parallel)
 
-Dispatch the `evaluate-prototypes-designer` skill in a **background** subagent. Pass it:
+Dispatch both subagents **in parallel** as **background** subagents:
+
+**Designer review** — dispatch the `evaluate-prototypes-designer` skill. Pass it:
 
 1. The path to the skill:
    `/workspaces/orianna/claude-plugin/skills/evaluate-prototypes-designer/SKILL.md`
 2. The `project_id`
 3. The problem statement from Phase 1
 4. The user's original prompt
+5. The `screenshot_manifest` path from step 4a
 
-Wait for the designer subagent to complete before proceeding to Phase 5.
+**Visual design review** — dispatch the `evaluate-prototypes-visual` skill. Pass it:
+
+1. The path to the skill:
+   `/workspaces/orianna/claude-plugin/skills/evaluate-prototypes-visual/SKILL.md`
+2. The `project_id`
+3. The problem statement from Phase 1
+4. The user's original prompt
+5. The `screenshot_manifest` path from step 4a
+
+Wait for **both** subagents to complete before proceeding to Phase 5.
 
 ## Phase 5: Second Prototype Generation
 
