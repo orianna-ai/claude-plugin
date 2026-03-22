@@ -20,14 +20,22 @@ Softlight project UUID.
 
 Canvas slot UUID.
 
-### `<spec>`
+### `<spec_url>`
 
-A text description of the desired change to the application. May contain image URLs or local file
-paths (design mocks, screenshots of the current prototype or baseline) — examine these for
-additional visual context. For local file paths (e.g., `/tmp/eval_screenshots/...`), use the
-**Read** tool directly. For URLs, use `curl` to download to a local file first, then **Read** it.
-Do **not** use WebFetch for images — it returns binary data as text and cannot render them.
-If `<spec>` includes a base content script URL, download it and edit from there.
+Drive URL of the design spec. Download it with `curl` first. The response is JSON — extract the
+`spec` field. That text is a description of the desired change to the application. May contain image URLs or local file paths (design mocks,
+screenshots of the current prototype or baseline) — examine these for additional visual context.
+For local file paths (e.g., `/tmp/eval_screenshots/...`), use the **Read** tool directly. For
+URLs, use `curl` to download to a local file first, then **Read** it. Do **not** use WebFetch for
+images — it returns binary data as text and cannot render them.
+
+### `<images>`
+
+Optional. Image URLs or local file paths, one per line. If these are passed, view all of these before writing code. The spec references them.
+
+### `<content_script_url>`
+
+Optional. Drive URL of an existing content script. If this exists, download the content script it and edit from there instead of starting from scratch.
 
 ### `<context>`
 
