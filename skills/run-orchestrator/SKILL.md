@@ -77,9 +77,9 @@ Dispatch rules:
 2. If `refine_prompt` is not null, dispatch it **in parallel**
 3. **Wait** for all planner subagents to finish before proceeding to 3b.
 
-The planners handle dispatching via `dispatch_prototype` — they write a plan JSON to a file,
-upload it to drive, then call `POST /api/projects/<project_id>/dispatch-prototype` which creates
-`prompt_created` events for each design.
+The planners handle dispatching via the `dispatch_prototype` MCP tool — they write a plan JSON to
+a file, upload it to drive, then call `dispatch_prototype` with the `project_id` and `plan_url`,
+which creates `prompt_created` events for each design.
 
 ### 3b. Extract per-item prompts
 

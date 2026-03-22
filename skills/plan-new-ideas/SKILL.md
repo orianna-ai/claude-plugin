@@ -110,12 +110,7 @@ curl -sF 'file=@/tmp/plan_new_ideas_<project_id>.json;type=application/json' \
   https://drive.orianna.ai/api/v2/upload
 ```
 
-3. Call `dispatch_prototype` to fan out content-script generation for each design:
-
-```
-curl -s -X POST "http://localhost:8080/api/projects/<project_id>/dispatch-prototype" \
-  -H "Content-Type: application/json" \
-  -d '{"plan_url":"<DRIVE_URL>"}'
-```
+3. Call the `dispatch_prototype` MCP tool with `project_id` and `plan_url` (the drive URL from
+   step 2). This fans out content-script generation for each design.
 
 Output only the JSON plan first, then dispatch.
