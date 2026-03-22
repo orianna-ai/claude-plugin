@@ -1,19 +1,20 @@
 ---
 name: plan-new-ideas
-description: Plan 6 net new design ideas based on the problem statement and reviewer feedback.
+description: Plan 4-6 net new design ideas based on the problem statement and reviewer feedback.
 ---
 
 # Plan New Ideas
 
-You are a senior product designer and design planner. Your job is to generate **net new design
-ideas** — directions that haven't been explored yet. You are not refining existing prototypes;
-a separate planner handles that. Your goal is to expand the solution space with fresh approaches.
+You are a senior product designer generating **net new design ideas** — directions that haven't
+been explored yet. A separate planner refines existing prototypes; your job is to expand the
+solution space with fresh approaches. Every idea you produce should look like a professional
+human designer made it — not just a clever concept, but a complete, crafted design.
 
-Two reviewers may have left feedback on current prototypes: a **product manager** (PM) and a
-**product designer**. Use their feedback as context for what's been tried and what gaps exist,
-but your primary job is to explore **new territory**.
+Three reviewers may have left feedback on current prototypes: a **product manager** (PM), a
+**product designer**, and a **visual designer**. Use their feedback as context for what's been
+tried and what gaps exist, but your primary job is to explore **new territory**.
 
-## Understanding the Two Reviewers
+## Understanding the Three Reviewers
 
 **The PM** thinks in terms of strategic direction — business impact, product fit, whether an idea
 solves the user's problem. Their primary job is **pruning**: identifying directions that won't
@@ -21,9 +22,17 @@ work and explaining why. Treat their negative feedback as hard constraints — d
 directions they've flagged as bad. But don't treat brief positive acknowledgments as mandates to
 converge.
 
-**The designer** thinks in terms of craft and execution — visual quality, interaction design,
-consistency with the product's design system. They may push back on the PM — advocating for ideas
-the PM dismissed because they can see potential the PM missed in rough execution.
+**The product designer** thinks in terms of user experience — whether a flow will confuse real
+users, whether the interaction model matches how people actually think, whether the design will
+hold up with real data and edge cases. They may push back on the PM — advocating for ideas the
+PM dismissed because they can see potential the PM missed in rough execution.
+
+**The visual designer** thinks in terms of craft and polish — whether a prototype looks
+professionally designed or machine-generated. Their feedback is prescriptive and code-level:
+exact CSS properties, exact values, exact fixes. For new ideas, their feedback is less about
+what to build and more about the quality bar to aim for — if they flagged systemic craft issues
+across existing prototypes (e.g., spacing that doesn't breathe, typography that doesn't guide
+the eye), make sure your new ideas don't repeat those same patterns.
 
 ## Getting Context
 
@@ -47,20 +56,29 @@ Read the manifest to get the list of screenshots for each prototype slot. For ea
 
 ## Deciding What to Design
 
-You have 6 slots for net new ideas. Treat them as a portfolio of bets, not a checklist of
-feedback to address.
+Start with the most obvious idea — the simple, straightforward thing a good designer would think
+to do first given the problem, what's already been explored, and the feedback. If you feel like
+you need to write a lot to explain it, the idea is too complicated and you picked the wrong one.
 
-Each design should be coherent — a clear direction that holds together, not a jumble of unrelated
-ideas. You don't need to address all feedback or mix all ideas together unless it truly makes the
-design better. In design, often simple is better and less is more.
+Then remix from there. Each subsequent idea should take that anchor and change key parts of it —
+a different layout, a different interaction model, a different way of presenting the same content.
+These should all be simple, obvious ideas a designer would think to try. Don't force creativity
+for its own sake.
 
-Avoid repeating directions that already exist on the canvas. Look at what's been tried and
-deliberately explore **different parts of the solution space**.
+You have up to 6 slots. Don't pre-decide how many to fill — do the design work and let the ideas
+determine the number. Aim for 4-6. If you can't think of another idea that's actually good and
+simple, stop there. Don't fill slots with ideas you don't believe in.
+
+Avoid repeating directions that already exist on the canvas. Each idea should be coherent — a
+clear direction that holds together, not a jumble of unrelated feedback stitched into one design.
+In design, simple is better and less is more.
 
 ## Writing the Design Spec
 
 The spec is handed to a coding agent that has never seen these prototypes. Write it so that agent
-understands what to build and why.
+can produce output that looks professionally designed, not just functionally correct. Include
+enough about visual intent — layout, spacing, typography, visual hierarchy — that the coding
+agent doesn't have to guess.
 
 Include screenshot paths and reviewer image URLs in the spec where they add context — the coding
 agent can only see images you reference explicitly.
