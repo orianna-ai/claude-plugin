@@ -44,7 +44,7 @@ remember the `project_id` for future interactions.
 
 ## Phase 3: Generate Prototypes
 
-### 3a. Plan and fire prompts
+### 3a. Plan and dispatch
 
 Call `plan_prototype_revision` directly with the `project_id`. It creates placeholder slots and
 returns:
@@ -66,6 +66,8 @@ For each planner subagent prompt, append the following context after the prompt 
 
 - If a `screenshot_manifest` path is available from a previous Phase 4:
   `<screenshot_manifest>/path/to/manifest.json</screenshot_manifest>`
+  The planner needs this to view screenshots and embed relevant image paths into each design's
+  spec and `images` array.
 - Remind the subagent to use `http://localhost:8080` as the API host for all `curl` commands
   (the same host as the Softlight MCP server, not a hard-coded production URL).
 
@@ -74,6 +76,10 @@ Dispatch rules:
 1. **Always** dispatch `new_ideas_prompt`.
 2. If `refine_prompt` is not null, dispatch it **in parallel**
 3. **Wait** for all planner subagents to finish before proceeding to 3b.
+
+The planners handle dispatching via `dispatch_prototype` — they write a plan JSON to a file,
+upload it to drive, then call `POST /api/projects/<project_id>/dispatch-prototype` which creates
+`prompt_created` events for each design.
 
 ### 3b. Extract per-item prompts
 
@@ -103,12 +109,17 @@ done.
 
 ### 3c. Dispatch subagents
 
-For each per-item prompt, dispatch a **background** subagent. Pass it:
+For each per-item prompt, dispatch a **background** subagent.
 
-1. The full prompt text verbatim (including the `<project_id>` and `<slot_id>` tags)
-2. The path to the edit-content-script skill:
-   `/workspaces/orianna/claude-plugin/skills/edit-content-script/SKILL.md`
-3. Instructions to mark the prompt as done when finished:
+**CRITICAL: You MUST pass the prompt text from each event VERBATIM to the subagent — every
+character. Do not summarize, shorten, paraphrase, or omit any part of it.
+The prompt text is already self-contained — it includes the skill name, project ID, slot ID,
+spec URL, image list, and content script URL. Just pass it through.**
+
+For each subagent, pass it:
+
+1. The full prompt text VERBATIM (it already contains everything the coding agent needs)
+2. Instructions to mark the prompt as done when finished:
    ```
    curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
      -H "Content-Type: application/json" \
