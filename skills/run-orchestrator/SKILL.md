@@ -1,7 +1,7 @@
 ---
 name: run-orchestrator
 description: Setup a Softlight project, generate prototypes, auto-evaluate with PM and designer feedback, generate a revised set of prototypes, and loop.
-allowed-tools: Bash, Read, Write, Glob, Grep, mcp__plugin_softlight_softlight__create_project, mcp__plugin_softlight_softlight__plan_prototype_revision, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__screenshot_prototype, mcp__plugin_softlight_softlight__create_comment_thread
+allowed-tools: Bash, Read, Write, Glob, Grep, mcp__plugin_softlight_softlight__create_project, mcp__plugin_softlight_softlight__plan_prototype_revision, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_comment_thread
 model: sonnet
 ---
 
@@ -64,10 +64,6 @@ prompt: <the full prompt text from plan_prototype_revision, plus the additions b
 For each planner subagent prompt, append the following context after the prompt text returned by
 `plan_prototype_revision`:
 
-- If a `screenshot_manifest` path is available from a previous Phase 4:
-  `<screenshot_manifest>/path/to/manifest.json</screenshot_manifest>`
-  The planner needs this to view screenshots and embed relevant image paths into each design's
-  spec and `images` array.
 - Remind the subagent to use `http://localhost:8080` as the API host for all `curl` commands
   (the same host as the Softlight MCP server, not a hard-coded production URL).
 
@@ -135,14 +131,14 @@ Phase 4 until every prototype has been generated.
 
 ### 4a. Screenshot prototypes
 
-Dispatch the `screenshot-prototypes` skill in a **background** subagent. Pass it:
+Dispatch the `screenshot-iframes` skill in a **background** subagent. Pass it:
 
 1. The path to the skill:
-   `/workspaces/orianna/claude-plugin/skills/screenshot-prototypes/SKILL.md`
+   `/workspaces/orianna/claude-plugin/skills/screenshot-iframes/SKILL.md`
 2. The `project_id`
 
-Wait for the screenshot subagent to complete. It returns the path to a manifest file
-(e.g. `/tmp/eval_screenshots/manifest.json`). Pass this manifest path to both reviewers below.
+Wait for the screenshot subagent to complete. It uploads screenshots to drive and attaches them
+to each iframe slot — reviewers will access them via `get_project`.
 
 ### 4b. PM review
 
@@ -153,7 +149,6 @@ Dispatch the `evaluate-prototypes` skill in a **background** subagent. Pass it:
 2. The `project_id`
 3. The problem statement from Phase 1
 4. The user's original prompt
-5. The `screenshot_manifest` path from step 4a
 
 Wait for the PM subagent to complete before proceeding to 4c.
 
@@ -168,7 +163,6 @@ Dispatch both subagents **in parallel** as **background** subagents:
 2. The `project_id`
 3. The problem statement from Phase 1
 4. The user's original prompt
-5. The `screenshot_manifest` path from step 4a
 
 **Visual design review** — dispatch the `evaluate-prototypes-visual` skill. Pass it:
 
@@ -177,7 +171,6 @@ Dispatch both subagents **in parallel** as **background** subagents:
 2. The `project_id`
 3. The problem statement from Phase 1
 4. The user's original prompt
-5. The `screenshot_manifest` path from step 4a
 
 Wait for **both** subagents to complete before proceeding.
 

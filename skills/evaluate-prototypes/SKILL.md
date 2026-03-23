@@ -31,7 +31,6 @@ You will receive:
 - **`project_id`** — the Softlight project to evaluate
 - **`problem_statement`** — the design problem the prototypes are trying to solve
 - **`user_prompt`** — the original prompt the user gave when starting the session
-- **`screenshot_manifest`** — path to a JSON file mapping each prototype slot to its screenshots
 
 ## Step 1: Build your understanding
 
@@ -85,19 +84,21 @@ answer should be and select for it.
 
 ### View the baseline
 
-The screenshot manifest includes a **`baseline`** section — screenshots of the unmodified app
+The `get_project` response includes `problem.attachments` — screenshots of the unmodified app
 as it exists in production today, with no content script applied. **View the baseline screenshots
-first.** This is your reference point. Every prototype should be evaluated against this — not
-in isolation.
+first.** Download each attachment URL to a temp file with `curl -o /tmp/baseline_N.png <url>`,
+then use **Read** to view it. This is your reference point. Every prototype should be evaluated
+against this — not in isolation.
 
 Study the baseline carefully. Internalize its layout, spacing, typography, and visual rhythm.
 When you evaluate prototypes, you are asking: "Is this better than what we already have?"
 
 ### View the prototype screenshots
 
-Read the manifest to get the list of screenshots for each prototype slot. For each slot, use the
-**Read** tool on every screenshot `.png` file. Do not skip any — you need to see every captured
-state of every prototype.
+From `get_project`, find every iframe slot in the latest revision. Each iframe element has a
+`screenshots` list of attachments with `url` fields. For each slot, download every screenshot
+URL to a temp file with `curl -o /tmp/<slot_id>_N.png <url>`, then use **Read** to view it.
+Do not skip any — you need to see every captured state of every prototype.
 
 ### Evaluate
 

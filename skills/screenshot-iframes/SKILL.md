@@ -1,7 +1,7 @@
 ---
-name: screenshot-prototypes
+name: screenshot-iframes
 description: Open each prototype in the browser, understand the proposed design changes, and capture screenshots that show what changed so evaluators can review without touching the browser.
-allowed-tools: Bash, Read, Glob, Grep, mcp__plugin_softlight_softlight__get_project, browser
+allowed-tools: Bash, Read, Glob, Grep, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__set_iframe_screenshots, browser
 model: sonnet
 ---
 
@@ -86,34 +86,28 @@ Create the directory first:
 mkdir -p /tmp/eval_screenshots
 ```
 
-## Step 4: Write the manifest
+## Step 4: Upload and attach screenshots
 
-Write a JSON manifest to `/tmp/eval_screenshots/manifest.json`:
+For each prototype slot, upload its screenshots to drive and attach them to the iframe element.
 
-```json
-{
-  "baseline": {
-    "screenshots": [
-      {"path": "/tmp/eval_screenshots/baseline_1.png", "description": "Current production homepage"}
-    ]
-  },
-  "slots": {
-    "<slot_id>": {
-      "design_summary": "Brief description of what this prototype proposes",
-      "screenshots": [
-        {"path": "/tmp/eval_screenshots/<slot_id>_1.png", "description": "Redesigned hero with new headline and CTA"},
-        {"path": "/tmp/eval_screenshots/<slot_id>_2.png", "description": "Pricing table below the fold"}
-      ]
-    }
-  }
-}
+1. Upload each screenshot file to drive:
+
+```bash
+curl -sF 'file=@/tmp/eval_screenshots/<slot_id>_1.png' https://drive.orianna.ai/api/v2/upload
 ```
 
-- `baseline` — screenshots of the unmodified app, the reference point for all comparisons
-- Each slot entry has:
-  - `design_summary` — what this prototype is proposing (from the caption/spec you read)
-  - `screenshots` — each with a `path` and `description` of what it shows
+The response body is the drive URL of the uploaded file.
+
+2. After uploading all screenshots for a slot, call `set_iframe_screenshots` with:
+   - `project_id`
+   - `slot_id`
+   - `screenshot_urls` — the list of drive URLs from step 1
+
+Repeat for every iframe slot.
+
+Baseline screenshots do not need to be uploaded — they are already stored on the project from
+when it was created.
 
 ## Step 5: Return
 
-Return the path to the manifest file: `/tmp/eval_screenshots/manifest.json`
+Confirm that screenshots were uploaded and attached to all iframe slots.

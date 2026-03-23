@@ -41,18 +41,21 @@ elements (prototypes, images, text, comments), and the problem statement.
 
 ## Viewing the Prototypes
 
-If a screenshot manifest path was provided to you, use it to view the prototypes directly.
+Use the `get_project` response to view screenshots of each prototype.
 
 ### View the baseline
 
-The manifest includes a **`baseline`** section — screenshots of the unmodified app. **View the
-baseline screenshots first.** This is your reference point. Study the baseline carefully.
-Internalize its layout, spacing, typography, and visual rhythm.
+The `get_project` response includes `problem.attachments` — screenshots of the unmodified app.
+Download each attachment URL to a temp file with `curl -o /tmp/baseline_N.png <url>`, then use
+**Read** to view it. **View the baseline screenshots first.** This is your reference point.
+Study the baseline carefully. Internalize its layout, spacing, typography, and visual rhythm.
 
 ### View the prototype screenshots
 
-Read the manifest to get the list of screenshots for each prototype slot. For each slot, use the
-**Read** tool on every screenshot `.png` file. Do not skip any.
+From `get_project`, find every iframe slot in the latest revision. Each iframe element has a
+`screenshots` list of attachments with `url` fields. For each slot, download every screenshot
+URL to a temp file with `curl -o /tmp/<slot_id>_N.png <url>`, then use **Read** to view it.
+Do not skip any.
 
 ## Deciding What to Design
 
@@ -80,7 +83,7 @@ can produce output that looks professionally designed, not just functionally cor
 enough about visual intent — layout, spacing, typography, visual hierarchy — that the coding
 agent doesn't have to guess.
 
-Include screenshot paths and reviewer image URLs in the spec where they add context — the coding
+Include screenshot URLs and reviewer image URLs in the spec where they add context — the coding
 agent can only see images you reference explicitly.
 
 ## Output Format
@@ -88,11 +91,11 @@ agent can only see images you reference explicitly.
 Output a JSON object with:
 - **designs**: Array of up to 6 designs, each with:
   - **slot_id**: Pick one from your allocated slot IDs list.
-  - **spec**: What to build and why. Include all relevant image URLs and screenshot paths
+  - **spec**: What to build and why. Include all relevant image URLs and screenshot URLs
     inline so the coding agent can view them.
-  - **images**: Array of all image URLs and local file paths referenced in the spec. This is a
-    structured safety net — even if the spec text is vague about references, the coding agent
-    gets a clear checklist of images to view. Do not include the .js content scripts here.
+  - **images**: Array of all image URLs referenced in the spec. This is a structured safety
+    net — even if the spec text is vague about references, the coding agent gets a clear
+    checklist of images to view. Do not include the .js content scripts here.
   - **caption**: Your reasoning — what you intended, what gap it fills, why this direction is
     worth exploring. This is read by reviewers in the next round.
 - **unused_slot_ids**: Array of slot IDs you didn't use.
@@ -103,7 +106,7 @@ Output a JSON object with:
     {
       "slot_id": "<pick from your allocated list>",
       "spec": "<design spec with references to images to better guide the coding model",
-      "images": ["<drive URL or local path for each relevant image>"],
+      "images": ["<drive URL for each relevant image>"],
       "caption": "<your reasoning>"
     }
   ],
