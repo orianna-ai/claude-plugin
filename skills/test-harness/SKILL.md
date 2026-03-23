@@ -1,6 +1,6 @@
 ---
 name: test-harness
-description: Replay an events file against a local Softlight instance. Sets up worktrees, builds applications, starts tunnels, posts events, and returns the project URL.
+description: Replay an events file against a local Softlight instance. Starts tunnels, posts events, and returns the project URL.
 ---
 
 # Run Test Harness
@@ -9,36 +9,35 @@ Replay a recorded events file end-to-end against a local Softlight instance.
 
 ## Input
 
-The user provides the name of an file in `events/` without `.json` extension.
+The user provides:
 
-## Step 1: Setup Worktrees
+- **file name** — name of a file in `events/` without the `.json` extension
+- **port** — local port where the target application is already running
+- **starting phase** — which `run-orchestrator` phase to begin from after setup (e.g. Phase 3,
+  Phase 3b, Phase 4). This is required — ask the user if they don't specify it.
 
-Run the setup script to create all git worktrees that are referenced by the events file:
+## Step 1: Extract Tunnel IDs
+
+Run the extraction script to find all tunnel IDs referenced by the events file:
 
 ```bash
-python3 ./setup_worktrees.py <file_name>
+python3 ./extract_tunnel_ids.py <file_name>
 ```
 
-The script prints a JSON array. Each object has `tunnel_id`, `git_commit`, `git_patch_url`, `id`,
-and a `path` (the worktree directory on disk). Parse this output — you will need it for the next
-step.
+The script prints a JSON array of unique tunnel ID strings. Parse this output — you will need it
+for the next step.
 
-## Step 2: Start Applications and Tunnels
+## Step 2: Start Tunnels
 
-For **each worktree** from Step 1, launch a **background subagent** with the `path` as its working
-directory that does the following:
+For **each tunnel ID** from Step 1, run the `start-tunnel` skill with the user-provided port and
+that tunnel ID.
 
-1. Run the `start-application` skill to start the app. Use the name of the events file as a hint
-   about what application to run. Pass the path so it knows where the app lives.
-  
-2. Once the app is running and you have a `PORT`, run the `start-tunnel` skill to create a tunnel.
-   The tunnel must use the worktree's `tunnel_id` — this is how the events file references it.
-
-Launch all worktree subagents **in parallel**. Wait for all of them to complete before proceeding.
+If there are multiple tunnel IDs, launch them **in parallel**. Wait for all tunnels to be live
+before proceeding.
 
 ## Step 3: Setup Project
 
-Once all tunnels are live, post the events to the local MCP server:
+Post the events to the local MCP server:
 
 ```bash
 python3 ./setup_project.py <file_name>
@@ -54,31 +53,15 @@ Print the project URL:
 http://localhost:8080/projects/<project_id>
 ```
 
-## Step 5: Prompt Handling
+## Step 5: Run Orchestrator Pipeline
 
-Loop indefinitely:
+Read the `run-orchestrator` skill and execute starting from the phase the user specified. Steps 1–4
+above replace the orchestrator's Phase 1 (Setup) and Phase 2 (Project Creation) — the project
+already exists with the `project_id` from Step 3.
 
-1. Call the `wait_for_prompt` tool with `project_id`. On the first call, omit `prompt_id`.
-   On subsequent calls, pass the `prompt_id` from the previous result.
-
-2. If the prompt only requires calling a single Softlight MCP tool (e.g. `generate_mock_revision`),
-   call the tool **directly** — do not spawn a subagent. After the tool
-   returns, mark the prompt as done and loop back to step 1:
-   ```
-   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
-     -H "Content-Type: application/json" \
-     -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
-   ```
-
-3. Otherwise, dispatch the skill in a **background** subagent. You must instruct the subagent to
-   mark the prompt as done when it is finished by running:
-   ```
-   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
-     -H "Content-Type: application/json" \
-     -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
-   ```
-   Loop back to step 1 immediately — do not wait for the subagent.
+Enter the orchestrator at the user's starting phase and continue the Phase 3 → Phase 4 → Phase 5
+loop from there.
 
 ## Step 6: Cleanup
 
-Run the `stop-tunnel` skill and then the `stop-application` skill to kill background processes.
+Run the `stop-tunnel` skill to kill background tunnel processes.

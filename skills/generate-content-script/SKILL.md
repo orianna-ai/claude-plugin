@@ -23,11 +23,11 @@ Canvas slot UUID.
 ### `<spec_url>`
 
 Drive URL of the design spec. Download it with `curl` first. The response is JSON — extract the
-`spec` field. That text is a description of the desired change to the application. May contain image URLs or local file paths (design mocks,
-screenshots of the current prototype or baseline) — examine these for additional visual context.
-For local file paths (e.g., `/tmp/eval_screenshots/...`), use the **Read** tool directly. For
-URLs, use `curl` to download to a local file first, then **Read** it. Do **not** use WebFetch for
-images — it returns binary data as text and cannot render them.
+`spec` field. That text is a description of the desired change to the application. May contain
+image URLs (design mocks, screenshots of the current prototype or baseline) — examine these for
+additional visual context. Use `curl` to download each image URL to a local file first, then
+**Read** it. Do **not** use WebFetch for images — it returns binary data as text and cannot
+render them.
 
 ### `<images>`
 
