@@ -23,9 +23,10 @@ You will receive:
 Call `get_project` with the `project_id`. From the response:
 
 1. Read the **problem statement** — this is the design challenge the prototypes are responding to.
-2. Find all slots in the **latest revision**. Each prototype (iframe slot) has a text caption
-   slot nearby that describes the design change — the spec the content script was built from.
-   Read these captions to understand what each prototype is trying to do.
+2. Find all slots in the **latest revision**. Each iframe element has a `spec_url` — download
+   it with `curl` to get a JSON object with a `spec` field describing the intended design
+   change represented in that prototype. Read these specs to understand what each prototype
+   is trying to do.
 3. Note the **slot IDs** of every iframe slot. For each, build the prototype URL:
 
 ```

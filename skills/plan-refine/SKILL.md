@@ -59,12 +59,15 @@ Download each attachment URL to a temp file with `curl -o /tmp/baseline_N.png <u
 **Read** to view it. **View the baseline screenshots first.** This is your reference point.
 Study the baseline carefully. Internalize its layout, spacing, typography, and visual rhythm.
 
-### View the prototype screenshots
+### View the prototype screenshots and understand the prototype spec
 
 From `get_project`, find every iframe slot in the latest revision. Each iframe element has a
 `screenshots` list of attachments with `url` fields. For each slot, download every screenshot
 URL to a temp file with `curl -o /tmp/<slot_id>_N.png <url>`, then use **Read** to view it.
 Do not skip any.
+
+Each iframe element also has a `spec_url` — download it with `curl` to get a JSON object with a
+`spec` field describing the intended design change represented in that prototype.
 
 ## Deciding What to Refine
 
