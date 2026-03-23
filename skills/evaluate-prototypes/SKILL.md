@@ -100,6 +100,9 @@ From `get_project`, find every iframe slot in the latest revision. Each iframe e
 URL to a temp file with `curl -o /tmp/<slot_id>_N.png <url>`, then use **Read** to view it.
 Do not skip any — you need to see every captured state of every prototype.
 
+Each iframe element also has a `spec_url` — download it with `curl` to get a JSON object with a
+`spec` field describing the intended design change represented in that prototype.
+
 ### Evaluate
 
 Look at all the prototypes together. Then work through these three questions.

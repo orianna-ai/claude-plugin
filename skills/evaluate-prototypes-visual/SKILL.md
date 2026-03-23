@@ -79,6 +79,9 @@ From `get_project`, find every iframe slot in the latest revision. Each iframe e
 `screenshots` list of attachments with `url` fields. For each slot, download every screenshot
 URL to a temp file with `curl -o /tmp/<slot_id>_N.png <url>`, then use **Read** to view it.
 
+Each iframe element also has a `spec_url` — download it with `curl` to get a JSON object with a
+`spec` field describing the intended design change represented in that prototype.
+
 ### React first
 
 Before analyzing anything, look at each prototype and let yourself react. Does it look good?
