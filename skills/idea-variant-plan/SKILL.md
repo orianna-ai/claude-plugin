@@ -62,7 +62,7 @@ and you picked the wrong one.
 These are not CSS-only changes. You can change flows, layouts, data presentation, interaction
 models, information architecture — anything the feedback suggests.
 
-## Step 4: Build and dispatch the plan
+## Step 3: Build and dispatch the plan
 
 Use 12 of the provided slot IDs (leave any extras in `unused_slot_ids`).
 

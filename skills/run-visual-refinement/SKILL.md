@@ -269,10 +269,17 @@ Wait for the variant planner to complete.
 
 ### Step 1c: Extract and Dispatch Content Script Subagents
 
-Read the per-item prompts from the event history:
+Read the per-item prompts from the event history, filtering to ONLY the slot IDs you created
+in Step 1a. This is critical — multiple prototypes run in parallel and all post events to the
+same project, so you must filter by your specific slot IDs to avoid picking up another
+prototype's prompts.
 
 curl -s "API_HOST/api/projects/PROJECT_ID/events" | python3 -c "
 import json, sys
+
+# IMPORTANT: Replace with the actual slot IDs from Step 1a
+my_slot_ids = set(['SLOT_ID_1', 'SLOT_ID_2', ...])
+
 events = json.load(sys.stdin)
 completed_ids = set()
 for event in events:
@@ -283,14 +290,16 @@ for event in events:
         prompt = event.get('prompt', {})
         key = prompt.get('key', '')
         pid = prompt.get('metadata', {}).get('id', '')
-        if key.startswith('slot:') and pid not in completed_ids:
+        # Only match prompts for OUR slot IDs
+        slot_id = key.replace('slot:', '') if key.startswith('slot:') else ''
+        if slot_id in my_slot_ids and pid not in completed_ids:
             print(f'PROMPT_ID={pid} KEY={key}')
             print('---TEXT_START---')
             print(prompt.get('text', ''))
             print('---TEXT_END---')
 "
 
-Only process prompts that have NOT already been completed.
+Only process prompts for YOUR slot IDs that have NOT already been completed.
 
 For each per-item prompt, dispatch a **background** subagent:
 
@@ -459,7 +468,8 @@ Wait for the variant planner to complete.
 
 ### Step 2e-2f: Extract Prompts, Dispatch Content Scripts, Collect Previews
 
-Same as Steps 1c and 1d.
+Same as Steps 1c and 1d — but filter prompts by the slot IDs created in Step 2c (not 1a).
+This is critical since multiple visual refinement passes run in parallel.
 
 ### Step 2g: Visual Pick
 
