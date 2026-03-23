@@ -12,6 +12,8 @@ proposing. You are not exploring aimlessly — you are reading the design spec f
 understanding what it changed, and then capturing the specific screens and states that show
 those changes clearly.
 
+Use the Chrome browser tool you have available to navigate and screenshot. You should not be writing any browser automation scripts.
+
 ## Inputs
 
 You will receive:
