@@ -1,7 +1,7 @@
 ---
 name: run-orchestrator
 description: Setup a Softlight project, generate prototypes, auto-evaluate with PM and designer feedback, generate a revised set of prototypes, and loop.
-allowed-tools: Bash, Read, Write, Glob, Grep, mcp__plugin_softlight_softlight__create_project, mcp__plugin_softlight_softlight__plan_prototype_revision, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_comment_thread
+allowed-tools: Bash, Read, Write, Glob, Grep, mcp__plugin_softlight_softlight__create_project, mcp__plugin_softlight_softlight__plan_prototype_revision, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_comment_thread, mcp__plugin_softlight_softlight__get_pending_prompts, mcp__plugin_softlight_softlight__complete_prompt
 model: sonnet
 ---
 
@@ -61,12 +61,6 @@ run_in_background: true
 prompt: <the full prompt text from plan_prototype_revision, plus the additions below>
 ```
 
-For each planner subagent prompt, append the following context after the prompt text returned by
-`plan_prototype_revision`:
-
-- Remind the subagent to use `http://localhost:8080` as the API host for all `curl` commands
-  (the same host as the Softlight MCP server, not a hard-coded production URL).
-
 Dispatch rules:
 
 1. **Always** dispatch `new_ideas_prompt`.
@@ -79,29 +73,9 @@ which creates `prompt_created` events for each design.
 
 ### 3b. Extract per-item prompts
 
-Read the per-item prompts from the event history:
-
-```bash
-curl -s "http://localhost:8080/api/projects/${PROJECT_ID}/events" | python3 -c "
-import json, sys
-events = json.load(sys.stdin)
-for event in events:
-    if event.get('type') == 'prompt_created':
-        prompt = event.get('prompt', {})
-        key = prompt.get('key', '')
-        if key.startswith('slot:'):
-            pid = prompt.get('metadata', {}).get('id', '')
-            print(f'PROMPT_ID={pid} KEY={key}')
-            print('---TEXT_START---')
-            print(prompt.get('text', ''))
-            print('---TEXT_END---')
-"
-```
-
-This gives you the prompt text and prompt_id for each per-item prompt. Only process `slot:*`
-prompts that have **not** already been completed (check the event history for a matching
-`prompt_completed` event). This matters on second+ revisions where older slot prompts are already
-done.
+Call `get_pending_prompts` with the `project_id`. This returns all uncompleted `slot:*` prompts —
+each with a `prompt_id`, `slot_id`, and full `text`. Only prompts that have **not** already been
+completed are returned, so on second+ revisions older prompts are automatically excluded.
 
 ### 3c. Dispatch subagents
 
@@ -115,12 +89,8 @@ spec URL, image list, and content script URL. Just pass it through.**
 For each subagent, pass it:
 
 1. The full prompt text VERBATIM (it already contains everything the coding agent needs)
-2. Instructions to mark the prompt as done when finished:
-   ```
-   curl -s -X POST "http://localhost:8080/api/projects/<project_id>/events" \
-     -H "Content-Type: application/json" \
-     -d '[{"type":"prompt_completed","prompt_id":"<prompt_id>"}]'
-   ```
+2. Instructions to mark the prompt as done when finished by calling `complete_prompt` with
+   the `project_id` and `prompt_id`.
 
 ### 3d. Wait for completion
 
@@ -131,11 +101,7 @@ Phase 4 until every prototype has been generated.
 
 ### 4a. Screenshot prototypes
 
-Dispatch the `screenshot-iframes` skill in a **background** subagent. Pass it:
-
-1. The path to the skill:
-   `/workspaces/orianna/claude-plugin/skills/screenshot-iframes/SKILL.md`
-2. The `project_id`
+Dispatch the `screenshot-iframes` skill in a **background** subagent. Pass it the `project_id`.
 
 Wait for the screenshot subagent to complete. It uploads screenshots to drive and attaches them
 to each iframe slot — reviewers will access them via `get_project`.
@@ -144,11 +110,9 @@ to each iframe slot — reviewers will access them via `get_project`.
 
 Dispatch the `evaluate-prototypes` skill in a **background** subagent. Pass it:
 
-1. The path to the skill:
-   `/workspaces/orianna/claude-plugin/skills/evaluate-prototypes/SKILL.md`
-2. The `project_id`
-3. The problem statement from Phase 1
-4. The user's original prompt
+1. The `project_id`
+2. The problem statement from Phase 1
+3. The user's original prompt
 
 Wait for the PM subagent to complete before proceeding to 4c.
 
@@ -158,19 +122,15 @@ Dispatch both subagents **in parallel** as **background** subagents:
 
 **Designer review** — dispatch the `evaluate-prototypes-designer` skill. Pass it:
 
-1. The path to the skill:
-   `/workspaces/orianna/claude-plugin/skills/evaluate-prototypes-designer/SKILL.md`
-2. The `project_id`
-3. The problem statement from Phase 1
-4. The user's original prompt
+1. The `project_id`
+2. The problem statement from Phase 1
+3. The user's original prompt
 
 **Visual design review** — dispatch the `evaluate-prototypes-visual` skill. Pass it:
 
-1. The path to the skill:
-   `/workspaces/orianna/claude-plugin/skills/evaluate-prototypes-visual/SKILL.md`
-2. The `project_id`
-3. The problem statement from Phase 1
-4. The user's original prompt
+1. The `project_id`
+2. The problem statement from Phase 1
+3. The user's original prompt
 
 Wait for **both** subagents to complete before proceeding.
 

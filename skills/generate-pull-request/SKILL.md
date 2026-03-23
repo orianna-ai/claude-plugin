@@ -4,7 +4,7 @@ description: >
   Take a Softlight prototype's content script and implement its changes into the source code,
   then create a GitHub pull request. Use when the user wants to ship a design prototype as a
   real code change.
-allowed-tools: Bash, Read, Write, Glob, Grep
+allowed-tools: Bash, Read, Write, Glob, Grep, mcp__plugin_softlight_softlight__create_pull_request
 ---
 
 # Generate PR
@@ -60,14 +60,9 @@ placeholders.
    for any reason (missing CLI, auth issues, etc.), that's fine — construct the GitHub
    compare URL instead: `https://github.com/<owner>/<repo>/compare/main...<branch>`.
    The user can open the PR from there.
-5. **Record the result** by posting a `pull_request_created` event. Substitute the actual
-   values for `<project_id>`, `<github_url>`, `<slot_id>`, and `<git_branch>`:
-   ```
-   curl -s -X POST "https://softlight.orianna.ai/api/projects/<project_id>/events" \
-     -H "Content-Type: application/json" \
-     -d '[{"type":"pull_request_created","github_url":"<github_url>","slot_id":"<slot_id>","git_branch":"<git_branch>"}]'
-   ```
-   This posts the URL back to the Softlight canvas so the user can see it.
+5. **Record the result** by calling `create_pull_request` with `project_id`, `github_url`,
+   `slot_id`, and `git_branch`. This posts the URL back to the Softlight canvas so the user
+   can see it.
 
 ### Step 4: Return
 

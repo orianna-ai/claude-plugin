@@ -32,14 +32,14 @@ Call `get_project` with the `project_id`. From the response:
 3. Note the **slot IDs** of every iframe slot. For each, build the prototype URL:
 
 ```
-http://localhost:8080/api/tunnel/{element.tunnel_id}/?content_script_url={element.content_script.url}
+https://softlight.orianna.ai/api/tunnel/{element.tunnel_id}/?content_script_url={element.content_script.url}
 ```
 
 4. Note the **`tunnel_id`** from any iframe slot — all prototypes share the same tunnel. Build
    the baseline URL (the app without any content script):
 
 ```
-http://localhost:8080/api/tunnel/{element.tunnel_id}/
+https://softlight.orianna.ai/api/tunnel/{element.tunnel_id}/
 ```
 
 You now know what each prototype proposes. Use that knowledge to decide what to screenshot.
