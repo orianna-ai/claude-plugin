@@ -38,7 +38,7 @@ def _extract_tunnel_ids(
                     if tid := element.get("tunnel_id"):
                         tunnel_ids.add(tid)
             case "slot_updated":
-                element = event.get("element", {})
+                element = event.get("element") or {}
                 if element.get("type") == "iframe":
                     if tid := element.get("tunnel_id"):
                         tunnel_ids.add(tid)
