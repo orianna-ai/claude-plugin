@@ -45,17 +45,17 @@ Use the `get_project` response to view screenshots of each prototype.
 
 ### View the baseline
 
-The `get_project` response includes `problem.attachments` — screenshots of the unmodified app.
-Download each attachment URL to a temp file with `curl -o /tmp/baseline_N.png <url>`, then use
-**Read** to view it. **View the baseline screenshots first.** This is your reference point.
-Study the baseline carefully. Internalize its layout, spacing, typography, and visual rhythm.
+The `get_project` response may include `problem.attachments` — screenshots of the unmodified app.
+If attachments are present, download each URL to a temp file with `curl -o /tmp/baseline_N.png <url>`, then use **Read** to view it. Study the baseline carefully — internalize its layout, spacing, typography, and visual rhythm.
+
+If no attachments are present, determine your ideas based on the codebase, the problem statement, and any other available context. Do NOT try to take screenshots yourself.
 
 ### View the prototype screenshots and understand the prototype spec
 
 From `get_project`, find every iframe slot in the latest revision. Each iframe element has a
 `screenshots` list of attachments with `url` fields. For each slot, download every screenshot
 URL to a temp file with `curl -o /tmp/<slot_id>_N.png <url>`, then use **Read** to view it.
-Do not skip any.
+Do not skip any, if the screenshots exist. Do NOT try to take screenshots yourself here, just rely on what you are passed.
 
 Each iframe element also has a `spec_url` — download it with `curl` to get a JSON object with a
 `spec` field describing the intended design change represented in that prototype.

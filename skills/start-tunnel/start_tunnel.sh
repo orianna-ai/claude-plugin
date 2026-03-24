@@ -51,6 +51,7 @@ ${PROXY_URL:+proxyURL = \"${PROXY_URL}\"}
 customDomains = ["frp-gateway.orianna.ai"]
 hostHeaderRewrite = "localhost"
 httpUser = "${TUNNEL_ID}"
+localIP = "localhost"
 localPort = ${PORT}
 name = "${TUNNEL_ID}"
 routeByHTTPUser = "${TUNNEL_ID}"
