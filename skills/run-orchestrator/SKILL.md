@@ -21,12 +21,15 @@ Use the agent tool to run the setup steps as **background** subagents **in paral
 ### 1a. Content Script
 
 Run the `generate-content-script` skill in a **background** subagent to get the app into the right
-state for screenshotting. Pass it the user's input so it knows which app to target.
+state to display the design problem. Pass it the user's input so it knows which app to target.
+The spec is writing a content script to show the application in a state where it displays the design problem. Tell it there is no `project_id`, `slot_id`, or
+`spec_url` yet — run Phase 1 (write the script) and Phase 2 (upload to drive). Skip Phase 3
+(placement). Write the script to `/tmp/baseline_content_script.js` and return the drive URL.
 
-### 1b. Application and Tunnel
+### 1b. Application
 
-Run the `start-environment` skill in a **background** subagent. Pass it the user's input so it
-knows which app to start.
+Run the `start-application` skill in a **background** subagent. Pass it the user's input so it
+knows which app to start. It returns the **port**, **PID**, and **start command**.
 
 ### 1c. Problem Statement
 
@@ -34,12 +37,17 @@ Run the `generate-problem-statement` skill in a **background** subagent.
 
 Share the problem statement with the user when it is ready.
 
-Phase 1a - 1c subagents must all complete before going to phase 2.
+Phase 1a - 1c subagents must all complete before going to phase 1d.
+
+### 1d. Tunnel
+
+Run the `start-tunnel` skill in a **background** subagent. Pass it the **port** from step 1b.
+It returns the **tunnel ID** and **frpc PID**.
 
 ## Phase 2: Project Creation
 
-Call the `create_project` tool with the problem statement, content script, and tunnel URL from
-Phase 1. Share the `project_url` with the user (e.g., `[View in Softlight →](<project_url>)`) and
+Call the `create_project` tool with the problem statement, content script drive URL, and tunnel ID
+from Phase 1. Share the `project_url` with the user (e.g., `[View in Softlight →](<project_url>)`) and
 remember the `project_id` for future interactions.
 
 ## Phase 3: Generate Prototypes
