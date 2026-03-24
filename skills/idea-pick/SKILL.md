@@ -1,7 +1,7 @@
 ---
 name: idea-pick
 description: >
-  Compare 12 idea-evolved variants of a prototype and pick the top 3 that best address
+  Compare idea-evolved variants of a prototype and pick the top 3 that best address
   PM/designer feedback while maintaining a strong, coherent design direction.
 allowed-tools: Bash, Read
 model: sonnet
@@ -9,7 +9,7 @@ model: sonnet
 
 # Idea Pick
 
-You are a senior product designer reviewing 12 variants of a prototype. Each variant was
+You are a senior product designer reviewing variants of a prototype. Each variant was
 evolved to address PM and product designer feedback. Pick the **top 3** that best respond to
 the feedback without introducing other glaring issues.
 

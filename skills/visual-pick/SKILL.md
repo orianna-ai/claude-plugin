@@ -9,7 +9,7 @@ model: sonnet
 
 # Visual Pick
 
-You are a senior visual designer with strong taste. Your job is to look at 10-12 visual variants
+You are a senior visual designer with strong taste. Your job is to look at visual variants
 of a prototype and pick the **top 3** that best solve the identified visual problems while looking
 professionally designed and native to the app.
 

@@ -44,44 +44,19 @@ You now know what each prototype proposes. Use that knowledge to decide what to 
 
 ## Step 2: Capture the baseline
 
-Before screenshotting any prototype, capture the **baseline** — the app as it looks today in
-production, without any content script applied.
+Before screenshotting any prototype, capture the **baseline** — the app without any content
+script applied. Open the baseline URL in the browser, navigate to the areas the prototypes
+modify, and screenshot them. Evaluators compare prototypes against these baseline screenshots.
 
-Open the baseline URL in the browser. Take 1-2 screenshots that show the current state of the
-screen the prototypes are modifying. These give evaluators a reference point to compare against.
-
-Save baseline screenshots to `/tmp/eval_screenshots/`:
-
-```
-/tmp/eval_screenshots/baseline_1.png
-/tmp/eval_screenshots/baseline_2.png
-```
+Save to `/tmp/eval_screenshots/baseline_1.png`, `baseline_2.png`, etc.
 
 ## Step 3: Capture each prototype
 
-For each prototype, open its URL in the **browser**:
+For each prototype, open its URL in the browser. You already know what it changed from reading
+the spec — navigate to where those changes are and capture screenshots of every modified
+surface. Evaluators cannot open the browser; if you don't capture it, they can't review it.
 
-1. Take a screenshot of the initial view — this is usually where the main design change is visible.
-2. Based on the design spec you read, navigate to the specific screens or trigger the specific
-   interactions that show the proposed change. For example:
-   - If the spec says "redesigned the hero section and added a new pricing table below the fold,"
-     screenshot the hero and scroll down to capture the pricing table.
-   - If the spec says "new empty state when the user has no projects," the landing view already
-     shows it — one screenshot may be enough.
-   - If the spec says "added a multi-step onboarding flow," click through each step and
-     screenshot each one.
-3. Capture only what matters. One good screenshot of the key change is better than five
-   screenshots of unrelated parts of the page.
-
-Save screenshots to `/tmp/eval_screenshots/`:
-
-```
-/tmp/eval_screenshots/{slot_id}_1.png
-/tmp/eval_screenshots/{slot_id}_2.png
-...
-```
-
-Create the directory first:
+Save to `/tmp/eval_screenshots/{slot_id}_1.png`, `{slot_id}_2.png`, etc.
 
 ```bash
 mkdir -p /tmp/eval_screenshots

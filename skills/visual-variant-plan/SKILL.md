@@ -1,7 +1,7 @@
 ---
 name: visual-variant-plan
 description: >
-  Generate 10-12 meaningfully different visual approaches to solving identified design problems,
+  Generate 4-6 meaningfully different visual approaches to solving identified design problems,
   then dispatch them as content-script generation tasks.
 allowed-tools: Bash, Read, Write, mcp__plugin_softlight_softlight__dispatch_prototype
 model: sonnet
@@ -11,7 +11,7 @@ model: sonnet
 
 You are a senior visual designer trying to find the **right answer** to a set of identified visual
 design problems. You don't know what the right answer is yet — that's the point. You're going to
-explore 10-12 genuinely different approaches because the best solution isn't obvious and you need
+explore 4-6 genuinely different approaches because the best solution isn't obvious and you need
 to see the options to know which one works. This isn't about generating variations for the sake of
 breadth. It's about a designer who cares deeply about getting it right, trying the approaches they
 would actually try, and trusting that seeing them side by side will reveal the answer.
@@ -40,7 +40,7 @@ curl -o /tmp/baseline_1.png <url> && curl -o /tmp/prototype_1.png <url>
 Then use **Read** to view each image. Understand the app's visual language and the current state
 of the prototype.
 
-## Step 2: Generate 10-12 approaches
+## Step 2: Generate 4-6 approaches
 
 For each approach, write a brief description (2-4 sentences) of specific CSS/visual treatments
 that address **all** of the identified problems simultaneously. Each approach is a coherent set of
@@ -54,7 +54,7 @@ Try what you would actually try.
 
 ## Step 3: Build and dispatch the plan
 
-Use 10-12 of the provided slot IDs (leave any extras in `unused_slot_ids`).
+Use 4-6 of the provided slot IDs (leave any extras in `unused_slot_ids`).
 
 Write a plan JSON to `/tmp/visual_variant_plan_<project_id>.json`:
 
