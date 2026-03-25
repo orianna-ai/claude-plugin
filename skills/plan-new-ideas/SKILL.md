@@ -10,10 +10,7 @@ design problem. There are no existing prototypes yet — you are starting from s
 you produce should look like a professional human designer made it — not just a clever concept,
 but a complete, crafted design.
 
-## Step 1: Understand the Product
-
-Before you design anything, you need to deeply understand how the product works today. You cannot
-come up with good ideas for changing a product you don't understand.
+## Step 1: Understand Why the Problem Exists
 
 ### Get the project
 
@@ -26,43 +23,32 @@ Download each attachment URL to a temp file with `curl -o /tmp/baseline_N.png <u
 **Read** to view it. **View every baseline screenshot.** This is the product as it exists today.
 Study it carefully.
 
-### Explore the codebase
+### Explore the codebase through the lens of the problem
 
-Read the relevant parts of the application source code. Understand:
+Read the relevant parts of the application source code — but don't just map out how the product
+works. Explore with a purpose: understand *why this problem exists*. What is the code actually
+doing that creates or contributes to the problem? What does the user experience that the
+screenshots alone can't tell you? What data, flows, or capabilities exist in the product that
+aren't being surfaced? What constraints are real and which are just artifacts of how it was built?
 
-- What does this part of the product do today?
-- What's the current user flow? What happens when a user interacts with this screen?
-- What data is available? What gets rendered and where does it come from?
-- What are the real constraints — technical, data, or structural?
-- How does this screen or feature fit into the broader product?
+Use Glob, Grep, and Read to explore. You have context that most designers never get — the full
+codebase. The baseline screenshots show you what the product looks like. The code shows you what
+the product *is* and why it behaves the way it does.
 
-Use Glob, Grep, and Read to explore. Don't skim — you need enough understanding to know what's
-actually possible and what ideas will hold up against how the product really works. The baseline
-screenshots show you what the product looks like. The code shows you what the product *is*.
-
-If you skip this step, your ideas will be generic and disconnected from the actual product. A
-designer who understands the codebase produces ideas grounded in reality. A designer who doesn't
-produces ideas that look clever but fall apart under scrutiny.
+If you skip this step, your ideas will be generic design patterns disconnected from the actual
+product. A designer who understands the codebase produces ideas grounded in reality. A designer
+who doesn't produces ideas that look clever but fall apart under scrutiny.
 
 ## Step 2: Decide What to Design
 
-Start with the most obvious idea — the simple, straightforward thing a good designer would think
-to do first given the problem. If you feel like you need to write a lot to explain it, the idea
-is too complicated and you picked the wrong one.
-
-Then generate more ideas. Each one should be a different way to solve the problem — not a
-variation on your first idea. Ask yourself "what's another simple, obvious thing a good product
-designer would try?" each time, as if you're starting fresh. If you find yourself building on
-your first idea rather than proposing a genuinely different approach, you're not exploring enough.
+Your ideas should flow directly from what you learned in Step 1. What's a simple, obvious thing
+a good product designer would do if they deeply understood this product and why the problem
+exists? Then ask yourself the same question again — what's another way to solve it? Each idea
+should be a different answer, not a variation on the first one.
 
 You have up to 6 slots. Don't pre-decide how many to fill — do the design work and let the ideas
-determine the number. Aim for 4-6. If you can't think of another idea that's actually good and
-simple, stop there. Don't fill slots with ideas you don't believe in.
-
-Each idea should be coherent — a clear direction that holds together, not a jumble of unrelated
-changes stitched into one design. In design, simple is better and less is more.
-
-Your ideas should feel like they were designed by someone who actually knows this product and business — because you do.
+determine the number. Aim for 4-6. If you can't think of another idea that's actually good,
+stop there. Don't fill slots with ideas you don't believe in.
 
 ## Step 3: Write the Design Specs
 

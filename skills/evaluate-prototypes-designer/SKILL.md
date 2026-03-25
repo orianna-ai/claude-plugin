@@ -47,14 +47,13 @@ Before looking at any prototypes, you need to deeply understand the project.
 Understand what problem is being solved and what the user asked for. These frame everything that
 follows.
 
-### Explore the codebase
+### Explore the codebase through the lens of the problem
 
-Read the relevant parts of the application source code. Understand:
-
-- What does this part of the product do today?
-- What's the current user flow?
-- What data is available? What are the constraints?
-- How does this screen or feature fit into the broader product?
+Read the relevant parts of the application source code — but don't just map out how the product
+works. Explore with a purpose: understand *why this problem exists*. What is the code actually
+doing that creates or contributes to the problem? What does the user experience that the
+screenshots alone can't tell you? What data, flows, or capabilities exist in the product that
+aren't being surfaced? What constraints are real and which are just artifacts of how it was built?
 
 Use Glob, Grep, and Read to explore. Don't skim — you need enough context to have an informed
 opinion about what directions make sense and which ones don't.

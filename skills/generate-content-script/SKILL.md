@@ -51,23 +51,18 @@ Optional. Image URLs or local file paths, one per line. If these are passed, vie
 
 Optional. Drive URL of an existing content script. If this exists, download the content script it and edit from there instead of starting from scratch.
 
-### `<context>`
+## Phase 1: Understand the app
 
-Pre-explored source code and analysis for the target application. The caller builds this by
-exploring the app's source tree before invoking this skill. It covers:
+Before writing any code, explore the codebase to understand how the app is built. Read the source
+files for the page or feature you're modifying — routing, components, data fetching, styles.
+Understand the app's design system (CSS variables, theme tokens, component patterns, spacing,
+typography) so that any UI you create or modify looks like it belongs in the product.
 
-1. **Routing & auth** — how the app picks which screen to show, and what auth state it checks
-2. **Data fetching** — which endpoints the target screen calls on mount (URL patterns, query params)
-3. **Response shapes** — the TypeScript types or destructured fields each component expects
-4. **Styling** — CSS variables, theme tokens, or class naming patterns used by the app
+Use Glob, Grep, and Read. Always read local source files — never `curl` the tunnel URL to fetch
+HTML, JS bundles, CSS, or API responses. The source code is in the repo and is faster and more
+informative than compiled output.
 
-If something critical is missing you may read additional source files within the application's root
-directory — but do not explore unrelated services. **Always read local source files** — never `curl`
-the tunnel URL to fetch HTML, JS bundles, CSS, or API responses. The source code is in the repo and
-is faster and more informative than compiled output. The tunnel exists for the iframe to load the
-app at runtime, not for you to explore.
-
-## Phase 1: Write the content script
+## Phase 2: Write the content script
 
 Write a content script that modifies the running app to implement `<spec>`. The app has its own
 routing, components, data fetching, and design system — use them. Mock routes, auth, and API
@@ -142,7 +137,7 @@ re-inject your elements if the application removes or replaces them.
   - `await import("https://esm.sh/@testing-library/user-event")` for simulating interactions
 
 
-## Phase 2: Upload the content script
+## Phase 3: Upload the content script
 
 You MUST save the content script to a **unique file path** that includes the slot ID — e.g.,
 `/tmp/content_script_<slot_id>.js`. Multiple content scripts may be generated in parallel, so
@@ -152,7 +147,7 @@ overwrite each other's files.
 Upload the content script via multipart form POST to `https://drive.orianna.ai/api/upload`.
 The response is the public URL of the uploaded file (e.g., `https://drive.orianna.ai/<hash>.js`).
 
-## Phase 3: Place the content script on the canvas
+## Phase 4: Place the content script on the canvas
 
 Call the `update_iframe_element` MCP tool with `project_id`, `slot_id`, `content_script_url`
 (the URL from Phase 2), and `spec_url` (the `<spec_url>` from your input — pass it through
