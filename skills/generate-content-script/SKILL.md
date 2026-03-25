@@ -30,6 +30,15 @@ render them.
 
 Optional. Image URLs or local file paths, one per line. If these are passed, view all of these before writing code. The spec references them.
 
+### `<caption_slot_id>`
+
+Optional. Canvas slot UUID for the caption below this prototype. If provided, fill it in after
+placing the content script (see Phase 4).
+
+### `<tunnel_id>`
+
+The tunnel ID for the running application. Used to construct the prototype URL for screenshotting.
+
 ### `<content_script_url>`
 
 Optional. Drive URL of an existing content script. If this exists, download the content script it and edit from there instead of starting from scratch.
@@ -134,3 +143,20 @@ Call the `update_iframe_element` MCP tool with `project_id`, `slot_id`, `content
 unchanged). This replaces the placeholder slot with an iframe that loads the app with your
 content script injected. All other iframe fields (`git_commit`, `tunnel_id`, `git_patch`)
 are inherited from `problem.baseline` automatically so you don't have to fill them in.
+
+## Phase 4: Fill in the caption
+
+If `<caption_slot_id>` was provided, call `update_text_element` with `project_id`,
+`slot_id` set to the `<caption_slot_id>`, and a short `text` (1-2 sentences) describing what
+this prototype does, how it solves the problem, and what its tradeoffs are.
+
+## Phase 5: Screenshot the prototype
+
+Open the prototype in a browser tab and screenshot it so reviewers can see it on the canvas.
+
+1. Call `tabs_context_mcp`, then `tabs_create_mcp` to get your own tab
+2. `navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/?content_script_url={content_script_url}`
+3. Wait for the page to load, then find the design changes described in the spec
+4. `computer` with `action: "screenshot"` and `save_to_disk: true` — returns a file path
+5. Upload: `curl -sF 'file=@<path>' https://drive.orianna.ai/api/v2/upload` — returns a drive URL
+6. Call `set_iframe_screenshots` with `project_id`, `slot_id`, and `screenshot_urls`
