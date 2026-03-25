@@ -36,19 +36,11 @@ Optional. Drive URL of an existing content script. If this exists, download the 
 
 ### `<context>`
 
-Pre-explored source code and analysis for the target application. The caller builds this by
-exploring the app's source tree before invoking this skill. It covers:
+Optional pre-explored source code and analysis from the caller. May cover routing, auth, data
+fetching, response shapes, and styling patterns.
 
-1. **Routing & auth** — how the app picks which screen to show, and what auth state it checks
-2. **Data fetching** — which endpoints the target screen calls on mount (URL patterns, query params)
-3. **Response shapes** — the TypeScript types or destructured fields each component expects
-4. **Styling** — CSS variables, theme tokens, or class naming patterns used by the app
-
-If something critical is missing you may read additional source files within the application's root
-directory — but do not explore unrelated services. **Always read local source files** — never `curl`
-the tunnel URL to fetch HTML, JS bundles, CSS, or API responses. The source code is in the repo and
-is faster and more informative than compiled output. The tunnel exists for the iframe to load the
-app at runtime, not for you to explore.
+**Explore the codebase yourself.** You have full access to the source code — use it to understand
+whatever you need about the app. Read local source files, not the tunnel URL.
 
 ## Phase 1: Write the content script
 
@@ -132,7 +124,7 @@ You MUST save the content script to a **unique file path** that includes the slo
 using a generic path like `/tmp/content_script.js` will cause race conditions where agents
 overwrite each other's files.
 
-Upload the content script via multipart form POST to `https://drive.orianna.ai/api/upload`.
+Upload the content script via multipart form POST to `https://drive.orianna.ai/api/v2/upload`.
 The response is the public URL of the uploaded file (e.g., `https://drive.orianna.ai/<hash>.js`).
 
 ## Phase 3: Place the content script on the canvas
