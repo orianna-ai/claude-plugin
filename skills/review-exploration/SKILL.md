@@ -1,7 +1,6 @@
 ---
 name: review-exploration
 description: "Review a completed exploration — provide deep feedback on every prototype and recommend what level each one needs next."
-allowed-tools: Bash, Read, Glob, Grep, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_comment_thread
 model: sonnet
 ---
 

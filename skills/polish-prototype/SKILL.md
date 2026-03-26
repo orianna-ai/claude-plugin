@@ -1,7 +1,6 @@
 ---
 name: polish-prototype
 description: "Visual refinement loop — critiques visual problems, fans out 10-12 variant content scripts in parallel, picks winners, and repeats until polished."
-allowed-tools: Bash, Read, Write, Glob, Grep, Agent, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_exploration, mcp__plugin_softlight_softlight__update_text_element, mcp__plugin_softlight_softlight__create_comment_thread
 model: sonnet
 ---
 

@@ -166,10 +166,17 @@ Baseline URL (the app as-is, no content script):
 https://softlight.orianna.ai/api/tunnel/{tunnel_id}/
 ```
 
+**CRITICAL — tab isolation:** Multiple agents run in parallel and share the same Chrome tab
+group. You MUST create a new tab when viewing a design — never reuse an existing tab or you will clobber another agent's page. Call `tabs_context_mcp` with `createIfEmpty: true` to find (or recreate) the active tab group, then **always** call `tabs_create_mcp` to create a new tab to take actions in. Take actions in that tab.
+
 To screenshot a prototype and attach it to the canvas (using the Claude in Chrome tools). It is important you use the computer tool with the save_to_disk. The other tools will fail:
 1. `computer` with `action: "screenshot"` and `save_to_disk: true` — returns a file path
 2. Upload: `curl -sF 'file=@<path>' https://drive.orianna.ai/api/v2/upload` — returns a drive URL
 3. Call `set_iframe_screenshots` with the `project_id`, `slot_id`, and `screenshot_urls`
+
+**Browser errors:** The Chrome extension's service worker can go idle during long sessions. If
+a Chrome tool fails, wait a few seconds and retry. You may need to create a new tab and start
+over.
 
 You don't need to upload baseline screenshots — those are already on the project.
 
