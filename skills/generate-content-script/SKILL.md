@@ -154,19 +154,17 @@ this prototype does, how it solves the problem, and what its tradeoffs are.
 
 Open the prototype in a browser tab and screenshot it so reviewers can see it on the canvas.
 
-**CRITICAL — tab isolation:** Multiple content-script agents run in parallel and share the same
-Chrome tab group. You MUST create your own tab — never reuse an existing tab or you will clobber
-another agent's page.
+**CRITICAL — tab isolation:** Multiple content script agents run in parallel and share the same
+Chrome tab group. You MUST create a new tab when viewing a design — never reuse an existing tab or you will clobber
+another agent's page. Call `tabs_context_mcp` with `createIfEmpty: true` to find (or recreate) the active tab group,
+then **always** call `tabs_create_mcp` to create a new tab. Use only the `tabId` returned by `tabs_create_mcp` for all subsequent browser
+operations. Never navigate a tab you did not create.
 
-1. Call `tabs_context_mcp` with `createIfEmpty: true` to find (or recreate) the active tab group,
-   then **always** call `tabs_create_mcp` to
-   create a new tab. Use only the `tabId` returned by `tabs_create_mcp` for all subsequent browser
-   operations. Never navigate a tab you did not create.
-2. `navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/?content_script_url={content_script_url}`
-3. Wait for the page to load, then find the design changes described in the spec
-4. `computer` with `action: "screenshot"` and `save_to_disk: true` — returns a file path
-5. Upload: `curl -sF 'file=@<path>' https://drive.orianna.ai/api/v2/upload` — returns a drive URL
-6. Call `set_iframe_screenshots` with `project_id`, `slot_id`, and `screenshot_urls`
+1. `navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/?content_script_url={content_script_url}`
+2. Wait for the page to load, then find the design changes described in the spec
+3. `computer` with `action: "screenshot"` and `save_to_disk: true` — returns a file path
+4. Upload: `curl -sF 'file=@<path>' https://drive.orianna.ai/api/v2/upload` — returns a drive URL
+5. Call `set_iframe_screenshots` with `project_id`, `slot_id`, and `screenshot_urls`
 
 **Browser errors:** The Chrome extension's service worker can go idle during long sessions. If
 a Chrome tool fails, wait a few seconds and retry. You may need to create a new tab and start
