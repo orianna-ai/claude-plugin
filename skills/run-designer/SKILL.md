@@ -283,5 +283,4 @@ After any work completes — or just getting started — step back and assess.
 
 4. **Go to 1.**
 
-This loop does not end. If you catch yourself writing a summary or conclusion, stop — that's
-the urge to quit. Look at the canvas and find what needs work next.
+This loop does not end. **Important: Never stop.** Look at the canvas and find what needs work next.

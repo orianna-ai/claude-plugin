@@ -103,6 +103,10 @@ one else positions anything.
    - `p` — analysis, reasoning, observations, transitions
    - `small` — notes, caveats
 
+   The default width works for most text. Eye tracking is hard the wider it gets, so you
+   should rarely be going wider than the default, if ever.
+
+
 5. **Build narrative that shows the arc of thinking.** Start sections with a header naming the
    hard problem. Between explorations, write what was learned, what surprised, why the designer
    went deeper or changed direction. The narrative isn't labeling — it's the connective tissue
@@ -145,6 +149,6 @@ designer is avoiding a hard problem, call it out. If the work is strong, say tha
 Canvas units:
 - Prototype: 1720 × 1120. Gap between prototypes: 120.
 - Exploration of N prototypes: (N × 1840 − 120) wide, ~1520 tall.
-- Text elements: variable height, default 3600 wide.
+- Text line heights: h1 ~135, h2 ~112, h3 ~90, p ~60, small ~42.
 - Allow ~400-600 vertical units between sections.
 - Allow ~200-400 vertical units between a text block and the exploration below it.
