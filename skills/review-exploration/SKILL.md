@@ -111,7 +111,7 @@ Every comment MUST include:
 
 For visual polish recommendations, be extremely specific about the problems — spacing,
 typography, color, alignment, weight, shadows, transitions, etc — because these are passed
-directly to the `polish-prototype` skill.
+directly to the visual polish exploration specs.
 
 For cross-cutting observations about the whole exploration, post a comment without
 `prototype_slot_id`.
