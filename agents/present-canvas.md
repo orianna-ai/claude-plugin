@@ -115,8 +115,12 @@ one else positions anything.
 6. **Evaluate the canvas and return feedback to the designer.** After organizing and writing,
    look at the full canvas critically. For each section ask: did the designer go to war with
    this problem? Is there real depth — multiple explorations, iteration, genuine wrestling? Or
-   did they do one pass and move on? Return your honest assessment — what sections need more
-   depth, what's missing, where the exploration is shallow. Be specific and direct.
+   did they do one pass and move on? Check PM comment threads on the canvas — PM comments have
+   the user's email as `metadata.created_by` (distinct from `"softlight"` or
+   `"claude-evaluator"`). A thread may contain a back-and-forth between the designer and PM —
+   read the full thread to understand where the discussion landed. If PM feedback raises issues
+   or directions that haven't been reflected in subsequent explorations, call that out as a
+   gap. Return your honest assessment — what sections need more depth, what's missing, where the exploration is shallow. Be specific and direct.
 
 ## How to write
 

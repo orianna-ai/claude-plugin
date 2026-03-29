@@ -55,6 +55,16 @@ about what will and won't work.
 Call `get_project` with the `project_id`. Review the full project state — all explorations,
 prototypes, and any existing comments or feedback. Understand what's been explored so far.
 
+Pay attention to PM comment threads — these are direct stakeholder feedback. Each comment has
+`metadata.created_by` (PM comments have the user's email; AI replies use `"softlight"`; review
+agent comments use `"claude-evaluator"`). Comments can have `attachments` — images the PM
+attached to comments. The thread's `anchor` hints at what part of a
+prototype the comment is about, though the PM can misclick — use the thread's `screenshot` (a
+canvas capture with a blue dot) for full visual context. A thread may contain a back-and-forth
+between the designer and the PM — read the full thread to understand where the discussion
+landed. When evaluating prototypes and recommending what to explore next, factor in whether PM
+feedback points to problems or directions the explorations should tackle.
+
 ### View the baseline
 
 Download baseline screenshots from `problem.attachments`:

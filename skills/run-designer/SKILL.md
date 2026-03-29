@@ -159,9 +159,25 @@ element) has:
 - **`screenshots`** — drive URLs. Download and Read to see what the prototype looks like.
 - **`tunnel_id`** — shared across all prototypes. Used to construct URLs for viewing in the browser.
 
-Comment threads are separate slots with a `comments` list. They link to prototypes via
-`references`. When you leave notes, pass `prototype_slot_id` to `create_comment_thread` to
-attach the thread to a specific prototype.
+Comment threads are separate slots. Each has:
+- **`comments`** — the conversation. Each comment has `text`, and `metadata.created_by` (PM
+  comments have the user's email; AI replies use `"softlight"`; review agent comments use
+  `"claude-evaluator"`). Comments can have **`attachments`** — images or screenshots the PM
+  attached to their comment to show you what they're looking at.
+- **`anchor`** — if present, tells you what part of a prototype the PM left the comment on.
+  It includes which `iframe` slot (prototype) the comment is attached to, `selectors` (the CSS
+  selectors of the HTML element they clicked on), and the `location` (page URL). This can give
+  you hints about what they were commenting on, but isn't the perfect source of truth (they can
+  misclick / click next to elements they wanted to reference). Use the comment screenshot for
+  full visual context on what the user is leaving feedback about.
+- **`screenshot`** — a canvas capture with a blue dot showing where the comment was placed.
+  The dot and surrounding area tell you what the PM is looking at.
+
+When you leave notes, pass `prototype_slot_id` to `create_comment_thread` to attach the
+thread to a specific prototype.
+
+A thread may contain a back-and-forth conversation between yourself and the PM as they
+progressed their thinking — read the full thread to understand where the discussion landed. When a PM leaves new feedback, it MUST be addressed in the next explorations.
 
 Canvas tools:
 - `create_exploration` — create an exploration (titled row of prototype slots). Returns `slot_ids` and `caption_slot_ids`. The presenter handles positioning
@@ -270,11 +286,13 @@ The user provides a design problem and the port where the application is already
 After any work completes — or just getting started — step back and assess.
 
 1. **Check your inputs.** Call `get_project`. Check for finished subagents — presenter feedback,
-   review feedback, completed prototypes. What's landed since you last looked?
+   review feedback, completed prototypes. Check for comments from the PM — these are direct
+   stakeholder feedback. What's landed since you last looked?
 
 2. **Decide what to do next.** You always have a view on what the canvas needs — more
    directions, more depth, more polish. Act on it. If presenter feedback or reviews have
-   landed, incorporate them. If not, keep going based on your own judgment.
+   landed, incorporate them. If there is unaddressed PM feedback in comment threads, a subset of the
+   next explorations MUST address that feedback in the next explorations. A separate agent handles replying to comments — your job is to let the feedback shape what you explore next.
 
 3. **Dispatch the work.** Create explorations, then dispatch `present-canvas` first (it's
    fast and keeps the canvas alive), then fan out content-script subagents. Dispatch reviews
