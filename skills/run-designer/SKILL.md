@@ -140,6 +140,50 @@ Dispatch the `present-canvas` agent in the background:
 </explorations_created>
 ```
 
+### Presenting work for review
+
+At certain points, the most productive next move is human input — not because you're stuck,
+but because you've reached a decision that requires the PM's judgment on priorities or
+tradeoffs you can't resolve alone.
+
+**When to present:**
+- Multiple strong directions with real depth, reviews say they're strong, and the
+  convergence decision is a value judgment the PM needs to make
+- A tradeoff that's fundamentally about business priorities — which user segment to
+  optimize for, which metric matters more, what risk tolerance looks like
+- You have a recommendation you want validated before investing heavily at the next level
+
+**When NOT to present:**
+- The work is shallow — reviews say it needs more depth. Present strong work, not early work
+- There's an obvious next move that doesn't need human input
+- Only one viable direction exists — that's not a decision point
+- There's already a review page out that the PM hasn't responded to
+
+Dispatch `present-for-review` in the background. You provide your raw thinking and the
+prototypes to feature; it composes a separate review page the PM can read and respond to.
+
+```
+<project_id>{project_id}</project_id>
+<thinking>
+{your raw analysis: what you explored, what you learned, what the decision is, what the
+tradeoffs are, what you'd recommend and why — be specific and detailed}
+</thinking>
+<prototypes>
+{the prototypes to feature — slot IDs and what each one represents}
+</prototypes>
+```
+
+**While waiting:** Don't stop working. Pursue problems that don't depend on the pending
+decision — sub-problems that apply regardless of direction, new areas, deeper technical
+investigation. Don't go deeper on directions you sent for review — that's the convergence
+decision you need PM input on.
+
+**Reading responses:** Each time you call `get_project`, check review pages for human
+feedback. Review pages appear in `project.pages` with `page_type: "review"` — look for
+comment threads from human users on those pages. Directional approval means converge.
+Requests for more depth mean explore further, then reassess. If the PM pushes back on your
+recommendation, respect it — they own the decision.
+
 ## What you have access to
 
 ### The canvas
@@ -286,13 +330,16 @@ The user provides a design problem and the port where the application is already
 After any work completes — or just getting started — step back and assess.
 
 1. **Check your inputs.** Call `get_project`. Check for finished subagents — presenter feedback,
-   review feedback, completed prototypes. Check for comments from the PM — these are direct
-   stakeholder feedback. What's landed since you last looked?
+   review feedback, completed prototypes. Check for PM comments on the canvas and on review
+   pages. What's landed since you last looked?
 
 2. **Decide what to do next.** You always have a view on what the canvas needs — more
-   directions, more depth, more polish. Act on it. If presenter feedback or reviews have
-   landed, incorporate them. If there is unaddressed PM feedback in comment threads, a subset of the
-   next explorations MUST address that feedback in the next explorations. A separate agent handles replying to comments — your job is to let the feedback shape what you explore next.
+   directions, more depth, more polish. If you've reached a genuine decision point that needs
+   human input, present work for review. If there is unaddressed PM feedback in canvas comment
+   threads, the next explorations MUST address that feedback — a separate agent handles
+   replying to comments, your job is to let it shape what you explore. If PM feedback has
+   landed on a review page, interpret it as a directional decision (see "Presenting work for
+   review"). Otherwise, keep going based on your own judgment.
 
 3. **Dispatch the work.** Create explorations, then dispatch `present-canvas` first (it's
    fast and keeps the canvas alive), then fan out content-script subagents. Dispatch reviews

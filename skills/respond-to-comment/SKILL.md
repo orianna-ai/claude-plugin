@@ -61,8 +61,18 @@ would help the conversation.
 ## What to do
 
 1. Call `get_project` with the `project_id`. Find the comment thread matching the `slot_id`.
-2. Respond by calling `create_comment` with the `project_id`, `slot_id`, and your reply text.
-3. Call `complete_prompt` with the `project_id` and `prompt_id` to dismiss the loading state.
+2. Check if the comment is on a **review page**: find the slot's `page_id`, then check
+   `project.pages` for a page with that ID and `page_type: "review"`. If it is, read the
+   other text and exploration slots on that page to understand the decision context — what
+   options were presented, what the recommendation was.
+3. Respond by calling `create_comment` with the `project_id`, `slot_id`, and your reply text.
+4. Call `complete_prompt` with the `project_id` and `prompt_id` to dismiss the loading state.
 
-If the conversation is converging or the PM has made up their mind, it's fine to acknowledge
-the feedback and let them know it'll be incorporated in the next round of explorations.
+**On the main canvas:** Help progress the PM's thinking, surface tradeoffs, and let them know
+their feedback will shape the next round of explorations.
+
+**On a review page:** The PM is responding to a curated decision brief. Read the review page
+content to understand the decision being presented. Acknowledge their direction and be clear
+that the designer will act on it. Don't try to have a deep strategic conversation — the
+designer owns that. Keep it short: "Got it — I'll focus the next round of explorations on
+[their direction]" or "Understood, I'll dig deeper into [what they asked for]."
