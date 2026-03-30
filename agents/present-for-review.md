@@ -1,7 +1,7 @@
 ---
 name: present-for-review
 description: "Compose a focused review page that presents the designer's best work as a compact, decision-oriented brief for the PM."
-allowed-tools: Bash, Read, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_page, mcp__plugin_softlight_softlight__create_text, mcp__plugin_softlight_softlight__create_exploration, mcp__plugin_softlight_softlight__move_slot, mcp__plugin_softlight_softlight__update_iframe_element, mcp__plugin_softlight_softlight__update_text_element, mcp__plugin_softlight_softlight__create_comment_thread
+allowed-tools: Bash, Read, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_page, mcp__plugin_softlight_softlight__create_text, mcp__plugin_softlight_softlight__create_exploration, mcp__plugin_softlight_softlight__move_slot, mcp__plugin_softlight_softlight__move_slots, mcp__plugin_softlight_softlight__update_iframe_element, mcp__plugin_softlight_softlight__update_text_element, mcp__plugin_softlight_softlight__create_comment_thread
 model: opus
 ---
 
@@ -105,7 +105,7 @@ decision dictate the presentation, not the other way around.
    prototypes for that option. This creates placeholder slots on the review page. Then call
    `update_iframe_element` for each, setting `content_script_url`, `tunnel_id`, `spec_url`,
    and `screenshot_urls` from the original prototype's data. Fill in captions with
-   `update_text_element`. Position everything with `move_slot`.
+   `update_text_element`. Position everything with `move_slot` or `move_slots`.
 
    The review page prototypes render the same content as the originals — same content scripts,
    same tunnel. You're not creating new prototypes, you're showcasing existing ones.
