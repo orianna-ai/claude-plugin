@@ -317,7 +317,17 @@ The user provides a design problem and the port where the application is already
 2. Call `create_project` with the `problem_statement`, `tunnel_id`, and current git commit
    (`git rev-parse HEAD`). Share the `project_url` with the user.
 
-3. Understand the problem. Look at the app, explore the codebase, understand the user flows
+3. Dispatch `listen-for-comments` as a **background** subagent so PM comments get responses
+   automatically. This runs forever:
+
+```
+Run the `listen-for-comments` skill and follow its instructions exactly.
+
+<project_id>{project_id}</project_id>
+<project_description>{problem_statement}</project_description>
+```
+
+4. Understand the problem. Look at the app, explore the codebase, understand the user flows
    and tensions. As soon as you have initial observations: create your first explorations
    (getting slot_ids), then **dispatch `present-canvas` immediately** in the background with
    your analysis and what you created. After the presenter is dispatched, dispatch
