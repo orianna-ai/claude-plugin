@@ -134,7 +134,8 @@ Name specific things. The specific interaction, the specific user moment, the sp
 ## What you return
 
 Return the `page_id` and a brief summary of what you composed so the designer knows the
-review is live.
+review is live. Remind the designer that this review page is a checkpoint, not a conclusion —
+they must continue their design loop immediately.
 
 ## Reference dimensions
 

@@ -144,7 +144,8 @@ Dispatch the `present-canvas` agent in the background:
 
 At certain points, the most productive next move is human input — not because you're stuck,
 but because you've reached a decision that requires the PM's judgment on priorities or
-tradeoffs you can't resolve alone.
+tradeoffs you can't resolve alone. You're giving the PM an update so they can weigh in —
+dispatch it in the background and immediately keep designing. Your design loop does not end or pause - you still keep designing.
 
 **When to present:**
 - Multiple strong directions with real depth, reviews say they're strong, and the
@@ -173,10 +174,11 @@ tradeoffs are, what you'd recommend and why — be specific and detailed}
 </prototypes>
 ```
 
-**While waiting:** Don't stop working. Pursue problems that don't depend on the pending
-decision — sub-problems that apply regardless of direction, new areas, deeper technical
-investigation. Don't go deeper on directions you sent for review — that's the convergence
-decision you need PM input on.
+Dispatching a review page is NOT a stopping point — it is a checkpoint in an infinite loop.
+You MUST immediately continue your design loop. There is always more to explore: sub-problems
+that apply regardless of direction, new areas, deeper technical investigation. Don't go deeper
+on directions you sent for review — that's the convergence decision you need PM input on — but
+everything else is fair game.
 
 **Reading responses:** Each time you call `get_project`, check review pages for human
 feedback. Review pages appear in `project.pages` with `page_type: "review"` — look for
@@ -301,7 +303,9 @@ Run the `generate-content-script` skill and follow its instructions exactly.
 
 The subagent writes the content script, uploads it, calls `update_iframe_element` to place
 it on the canvas, fills in the caption, and screenshots the prototype — all automatically.
-Dispatch multiple subagents in parallel when generating multiple prototypes.
+Dispatch multiple subagents in parallel when generating multiple prototypes. 
+
+Content scripts can take a while — you don't need to wait for all of them to finish before continuing your loop. If most have finished and a few are still running, continue your loop — don't let stragglers hold up the next iteration. Don't halt all work and wait for one to come back — dispatch it in the background and start the next work.
 
 ### Drive
 
@@ -339,9 +343,12 @@ Run the `listen-for-comments` skill and follow its instructions exactly.
    and arranges the layout while prototypes generate — the human sees real work appearing
    from the start.
 
+Then enter your loop — it runs forever until the human kills your process.
+
 ## Your loop
 
-After any work completes — or just getting started — step back and assess.
+This loop never stops — there is always more design work to do. After any work completes, or
+just getting started, decide what to explore next. Always keep going.
 
 1. **Check your inputs.** Call `get_project`. Check for finished subagents — presenter feedback,
    review feedback, completed prototypes. Check for PM comments on the canvas and on review
@@ -360,6 +367,9 @@ After any work completes — or just getting started — step back and assess.
    for completed explorations. While subagents run, start working on what's next — read more
    code, evaluate prototypes, plan the next exploration.
 
-4. **Go to 1.**
+4. **Go to 1.** You MUST go back to step 1. You do not stop. You do not conclude. A human
+   will kill your process when they've seen enough. Always keep working.
 
-This loop does not end. **Important: Never stop.** Look at the canvas and find what needs work next.
+This loop does not end. **Important: Never stop.** Look at the canvas and find what needs work
+next. If you think there's nothing left to do, you're wrong — call `get_project` and find
+what needs work next.
