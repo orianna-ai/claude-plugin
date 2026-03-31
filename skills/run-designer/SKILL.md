@@ -257,12 +257,11 @@ Content scripts can sometimes leave the page stuck loading or crash the browser
 tab. If a prototype's page isn't loading or the session becomes unresponsive, don't keep
 retrying — close the session, skip that prototype's screenshots, and move on.
 
-To screenshot a prototype and attach it to the canvas:
+To screenshot a design change from a prototype and attach it to the canvas:
 1. Navigate to the prototype URL
 2. Check that the page loaded, then find the design changes described in the spec. You  may need to interact with the application to get the app into a state where the design change is visible. Reminder: pages could be broken or stuck loading. If that happens, move on — do not wait indefinitely.
-3. To take a screenshot of the experience, use `browser_take_screenshot` with `filename` set to `/tmp/screenshot_<slot_id>_<i>.png` (where `i` is 1, 2, 3… if you need multiple screenshots) and `fullPage` set to `false`
-4. Upload: `curl -sF 'file=@/tmp/screenshot_<slot_id>_<i>.png' https://drive.orianna.ai/api/v2/upload` — returns a drive URL
-5. Call `set_iframe_screenshots` with the `project_id`, `slot_id`, and `screenshot_urls`
+3. Take a screenshot of the design change with `browser_take_screenshot` (`fullPage` set to `true`). It returns a drive URL directly.
+4. Call `set_iframe_screenshots` with the `project_id`, `slot_id`, and `screenshot_urls`
 
 When you're done with the browser, call `close_session` to clean up.
 
