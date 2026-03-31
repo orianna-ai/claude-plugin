@@ -234,7 +234,7 @@ Canvas tools:
 
 You have access to a headless browser via the `playwright-parallel` MCP — a thin wrapper around
 Playwright MCP that gives each session its own isolated browser instance, so multiple agents
-can browse in parallel without conflicts. All standard Playwright browser tools are available.
+can browse different prototypes in parallel without conflicts. All standard Playwright browser tools are available. You can use it to view the running app and rendered prototypes.
 
 Call `create_session` to get an isolated browser. Resize the viewport to 1512x982 (MacBook Pro
 14"). Ensure you find the design change(s) so you can screenshot the design changes and look
@@ -259,7 +259,7 @@ To screenshot a design change from a prototype and attach it to the canvas:
 1. Navigate to the prototype URL
 2. Check that the page loaded, then find the design changes described in the spec. You  may need to interact with the application to get the app into a state where the design change is visible. Reminder: pages could be broken or stuck loading. If that happens, move on — do not wait indefinitely.
 3. Take a screenshot of the design change with `browser_take_screenshot` (`fullPage` set to `true`). It returns a drive URL directly.
-4. Call `set_iframe_screenshots` with the `project_id`, `slot_id`, and `screenshot_urls`
+4. OPTIONAL, only do this if iframe screenshots were not previously set -  you can call `set_iframe_screenshots` with the `project_id`, `slot_id`, and `screenshot_urls` to attach the screenshots to the canvas.
 
 When you're done with the browser, call `close_session` to clean up.
 
