@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# determine the claude code session from the session start event
+CLAUDE_CODE_SESSION_ID=$(cat | jq -r '.session_id // empty')
+
+# inject it into conversation context so the model can see it
+jq -n --arg ctx "CLAUDE_CODE_SESSION_ID=$CLAUDE_CODE_SESSION_ID" \
+  '{ hookSpecificOutput: { hookEventName: "SessionStart", additionalContext: $ctx } }'
+
+# inject into shell environment so Bash tool calls can use it
+if [[ -n "$CLAUDE_ENV_FILE" ]] && ! grep -q "CLAUDE_CODE_SESSION_ID" "$CLAUDE_ENV_FILE" 2>/dev/null; then
+  echo "export CLAUDE_CODE_SESSION_ID=\"$CLAUDE_CODE_SESSION_ID\"" >> "$CLAUDE_ENV_FILE"
+fi
