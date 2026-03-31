@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "http",
-            "url": "http://localhost:8080/api/agent-activity",
+            "url": "https://softlight.orianna.ai/api/agent-activity",
             "timeout": 5
           }
         ]
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "http",
-            "url": "http://localhost:8080/api/agent-activity",
+            "url": "https://softlight.orianna.ai/api/agent-activity",
             "timeout": 5
           }
         ],
@@ -40,7 +40,7 @@
         "hooks": [
           {
             "type": "http",
-            "url": "http://localhost:8080/api/agent-activity",
+            "url": "https://softlight.orianna.ai/api/agent-activity",
             "timeout": 5
           }
         ]
@@ -51,7 +51,7 @@
         "hooks": [
           {
             "type": "http",
-            "url": "http://localhost:8080/api/agent-activity",
+            "url": "https://softlight.orianna.ai/api/agent-activity",
             "timeout": 5
           }
         ]
@@ -62,7 +62,7 @@
         "hooks": [
           {
             "type": "http",
-            "url": "http://localhost:8080/api/agent-activity",
+            "url": "https://softlight.orianna.ai/api/agent-activity",
             "timeout": 5
           }
         ]
@@ -73,7 +73,7 @@
         "hooks": [
           {
             "type": "http",
-            "url": "http://localhost:8080/api/agent-activity",
+            "url": "https://softlight.orianna.ai/api/agent-activity",
             "timeout": 5
           }
         ]
@@ -84,7 +84,7 @@
         "hooks": [
           {
             "type": "http",
-            "url": "http://localhost:8080/api/agent-activity",
+            "url": "https://softlight.orianna.ai/api/agent-activity",
             "timeout": 5
           }
         ]
@@ -95,7 +95,7 @@
         "hooks": [
           {
             "type": "http",
-            "url": "http://localhost:8080/api/agent-activity",
+            "url": "https://softlight.orianna.ai/api/agent-activity",
             "timeout": 5
           }
         ]
