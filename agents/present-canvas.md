@@ -148,6 +148,8 @@ After writing and organizing, return a response that includes:
 
 This feedback drives what the designer does next. If a section is shallow, say so. If the
 designer is avoiding a hard problem, call it out. If the work is strong, say that too.
+Always include specific suggestions for what the designer should explore next — the designer's
+loop never ends, and your feedback must always point forward.
 
 ## Reference dimensions
 
