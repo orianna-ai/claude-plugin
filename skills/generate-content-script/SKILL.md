@@ -152,20 +152,19 @@ this prototype does, how it solves the problem, and what its tradeoffs are.
 
 ## Phase 5: Screenshot the prototype
 
-Open the prototype in a browser tab and screenshot it so reviewers can see it on the canvas.
+Open the prototype in a browser and screenshot it so reviewers can see the design changes. The task is to take screenshot(s) if the prototype in states where the design change(s) are visible.
 
-**CRITICAL — tab isolation:** Multiple content script agents run in parallel and share the same
-Chrome tab group. You MUST create a new tab when viewing a design — never reuse an existing tab or you will clobber
-another agent's page. Call `tabs_context_mcp` with `createIfEmpty: true` to find (or recreate) the active tab group,
-then **always** call `tabs_create_mcp` to create a new tab. Use only the `tabId` returned by `tabs_create_mcp` for all subsequent browser
-operations. Never navigate a tab you did not create.
+The `playwright-parallel` MCP is a thin wrapper around Playwright MCP that gives each session
+its own isolated browser. All standard Playwright browser tools are available.
 
-1. `navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/?content_script_url={content_script_url}`
-2. Wait for the page to load, then find the design changes described in the spec
-3. `computer` with `action: "screenshot"` and `save_to_disk: true` — returns a file path
-4. Upload: `curl -sF 'file=@<path>' https://drive.orianna.ai/api/v2/upload` — returns a drive URL
+Call `create_session` to get an isolated browser instance. Resize the viewport to 1512x982
+(MacBook Pro 14"). Ensure you find the design change(s) so you can screenshot the design
+changes and look at it. You may need to interact with the prototype to find all the design
+changes to screenshot them (the codebase, spec_url, and content_script can help you figure out what screenshots you need to take).
+
+1. Navigate to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/?content_script_url={content_script_url}`
+2. Wait for the page to load, then find the design changes described in the spec. You  may need to interact with the application to get the app into a state where the design change is visible.
+3. To take a screenshot of the experience, use `browser_take_screenshot` with `filename` set to `/tmp/screenshot_<slot_id>_<i>.png` (where `i` is 1, 2, 3… if you need multiple screenshots) and `fullPage` set to `false`
+4. Upload: `curl -sF 'file=@/tmp/screenshot_<slot_id>_<i>.png' https://drive.orianna.ai/api/v2/upload` — returns a drive URL
 5. Call `set_iframe_screenshots` with `project_id`, `slot_id`, and `screenshot_urls`
-
-**Browser errors:** The Chrome extension's service worker can go idle during long sessions. If
-a Chrome tool fails, wait a few seconds and retry. You may need to create a new tab and start
-the screenshot steps over.
+6. Call `close_session` to clean up the browser
