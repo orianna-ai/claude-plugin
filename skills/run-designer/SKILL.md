@@ -232,7 +232,7 @@ Canvas tools:
 
 ### The browser
 
-You have access to a headless browser via the `playwright-parallel` MCP — a thin wrapper around
+You have access to a headless browser via Softlight MCP `playwright` tools - a thin wrapper around
 Playwright MCP that gives each session its own isolated browser instance, so multiple agents
 can browse different prototypes in parallel without conflicts. All standard Playwright browser tools are available. You can use it to view the running app and rendered prototypes.
 

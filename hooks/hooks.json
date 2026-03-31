@@ -16,9 +16,8 @@
       {
         "hooks": [
           {
-            "type": "http",
-            "url": "https://softlight.orianna.ai/api/agent-activity",
-            "timeout": 5
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/forward-activity.sh"
           }
         ]
       }
@@ -27,9 +26,8 @@
       {
         "hooks": [
           {
-            "type": "http",
-            "url": "https://softlight.orianna.ai/api/agent-activity",
-            "timeout": 5
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/forward-activity.sh"
           }
         ],
         "matcher": ""
@@ -39,9 +37,8 @@
       {
         "hooks": [
           {
-            "type": "http",
-            "url": "https://softlight.orianna.ai/api/agent-activity",
-            "timeout": 5
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/forward-activity.sh"
           }
         ]
       }
@@ -50,9 +47,8 @@
       {
         "hooks": [
           {
-            "type": "http",
-            "url": "https://softlight.orianna.ai/api/agent-activity",
-            "timeout": 5
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/forward-activity.sh"
           }
         ]
       }
@@ -61,9 +57,8 @@
       {
         "hooks": [
           {
-            "type": "http",
-            "url": "https://softlight.orianna.ai/api/agent-activity",
-            "timeout": 5
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/forward-activity.sh"
           }
         ]
       }
@@ -72,9 +67,8 @@
       {
         "hooks": [
           {
-            "type": "http",
-            "url": "https://softlight.orianna.ai/api/agent-activity",
-            "timeout": 5
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/forward-activity.sh"
           }
         ]
       }
@@ -83,9 +77,8 @@
       {
         "hooks": [
           {
-            "type": "http",
-            "url": "https://softlight.orianna.ai/api/agent-activity",
-            "timeout": 5
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/forward-activity.sh"
           }
         ]
       }
@@ -94,9 +87,28 @@
       {
         "hooks": [
           {
-            "type": "http",
-            "url": "https://softlight.orianna.ai/api/agent-activity",
-            "timeout": 5
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/forward-activity.sh"
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/forward-activity.sh"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/forward-activity.sh"
           }
         ]
       }

@@ -326,7 +326,6 @@ function Canvas() {
     return visibleNodes;
   }, [reactFlowInstance]);
 
-  // Determine if empty canvas overlay should show
   // Show when: no elements AND no comments AND no request in flight
   const hasAnyComments = layout.comments.some((c) => !c.is_deleted);
   const showEmptyOverlay =
@@ -1296,7 +1295,6 @@ function Canvas() {
   // Listen for create-comment-at-center events (from EmptyCanvasOverlay)
   useEffect(() => {
     const handleCreateCommentAtCenter = async () => {
-      // Get the center of the current viewport in flow coordinates
       const viewport = reactFlowInstance.getViewport();
       const wrapperBounds = canvasWrapperRef.current?.getBoundingClientRect();
       if (!wrapperBounds) return;
@@ -1304,11 +1302,9 @@ function Canvas() {
       const centerScreenX = wrapperBounds.width / 2;
       const centerScreenY = wrapperBounds.height / 2;
 
-      // Convert screen coordinates to flow coordinates
       const x = (centerScreenX - viewport.x) / viewport.zoom;
       const y = (centerScreenY - viewport.y) / viewport.zoom;
 
-      // Create comment using the same flow as handleCanvasClick
       const commentId = uuidv4().toString();
       const comment: Comment = {
         created_at: new Date().toISOString(),
@@ -1327,7 +1323,6 @@ function Canvas() {
       createComment(comment);
       setSelectedCommentId(commentId);
 
-      // defer screenshot capture so comment renders and animates first
       setTimeout(async () => {
         const screenshot = await captureScreenshot({
           reactFlowInstance,
