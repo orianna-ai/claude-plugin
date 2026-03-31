@@ -154,6 +154,11 @@ this prototype does, how it solves the problem, and what its tradeoffs are.
 
 Open the prototype in a browser and screenshot it so reviewers can see the design changes. The task is to take screenshot(s) if the prototype in states where the design change(s) are visible.
 
+Content scripts can sometimes leave the page stuck loading or crash the browser
+tab. If the page isn't loading or the browser becomes unresponsive, don't keep retrying —
+return whatever screenshots you managed to capture (even none) and move on. The content
+script is already on the canvas from Phase 3.
+
 The `playwright-parallel` MCP is a thin wrapper around Playwright MCP that gives each session
 its own isolated browser. All standard Playwright browser tools are available.
 
@@ -163,7 +168,7 @@ changes and look at it. You may need to interact with the prototype to find all 
 changes to screenshot them (the codebase, spec_url, and content_script can help you figure out what screenshots you need to take).
 
 1. Navigate to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/?content_script_url={content_script_url}`
-2. Wait for the page to load, then find the design changes described in the spec. You  may need to interact with the application to get the app into a state where the design change is visible.
+2. Check that the page loaded, then find the design changes described in the spec. You  may need to interact with the application to get the app into a state where the design change is visible. Reminder: pages could be broken or stuck loading. If that happens, move on — do not wait indefinitely.
 3. To take a screenshot of the experience, use `browser_take_screenshot` with `filename` set to `/tmp/screenshot_<slot_id>_<i>.png` (where `i` is 1, 2, 3… if you need multiple screenshots) and `fullPage` set to `false`
 4. Upload: `curl -sF 'file=@/tmp/screenshot_<slot_id>_<i>.png' https://drive.orianna.ai/api/v2/upload` — returns a drive URL
 5. Call `set_iframe_screenshots` with `project_id`, `slot_id`, and `screenshot_urls`
