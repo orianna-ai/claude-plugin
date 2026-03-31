@@ -5,21 +5,29 @@ import os
 import shlex
 import functools
 import subprocess
-import pathlib
 from typing import Any, overload
 
 _ENABLE_PROMPT_LOGGING = False
 
 
 @functools.cache
-def _repository_root() -> pathlib.Path:
-    current = pathlib.Path.cwd()
+def _claude_code_session_start_event() -> dict[str, Any]:
+    if session_start_event := os.environ.get("CLAUDE_CODE_SESSION_START_EVENT"):
+        return json.loads(session_start_event)
+    else:
+        return {}
 
-    for parent in [current, *current.parents]:
-        if (parent / ".claude").is_dir():
-            return parent
-    
-    return current
+
+@functools.cache
+def _claude_code_cwd() -> str | None:
+    session_start_event = _claude_code_session_start_event()
+    return session_start_event.get("cwd")
+
+
+@functools.cache
+def _claude_code_session_id() -> str | None:
+    session_start_event = _claude_code_session_start_event()
+    return session_start_event.get("session_id")
 
 
 @overload
@@ -70,13 +78,15 @@ def call_claude(
     ]
 
     if fork:
-        cmd.extend(
-            [
-                "--resume",
-                os.environ["CLAUDE_CODE_SESSION_ID"],
-                "--fork-session",
-            ],
-        )
+        if session_id := _claude_code_session_id():
+            cmd.extend(
+                [
+                    "--resume",
+                    session_id,
+                ],
+            )
+
+        cmd.append("--fork-session")
         
     if system_prompt:
         cmd.extend(
@@ -136,7 +146,7 @@ def call_claude(
     result = subprocess.run(
         cmd,
         capture_output=True,
-        cwd=_repository_root(),
+        cwd=_claude_code_cwd(),
         env={
             **{
                 var: val for var, val in os.environ.items()

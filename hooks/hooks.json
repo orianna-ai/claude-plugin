@@ -5,7 +5,7 @@
       {
         "hooks": [
           {
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/inject_session_id",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/inject_environment_variables",
             "type": "command"
           }
         ],
