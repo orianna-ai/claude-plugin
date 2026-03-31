@@ -1,7 +1,7 @@
 ---
 name: run-designer
 description: "Autonomous product designer. Explores the problem space, generates prototypes, self-critiques, and iterates until the work is excellent."
-allowed-tools: Bash, Read, Write, Glob, Grep, Agent, mcp__plugin_softlight_softlight__create_project, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_exploration, mcp__plugin_softlight_softlight__create_text, mcp__plugin_softlight_softlight__move_slot, mcp__plugin_softlight_softlight__update_iframe_element, mcp__plugin_softlight_softlight__update_text_element, mcp__plugin_softlight_softlight__set_iframe_screenshots, mcp__plugin_softlight_softlight__create_comment_thread, mcp__plugin_softlight_softlight__create_comment, mcp__plugin_softlight_softlight__complete_prompt, mcp__Claude_in_Chrome__computer, mcp__Claude_in_Chrome__tabs_context_mcp, mcp__Claude_in_Chrome__tabs_create_mcp, mcp__Claude_in_Chrome__navigate, mcp__Claude_in_Chrome__read_page, mcp__Claude_in_Chrome__find, mcp__Claude_in_Chrome__get_page_text, mcp__Claude_in_Chrome__javascript_tool
+allowed-tools: Bash, Read, Write, Glob, Grep, Agent, mcp__plugin_softlight_softlight__create_project, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_exploration, mcp__plugin_softlight_softlight__create_text, mcp__plugin_softlight_softlight__move_slot, mcp__plugin_softlight_softlight__update_iframe_element, mcp__plugin_softlight_softlight__update_text_element, mcp__plugin_softlight_softlight__set_iframe_screenshots, mcp__plugin_softlight_softlight__create_comment_thread, mcp__plugin_softlight_softlight__create_comment, mcp__plugin_softlight_softlight__complete_prompt, mcp__plugin_softlight_playwright-parallel__create_session, mcp__plugin_softlight_playwright-parallel__close_session, mcp__plugin_softlight_playwright-parallel__list_sessions, mcp__plugin_softlight_playwright-parallel__browser_click, mcp__plugin_softlight_playwright-parallel__browser_close, mcp__plugin_softlight_playwright-parallel__browser_console_messages, mcp__plugin_softlight_playwright-parallel__browser_drag, mcp__plugin_softlight_playwright-parallel__browser_evaluate, mcp__plugin_softlight_playwright-parallel__browser_file_upload, mcp__plugin_softlight_playwright-parallel__browser_fill_form, mcp__plugin_softlight_playwright-parallel__browser_handle_dialog, mcp__plugin_softlight_playwright-parallel__browser_hover, mcp__plugin_softlight_playwright-parallel__browser_navigate, mcp__plugin_softlight_playwright-parallel__browser_navigate_back, mcp__plugin_softlight_playwright-parallel__browser_network_requests, mcp__plugin_softlight_playwright-parallel__browser_press_key, mcp__plugin_softlight_playwright-parallel__browser_resize, mcp__plugin_softlight_playwright-parallel__browser_run_code, mcp__plugin_softlight_playwright-parallel__browser_select_option, mcp__plugin_softlight_playwright-parallel__browser_snapshot, mcp__plugin_softlight_playwright-parallel__browser_take_screenshot, mcp__plugin_softlight_playwright-parallel__browser_type, mcp__plugin_softlight_playwright-parallel__browser_wait_for, mcp__plugin_softlight_playwright-parallel__browser_tabs
 model: opus
 ---
 
@@ -233,7 +233,14 @@ Canvas tools:
 
 ### The browser
 
-Use the Claude in Chrome tools to view the running app and rendered prototypes. Ensure you find the design change(s) so you can screenshot the design changes and look at it. You may need to interact with the prototype to find all the design changes (the codebase, spec_url, and content_script can help you figure out what screenshots you need to take).
+You have access to a headless browser via the `playwright-parallel` MCP — a thin wrapper around
+Playwright MCP that gives each session its own isolated browser instance, so multiple agents
+can browse in parallel without conflicts. All standard Playwright browser tools are available.
+
+Call `create_session` to get an isolated browser. Resize the viewport to 1512x982 (MacBook Pro
+14"). Ensure you find the design change(s) so you can screenshot the design changes and look
+at it. You may need to interact with the prototype to find all the design changes (the codebase,
+spec_url, and content_script can help you figure out what screenshots you need to take).
 
 Prototype URL (with content script injected):
 ```
@@ -245,17 +252,14 @@ Baseline URL (the app as-is, no content script):
 https://softlight.orianna.ai/api/tunnel/{tunnel_id}/
 ```
 
-**CRITICAL — tab isolation:** Multiple agents run in parallel and share the same Chrome tab
-group. You MUST create a new tab when viewing a design — never reuse an existing tab or you will clobber another agent's page. Call `tabs_context_mcp` with `createIfEmpty: true` to find (or recreate) the active tab group, then **always** call `tabs_create_mcp` to create a new tab to take actions in. Take actions in that tab.
+To screenshot a prototype and attach it to the canvas:
+1. Navigate to the prototype URL
+2. Wait for the page to load, then find the design changes described in the spec. You  may need to interact with the application to get the app into a state where the design change is visible.
+3. To take a screenshot of the experience, use `browser_take_screenshot` with `filename` set to `/tmp/screenshot_<slot_id>_<i>.png` (where `i` is 1, 2, 3… if you need multiple screenshots) and `fullPage` set to `false`
+4. Upload: `curl -sF 'file=@/tmp/screenshot_<slot_id>_<i>.png' https://drive.orianna.ai/api/v2/upload` — returns a drive URL
+5. Call `set_iframe_screenshots` with the `project_id`, `slot_id`, and `screenshot_urls`
 
-To screenshot a prototype and attach it to the canvas (using the Claude in Chrome tools). It is important you use the computer tool with the save_to_disk. The other tools will fail:
-1. `computer` with `action: "screenshot"` and `save_to_disk: true` — returns a file path
-2. Upload: `curl -sF 'file=@<path>' https://drive.orianna.ai/api/v2/upload` — returns a drive URL
-3. Call `set_iframe_screenshots` with the `project_id`, `slot_id`, and `screenshot_urls`
-
-**Browser errors:** The Chrome extension's service worker can go idle during long sessions. If
-a Chrome tool fails, wait a few seconds and retry. You may need to create a new tab and start
-over.
+When you're done with the browser, call `close_session` to clean up.
 
 You don't need to upload baseline screenshots — those are already on the project.
 
