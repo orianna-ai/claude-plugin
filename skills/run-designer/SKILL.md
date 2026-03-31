@@ -143,9 +143,9 @@ Dispatch the `present-canvas` agent in the background:
 ### Presenting work for review
 
 At certain points, the most productive next move is human input — not because you're stuck,
-but because you've reached a decision that requires the PM's judgment on priorities or
-tradeoffs you can't resolve alone. You're giving the PM an update so they can weigh in —
-dispatch it in the background and immediately keep designing. Your design loop does not end or pause - you still keep designing.
+but because you've mapped enough of the problem space that the PM should see the landscape
+and weigh in on tradeoffs you can't resolve alone. You're giving the PM a strategic update —
+dispatch it in the background and immediately keep designing. Your loop does not pause.
 
 **When to present:**
 - Multiple strong directions with real depth, reviews say they're strong, and the
@@ -166,8 +166,8 @@ prototypes to feature; it composes a separate review page the PM can read and re
 ```
 <project_id>{project_id}</project_id>
 <thinking>
-{your raw analysis: what you explored, what you learned, what the decision is, what the
-tradeoffs are, what you'd recommend and why — be specific and detailed}
+{your raw analysis: what you explored, what you learned, what the key tradeoffs are, what
+axes you've been exploring, what tensions you've found — be specific and detailed}
 </thinking>
 <prototypes>
 {the prototypes to feature — slot IDs and what each one represents}
