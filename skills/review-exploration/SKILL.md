@@ -112,6 +112,9 @@ For every prototype, call `create_comment_thread` with:
 - `project_id`
 - `prototype_slot_id` — the prototype's slot_id
 - `text` — your feedback
+- `created_by` — always set to `"claude-evaluator"` (this is internal feedback for the
+  designer agent, not user-facing — it must use this identifier so the UI suppresses
+  notification dots)
 
 Every comment MUST include:
 1. What's not working/how it can be improved
