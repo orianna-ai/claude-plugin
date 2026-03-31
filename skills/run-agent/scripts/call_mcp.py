@@ -5,6 +5,9 @@ from typing import Any, overload
 from scripts.call_claude import call_claude
 
 
+_DEFAULT_MCP_TIMEOUT = 60
+
+
 @overload
 def call_mcp(
     tool: str,
@@ -49,7 +52,7 @@ Call the `mcp__plugin_softlight_softlight__{tool}` MCP tool with these exact arg
         fork=False,
         json_schema=json_schema,
         model="haiku",
-        timeout=timeout or 60,
+        timeout=timeout or _DEFAULT_MCP_TIMEOUT,
         tools=[],
     )
 
