@@ -255,11 +255,10 @@ Content scripts can sometimes leave the page stuck loading or crash the browser
 tab. If a prototype's page isn't loading or the session becomes unresponsive, don't keep
 retrying — close the session, skip that prototype's screenshots, and move on.
 
-To screenshot a design change from a prototype and attach it to the canvas:
+To view a design change from a prototype:
 1. Navigate to the prototype URL
 2. Check that the page loaded, then find the design changes described in the spec. You  may need to interact with the application to get the app into a state where the design change is visible. Reminder: pages could be broken or stuck loading. If that happens, move on — do not wait indefinitely.
 3. Take a screenshot of the design change with `browser_take_screenshot` (`fullPage` set to `true`). It returns a drive URL directly.
-4. OPTIONAL, only do this if iframe screenshots were not previously set -  you can call `set_iframe_screenshots` with the `project_id`, `slot_id`, and `screenshot_urls` to attach the screenshots to the canvas.
 
 When you're done with the browser, call `close_session` to clean up.
 
