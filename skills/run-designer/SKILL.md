@@ -318,11 +318,14 @@ curl -sF 'file=@/path/to/file' https://drive.orianna.ai/api/v2/upload
 
 The user provides a design problem and the port where the application is already running. If they haven't ask them for both.
 
-1. First, dispatch both skills `generate-problem-statement` and `start-tunnel` (with the port) as
-     **background subagents in parallel**. Wait for both before creating the project.
+1. Dispatch `start-tunnel` (with the port) as a **background subagent**. While it runs, write a
+     short problem statement yourself — a natural paragraph covering what the product is, who uses
+     it, and the people problem that needs solving. You already have full context from exploring the
+     codebase and the user's prompt; no subagent needed.
 
-2. Then, call `create_project` with the `problem_statement`, `tunnel_id`, and current git commit
-     (`git rev-parse HEAD`). Share the `project_url` with the user, then move forward.
+2. Once the tunnel is ready, call `create_project` with the `problem_statement`, `tunnel_id`, and
+     current git commit (`git rev-parse HEAD`). Share the `project_url` with the user, then move
+     forward.
 
 3. Immediately after the project is created, you must dispatch `listen-for-comments` as a
    **background** subagent so PM comments get responses
