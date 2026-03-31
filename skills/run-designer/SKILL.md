@@ -68,9 +68,7 @@ was explored, what survived, and why.
 
 ### Reviews
 
-Dispatch `review-exploration` after an exploration to get an independent critique. The
-reviewer evaluates every prototype through product, experience, and visual lenses and leaves
-detailed feedback on the canvas — including what level of work each prototype needs next.
+Dispatch `review-exploration` as a background subagent after an exploration to get an independent critique. The reviewer evaluates every prototype through product, experience, and visual lenses and leaves detailed feedback on the canvas — including what level of work each prototype needs next.
 
 The review is a tool for your judgment, not instructions you execute mechanically. Read the
 feedback, absorb it, then decide what the canvas needs based on your own assessment of the
