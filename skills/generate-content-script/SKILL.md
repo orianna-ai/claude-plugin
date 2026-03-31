@@ -30,25 +30,26 @@ render them.
 
 Optional. Image URLs or local file paths, one per line. If these are passed, view all of these before writing code. The spec references them.
 
+### `<caption_slot_id>`
+
+Optional. Canvas slot UUID for the caption below this prototype. If provided, fill it in after
+placing the content script (see Phase 4).
+
+### `<tunnel_id>`
+
+The tunnel ID for the running application. Used to construct the prototype URL for screenshotting.
+
 ### `<content_script_url>`
 
 Optional. Drive URL of an existing content script. If this exists, download the content script it and edit from there instead of starting from scratch.
 
 ### `<context>`
 
-Pre-explored source code and analysis for the target application. The caller builds this by
-exploring the app's source tree before invoking this skill. It covers:
+Optional pre-explored source code and analysis from the caller. May cover routing, auth, data
+fetching, response shapes, and styling patterns.
 
-1. **Routing & auth** — how the app picks which screen to show, and what auth state it checks
-2. **Data fetching** — which endpoints the target screen calls on mount (URL patterns, query params)
-3. **Response shapes** — the TypeScript types or destructured fields each component expects
-4. **Styling** — CSS variables, theme tokens, or class naming patterns used by the app
-
-If something critical is missing you may read additional source files within the application's root
-directory — but do not explore unrelated services. **Always read local source files** — never `curl`
-the tunnel URL to fetch HTML, JS bundles, CSS, or API responses. The source code is in the repo and
-is faster and more informative than compiled output. The tunnel exists for the iframe to load the
-app at runtime, not for you to explore.
+**Explore the codebase yourself.** You have full access to the source code — use it to understand
+whatever you need about the app. Read local source files, not the tunnel URL.
 
 ## Phase 1: Write the content script
 
@@ -132,7 +133,7 @@ You MUST save the content script to a **unique file path** that includes the slo
 using a generic path like `/tmp/content_script.js` will cause race conditions where agents
 overwrite each other's files.
 
-Upload the content script via multipart form POST to `https://drive.orianna.ai/api/upload`.
+Upload the content script via multipart form POST to `https://drive.orianna.ai/api/v2/upload`.
 The response is the public URL of the uploaded file (e.g., `https://drive.orianna.ai/<hash>.js`).
 
 ## Phase 3: Place the content script on the canvas
@@ -142,3 +143,29 @@ Call the `update_iframe_element` MCP tool with `project_id`, `slot_id`, `content
 unchanged). This replaces the placeholder slot with an iframe that loads the app with your
 content script injected. All other iframe fields (`git_commit`, `tunnel_id`, `git_patch`)
 are inherited from `problem.baseline` automatically so you don't have to fill them in.
+
+## Phase 4: Fill in the caption
+
+If `<caption_slot_id>` was provided, call `update_text_element` with `project_id`,
+`slot_id` set to the `<caption_slot_id>`, and a short `text` (1-2 sentences) describing what
+this prototype does, how it solves the problem, and what its tradeoffs are.
+
+## Phase 5: Screenshot the prototype
+
+Open the prototype in a browser tab and screenshot it so reviewers can see it on the canvas.
+
+**CRITICAL — tab isolation:** Multiple content script agents run in parallel and share the same
+Chrome tab group. You MUST create a new tab when viewing a design — never reuse an existing tab or you will clobber
+another agent's page. Call `tabs_context_mcp` with `createIfEmpty: true` to find (or recreate) the active tab group,
+then **always** call `tabs_create_mcp` to create a new tab. Use only the `tabId` returned by `tabs_create_mcp` for all subsequent browser
+operations. Never navigate a tab you did not create.
+
+1. `navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/?content_script_url={content_script_url}`
+2. Wait for the page to load, then find the design changes described in the spec
+3. `computer` with `action: "screenshot"` and `save_to_disk: true` — returns a file path
+4. Upload: `curl -sF 'file=@<path>' https://drive.orianna.ai/api/v2/upload` — returns a drive URL
+5. Call `set_iframe_screenshots` with `project_id`, `slot_id`, and `screenshot_urls`
+
+**Browser errors:** The Chrome extension's service worker can go idle during long sessions. If
+a Chrome tool fails, wait a few seconds and retry. You may need to create a new tab and start
+the screenshot steps over.
