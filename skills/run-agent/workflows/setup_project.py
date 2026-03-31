@@ -3,6 +3,7 @@ import argparse
 import subprocess
 
 from scripts.call_mcp import call_mcp
+from scripts.load_config import load_config
 from scripts.start_tunnel import start_tunnel
 
 
@@ -11,6 +12,8 @@ def setup_project(
     port: int,
     problem_statement: str,
 ) -> None:
+    config = load_config()
+
     tunnel_id = start_tunnel(
         port=port,
     )
@@ -45,6 +48,7 @@ def setup_project(
     )
 
     project_id = create_project_output["project_id"]
+    config.project_id = project_id
     print(f"{project_id=}")
 
     project_url = create_project_output["project_url"]

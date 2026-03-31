@@ -20,5 +20,5 @@ Description of a design problem the user is exploring in the application.
 ```bash
 python3 -m workflows.setup_project \
   --port '<port>' \
-  --problem-statement '<problem_statement>' \
+  --problem-statement '<problem_statement>'
 ```

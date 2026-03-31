@@ -7,7 +7,10 @@ import functools
 import subprocess
 from typing import Any, overload
 
+from scripts.load_config import load_config
+
 _ENABLE_PROMPT_LOGGING = False
+_DEFAULT_PROMPT_TIMEOUT = 300
 
 
 @functools.cache
@@ -72,6 +75,8 @@ def call_claude(
     timeout: int | None = None,
     tools: list[str] | None = None,
 ) -> str | dict[str, Any]:
+    config = load_config()
+
     cmd = [
         "claude",
         "-p",
@@ -152,13 +157,12 @@ def call_claude(
                 var: val for var, val in os.environ.items()
                 if var != "CLAUDECODE"
             },
-            **{
-                "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-            },
+            **config.dump_config(),
+            "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
         },
         input=prompt,
         text=True,
-        timeout=timeout or 300,
+        timeout=timeout or _DEFAULT_PROMPT_TIMEOUT,
     )
 
     if result.returncode != 0:
