@@ -159,8 +159,7 @@ tab. If the page isn't loading or the browser becomes unresponsive, don't keep r
 return whatever screenshots you managed to capture (even none) and move on. The content
 script is already on the canvas from Phase 3.
 
-The `playwright-parallel` MCP is a thin wrapper around Playwright MCP that gives each session
-its own isolated browser. All standard Playwright browser tools are available.
+You have access to a headless browser via Softlight MCP `playwright` tools - a thin wrapper around Playwright MCP that gives each session its own isolated browser. All standard Playwright browser tools are available.
 
 Call `create_session` to get an isolated browser instance. Resize the viewport to 1512x982
 (MacBook Pro 14"). Ensure you find the design change(s) so you can screenshot the design
