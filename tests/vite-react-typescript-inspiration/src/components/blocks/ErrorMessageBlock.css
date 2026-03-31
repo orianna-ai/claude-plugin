@@ -1,0 +1,17 @@
+.error-message-block {
+  display: grid;
+  justify-items: start;
+}
+
+.error-message-block-bubble {
+  border-radius: 18px;
+  padding: 12px;
+  background: #FFD3CF;
+  max-width: 350px;
+}
+
+.error-message-block-content {
+  white-space: pre-wrap;
+  color: #453321;
+  font-size: 14px;
+}

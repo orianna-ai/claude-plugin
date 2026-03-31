@@ -1,0 +1,25 @@
+.design-picker-toggle {
+  align-items: center;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e5e2dc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  color: #5b4f43;
+  cursor: pointer;
+  display: flex;
+  left: 16px;
+  padding: 12px;
+  position: fixed;
+  top: 16px;
+  transition: background 0.15s, box-shadow 0.15s;
+  z-index: 100;
+}
+
+.design-picker-toggle:hover {
+  background: #f9f7f4;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.design-picker-toggle:active {
+  background: #f0ebe3;
+}

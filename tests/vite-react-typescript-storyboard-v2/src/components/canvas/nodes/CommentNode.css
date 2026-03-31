@@ -1,0 +1,1067 @@
+.comment-node-wrapper {
+  align-items: flex-start;
+  display: flex;
+  outline: none;
+  pointer-events: none;
+  position: relative;
+  z-index: 9999;
+}
+
+.comment-node-shake-wrapper {
+  display: flex;
+  flex-direction: column;
+  /* Align with icon: 28px wide, translate(-1px, -23px), scale(1.1) from (3px, 27px) */
+  /* Scaled icon: right edge ~30px, top edge ~-26px. Plus 8px gap = 38px left */
+  margin-top: -26px;
+  outline: none;
+  padding-left: 38px;
+}
+
+.comment-node-shadow-wrapper {
+  display: flex;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+  flex-direction: column;
+  outline: none;
+  pointer-events: auto;
+  translate: var(--horizontal-offset, 0px) var(--vertical-offset, 0px);
+}
+
+.comment-node-bubble {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+  left: 0;
+  pointer-events: auto;
+  position: absolute;
+  top: 0;
+  /* Match exactly the hover state: translate + scale, same transform-origin */
+  transform: translate(-3px, -23px) scale(1.1);
+  transform-origin: 3px 27px;
+  /* Needed for thinking dots positioning */
+  width: fit-content;
+}
+
+.comment-node-bubble-selected {
+  transform: translate(-3px, -23px) scale(1.1);
+}
+
+.comment-node {
+  background: #F9F7F4;
+  border-radius: 12px;
+  border: 1px solid #e8e4de;
+  display: flex;
+  flex-direction: column;
+  min-height: 128px;
+  min-width: 364px;
+  outline: none;
+  position: relative;
+  transform-origin: top left;
+  width: fit-content;
+}
+
+.comment-node-with-images {
+  height: auto;
+}
+
+.comment-node-open {
+  animation: comment-node-fade-in-up 140ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.comment-node-body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 60px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px 12px 0 12px;
+}
+
+.comment-node-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.comment-node-placeholder {
+  animation: comment-node-placeholder-enter 180ms ease-out;
+  color: #8B7F73;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  left: 0;
+  line-height: 22px;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+}
+
+@keyframes comment-node-placeholder-enter {
+  from {
+    filter: blur(2px);
+    opacity: 0;
+  }
+
+  to {
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+.comment-node-input {
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  box-sizing: border-box;
+  color: #3a3128;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 22px;
+  min-height: 60px;
+  outline: none;
+  overflow: hidden;
+  padding: 0;
+  resize: none;
+  width: 100%;
+}
+
+.comment-node-input::placeholder {
+  color: #8B7F73;
+}
+
+.comment-node-images {
+  display: flex;
+  gap: 8px;
+  padding: 0 12px;
+}
+
+.comment-node-image-wrap {
+  position: relative;
+  height: 90px;
+}
+
+.comment-node-image {
+  border-radius: 4px;
+  cursor: zoom-in;
+  height: 90px;
+  object-fit: cover;
+  transition: opacity 0.15s ease;
+  width: 90px;
+}
+
+.comment-node-image:hover {
+  opacity: 0.9;
+}
+
+.comment-node-remove-image {
+  align-items: center;
+  background: #453321;
+  border-radius: 50%;
+  border: none;
+  color: #F5F1ED;
+  cursor: pointer;
+  display: inline-flex;
+  height: 18px;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  transform: translate(50%, -50%);
+  visibility: hidden;
+  width: 18px;
+}
+
+.comment-node-image-wrap:hover .comment-node-remove-image,
+.comment-node-remove-image:hover {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.comment-node-image-loading {
+  align-items: center;
+  background: #F0ECE6;
+  border-radius: 4px;
+  color: #8B7F73;
+  display: inline-flex;
+  height: 90px;
+  justify-content: center;
+  width: 90px;
+}
+
+.comment-node-loading-spinner {
+  animation: comment-node-spin 1.5s linear infinite;
+}
+
+@keyframes comment-node-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.comment-node-actions {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: space-between;
+  padding: 8px 12px 12px;
+}
+
+.comment-node-action-buttons {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.comment-node-action {
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: #5b4f43;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  padding: 0;
+}
+
+.comment-node-action-add {
+  border: 1px solid #e8e4de;
+  border-radius: 6px;
+  height: 28px;
+  width: 28px;
+  transition: border-color 180ms ease;
+}
+
+.comment-node-action-add:hover {
+  border-color: rgba(69, 51, 33, 0.5);
+}
+
+.comment-node-action-send {
+  background: #627532;
+  border-radius: 50%;
+  color: #fff;
+  height: 28px;
+  width: 28px;
+}
+
+.comment-node-action-send-disabled {
+  background: #E5E0DB;
+  color: #8B7F73;
+}
+
+.comment-node-action-send-chat {
+  background: #EC497B;
+}
+
+/* Legacy icon styles - kept for compatibility but primary styles are in .comment-node-icon-fixed */
+.comment-node-icon {
+  align-items: center;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+  justify-content: center;
+  outline: none;
+}
+
+.comment-node-readonly {
+  cursor: default;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+  height: auto;
+  min-height: 80px;
+  pointer-events: auto;
+  width: 320px;
+  /* Align with icon: 28px wide, translate(-1px, -23px), scale(1.1) from (3px, 27px) */
+  /* Scaled icon: right edge ~30px, top edge ~-26px. Plus 8px gap = 38px left */
+  margin-left: 38px;
+  margin-top: -26px;
+  translate: var(--horizontal-offset, 0px) var(--vertical-offset, 0px);
+}
+
+.comment-node-readonly-actions {
+  align-items: center;
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+  padding: 8px 8px;
+  width: 100%;
+  box-sizing: border-box;
+  border-bottom: 1px solid transparent;
+}
+
+.comment-node-readonly-actions-scrollable {
+  border-bottom-color: #e8e4de;
+}
+
+.comment-node-readonly-action {
+  align-items: center;
+  background: transparent;
+  border-radius: 4px;
+  border: none;
+  color: #8b7d6e;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  padding: 4px;
+}
+
+.comment-node-readonly-action:hover {
+  background: #ece8e2;
+  color: #5b4f43;
+}
+
+.comment-node-readonly-body {
+  padding: 12px;
+  padding-top: 36px;
+}
+
+.comment-node-readonly-bubble {
+  background: #E5E0DB;
+  border-radius: 12px;
+  color: #453321;
+  cursor: text;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 22px;
+  padding: 12px;
+  user-select: text;
+  -webkit-user-select: text;
+  white-space: pre-wrap;
+}
+
+.comment-node-readonly-images {
+  display: flex;
+  gap: 8px;
+  padding: 0 12px 12px;
+}
+
+.comment-node-readonly-image {
+  border-radius: 4px;
+  cursor: zoom-in;
+  height: 90px;
+  object-fit: cover;
+  transition: opacity 0.15s ease;
+  width: 90px;
+}
+
+.comment-node-readonly-image:hover {
+  opacity: 0.9;
+}
+
+@keyframes comment-node-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes comment-node-shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-6px);
+  }
+
+  40% {
+    transform: translateX(6px);
+  }
+
+  60% {
+    transform: translateX(-4px);
+  }
+
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+.comment-node-shake {
+  animation: comment-node-shake 400ms ease;
+}
+
+.comment-node-pills {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+.comment-node-pill {
+  align-items: center;
+  animation: comment-node-pill-enter 180ms ease-out backwards;
+  background: #F9F7F4;
+  border-radius: 999px;
+  border: 1px solid #e8e4de;
+  color: #8B7F73;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  gap: 4px;
+  line-height: 18px;
+  padding: 4px 6px;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+  white-space: nowrap;
+}
+
+.comment-node-pill:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.comment-node-pill:nth-child(2) {
+  animation-delay: 40ms;
+}
+
+.comment-node-pill:nth-child(3) {
+  animation-delay: 80ms;
+}
+
+.comment-node-pill:nth-child(4) {
+  animation-delay: 120ms;
+}
+
+@keyframes comment-node-pill-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.comment-node-pill:hover {
+  background: #F0ECE6;
+  border-color: rgba(69, 51, 33, 0.3);
+  color: #453321;
+}
+
+/* Left placement styles */
+/* Animation keyframes for left placement - include translateX in the animation itself
+   to avoid transform conflict between animation and placement */
+@keyframes comment-node-fade-in-up-left {
+  from {
+    opacity: 0;
+    transform: translateX(calc(-100% - 10px)) translateY(6px) scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(calc(-100% - 10px)) translateY(0) scale(1);
+  }
+}
+
+/* Editable comment - left placement */
+.comment-node-wrapper[data-placement="left"] .comment-node-shake-wrapper {
+  padding-left: 0;
+}
+
+.comment-node-wrapper[data-placement="left"] .comment-node-shadow-wrapper {
+  transform: translateX(calc(-100% - 10px));
+}
+
+.comment-node-wrapper[data-placement="left"] .comment-node-shadow-wrapper.comment-node-open {
+  animation-name: comment-node-fade-in-up-left;
+}
+
+/* Readonly comment - left placement */
+.comment-node-wrapper[data-placement="left"] .comment-node-readonly {
+  margin-left: 0;
+  transform: translateX(calc(-100% - 10px));
+}
+
+.comment-node-wrapper[data-placement="left"] .comment-node-readonly.comment-node-open {
+  animation-name: comment-node-fade-in-up-left;
+}
+
+/* Ensure selected comment nodes have highest z-index at the ReactFlow node level */
+/* Uses :has() to detect when the node contains a selected comment (wrapper vs icon) */
+.react-flow__node-CommentNode:has(.comment-node-wrapper) {
+  z-index: 9999 !important;
+}
+
+/* Thread styles */
+.comment-node-thread {
+  /* Use dynamic viewport height to fill available screen space */
+  /* Account for: header (~56px), floating bar (~80px), margins (~24px) */
+  max-height: calc(100dvh - 160px);
+  min-height: auto;
+  width: 364px;
+}
+
+.comment-node-thread-messages {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 100px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 12px 40px;
+  position: relative; /* Required for offsetTop to be relative to this container */
+}
+
+.comment-node-thread-messages-scrollable {
+  padding-top: 12px;
+}
+
+.comment-node-thread-message {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.comment-node-avatar {
+  align-items: center;
+  border-radius: 50%;
+  display: flex;
+  flex-shrink: 0;
+  height: 24px;
+  justify-content: center;
+  overflow: hidden;
+  width: 24px;
+}
+
+.comment-node-avatar-ai {
+  background: #F9F7F4;
+}
+
+.comment-node-avatar-ai img {
+  height: 20px;
+  width: 20px;
+}
+
+.comment-node-avatar-user {
+  background: transparent;
+  border: 0.5px solid #dbd5ce;
+}
+
+.comment-node-avatar-user img {
+  border-radius: 50%;
+  height: 24px;
+  object-fit: cover;
+  width: 24px;
+}
+
+.comment-node-avatar-initials {
+  align-items: center;
+  background-color: #E5E0DB;
+  border: 0.5px solid #e8e4de;
+  border-radius: 50%;
+  color: #453321;
+  display: flex;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  height: 24px;
+  justify-content: center;
+  line-height: 1;
+  width: 24px;
+}
+
+.comment-node-thread-message-author {
+  color: #8B7F73;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.comment-node-thread-message-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  flex: 1;
+  min-width: 0;
+}
+
+.comment-node-thread-message-text {
+  color: #3a3128;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 22px;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Markdown rendering styles for AI responses */
+.comment-node-thread-message-text p {
+  margin: 0 0 8px 0;
+}
+
+.comment-node-thread-message-text p:last-child {
+  margin-bottom: 0;
+}
+
+.comment-node-thread-message-text strong {
+  font-weight: 700;
+}
+
+.comment-node-thread-message-text em {
+  font-style: italic;
+}
+
+/* Inline code - subtle background matching design system */
+.comment-node-thread-message-text code {
+  background: #F0ECE6;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 13px;
+  padding: 2px 5px;
+}
+
+/* Code blocks */
+.comment-node-thread-message-text pre {
+  background: #F0ECE6;
+  border: 1px solid #e8e4de;
+  border-radius: 6px;
+  margin: 8px 0;
+  overflow-x: auto;
+  padding: 10px 12px;
+}
+
+.comment-node-thread-message-text pre code {
+  background: transparent;
+  border-radius: 0;
+  font-size: 12px;
+  line-height: 18px;
+  padding: 0;
+}
+
+/* Lists */
+.comment-node-thread-message-text ul,
+.comment-node-thread-message-text ol {
+  margin: 8px 0;
+  padding-left: 12px;
+}
+
+.comment-node-thread-message-text li {
+  margin-bottom: 4px;
+}
+
+.comment-node-thread-message-text li:last-child {
+  margin-bottom: 0;
+}
+
+/* Links */
+.comment-node-thread-message-text a {
+  color: #627532;
+  text-decoration: none;
+}
+
+.comment-node-thread-message-text a:hover {
+  text-decoration: underline;
+}
+
+/* Blockquotes */
+.comment-node-thread-message-text blockquote {
+  border-left: 3px solid #DBD5CE;
+  color: #8B7F73;
+  margin: 8px 0;
+  padding-left: 12px;
+}
+
+/* Headings */
+.comment-node-thread-message-text h1,
+.comment-node-thread-message-text h2,
+.comment-node-thread-message-text h3 {
+  color: #453321;
+  font-weight: 600;
+  margin: 12px 0 8px 0;
+}
+
+.comment-node-thread-message-text h1:first-child,
+.comment-node-thread-message-text h2:first-child,
+.comment-node-thread-message-text h3:first-child {
+  margin-top: 0;
+}
+
+.comment-node-thread-message-text h1 {
+  font-size: 16px;
+}
+
+.comment-node-thread-message-text h2 {
+  font-size: 15px;
+}
+
+.comment-node-thread-message-text h3 {
+  font-size: 14px;
+}
+
+.comment-node-thread-message-loading .comment-node-thread-message-text {
+  align-items: center;
+  display: flex;
+  min-height: 20px;
+}
+
+.comment-node-thread-message-images {
+  display: flex;
+  gap: 8px;
+}
+
+.comment-node-thread-reply {
+  align-items: flex-end;
+  border-top: 1px solid #e8e4de;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+
+.comment-node-thread-reply-input {
+  background: transparent;
+  border: none;
+  box-sizing: border-box;
+  color: #3a3128;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 22px;
+  min-height: 44px;
+  max-height: 150px;
+  outline: none;
+  overflow: hidden;
+  padding: 0;
+  resize: none;
+  width: 100%;
+}
+
+.comment-node-thread-reply-input::placeholder {
+  color: #8B7F73;
+}
+
+.comment-node-thread-reply-images {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.comment-node-thread-reply-actions {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.comment-node-chat-toggle {
+  align-items: center;
+  background: transparent;
+  border: 1px solid #e8e4de;
+  border-radius: 6px;
+  color: #8B7F73;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  gap: 4px;
+  height: 28px;
+  line-height: 22px;
+  padding: 0 8px;
+  transition: background 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.comment-node-chat-toggle:hover {
+  border-color: rgba(69, 51, 33, 0.5);
+}
+
+.comment-node-chat-toggle-active {
+  background: rgba(236, 73, 123, 0.1);
+  border-color: rgba(236, 73, 123, 0.2);
+  color: #EC497B;
+}
+
+.comment-node-chat-toggle-active:hover {
+  border-color: rgba(236, 73, 123, 0.4);
+}
+
+.comment-node-thread-reply-buttons {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.comment-node-thread-reply-buttons .comment-node-action-add {
+  height: 28px;
+  width: 28px;
+}
+
+.comment-node-thread-reply-buttons .comment-node-action-send {
+  height: 28px;
+  width: 28px;
+}
+
+/* Anchor container - handles zoom scaling, positioned at comment coordinates */
+.comment-node-anchor {
+  cursor: pointer;
+  outline: none;
+  position: relative;
+}
+
+/* Invisible bridge covering gap between icon and bubble */
+.comment-node-anchor::after {
+  content: "";
+  height: 35px;
+  left: 20px;
+  position: absolute;
+  top: -25px;
+  width: 18px;
+}
+
+/* Icon with fixed pixel-based positioning to anchor at tail tip */
+.comment-node-icon-fixed {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+  position: relative;
+  /* Position so tail tip (bottom-left of bubble) is at origin */
+  transform: translate(-3px, -23px);
+  /* Scale from tail tip location (bottom-left area of icon) */
+  transform-origin: 3px 27px;
+  transition: transform 180ms ease;
+  width: fit-content;
+}
+
+.comment-node-anchor:hover .comment-node-icon-fixed {
+  transform: translate(-3px, -23px) scale(1.1);
+}
+
+/* Selected state: absolutely positioned within wrapper, same as original bubble.
+   Uses combined selector for higher specificity to ensure position: absolute wins. */
+.comment-node-icon-fixed.comment-node-icon-selected {
+  left: 0;
+  pointer-events: auto;
+  position: absolute;
+  top: 0;
+  transform: translate(-3px, -23px) scale(1.1);
+}
+
+/* Thinking dots color variants for selected states */
+.comment-node-thinking-dots-selected .comment-node-thinking-dot {
+  animation-name: comment-node-thinking-pulse-selected;
+  background: rgba(98, 117, 50, 0.3);
+}
+
+.comment-node-thinking-dots-chat .comment-node-thinking-dot {
+  animation-name: comment-node-thinking-pulse-chat;
+  background: rgba(236, 73, 123, 0.3);
+}
+
+.comment-node-notification-dot {
+  background: #EC497B;
+  border: 2px solid #F9F7F4;
+  border-radius: 50%;
+  box-sizing: border-box;
+  height: 12px;
+  position: absolute;
+  right: -5px;
+  top: -5px;
+  width: 12px;
+}
+
+/* Pop animation for new unread AI responses */
+.comment-node-notification-dot-animate {
+  animation: comment-node-pop 275ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes comment-node-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Thinking dots for when model is responding and comment is closed */
+.comment-node-thinking-dots {
+  align-items: center;
+  display: flex;
+  gap: 1.5px;
+  justify-content: center;
+  left: 50%;
+  position: absolute;
+  top: 34%;
+  transform: translate(-50%, -50%);
+}
+
+.comment-node-thinking-dot {
+  animation: comment-node-thinking-pulse 1.4s ease-in-out infinite;
+  background: rgba(130, 101, 72, 0.3);
+  border-radius: 50%;
+  height: 5px;
+  width: 5px;
+}
+
+.comment-node-thinking-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.comment-node-thinking-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.comment-node-thinking-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes comment-node-thinking-pulse {
+
+  0%,
+  100% {
+    background: rgba(130, 101, 72, 0.3);
+  }
+
+  50% {
+    background: rgba(130, 101, 72, 0.6);
+  }
+}
+
+/* Green thinking dots for selected state */
+.comment-node-bubble-selected .comment-node-thinking-dot {
+  animation-name: comment-node-thinking-pulse-selected;
+  background: rgba(98, 117, 50, 0.3);
+}
+
+@keyframes comment-node-thinking-pulse-selected {
+
+  0%,
+  100% {
+    background: rgba(98, 117, 50, 0.3);
+  }
+
+  50% {
+    background: rgba(98, 117, 50, 0.6);
+  }
+}
+
+/* Pink thinking dots for selected chat mode state */
+.comment-node-bubble-chat .comment-node-thinking-dot {
+  animation-name: comment-node-thinking-pulse-chat;
+  background: rgba(236, 73, 123, 0.3);
+}
+
+@keyframes comment-node-thinking-pulse-chat {
+
+  0%,
+  100% {
+    background: rgba(236, 73, 123, 0.3);
+  }
+
+  50% {
+    background: rgba(236, 73, 123, 0.6);
+  }
+}
+
+/* Preview bubble - positioned absolutely so it doesn't affect icon position */
+.comment-node-preview-bubble {
+  background: #F9F7F5;
+  border: 1px solid #DBD5CE;
+  border-radius: 12px;
+  cursor: pointer;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+  /* Align with icon: icon (28px wide) at translate(-3px, -23px), plus 8px gap = 33px */
+  left: 33px;
+  /* 2 lines (18px each = 36px) + padding (16px) = 52px */
+  max-height: 52px;
+  max-width: 360px;
+  min-width: 200px;
+  overflow: hidden;
+  padding: 8px 12px;
+  position: absolute;
+  top: -23px;
+  transition: left 180ms ease, max-height 200ms ease;
+}
+
+/* Pop animation for new unread AI responses */
+.comment-node-preview-animate {
+  animation: comment-node-preview-pop 325ms cubic-bezier(0.34, 1.56, 0.64, 1) 100ms backwards;
+}
+
+@keyframes comment-node-preview-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) translateX(-10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+}
+
+.comment-node-anchor:hover .comment-node-preview-bubble {
+  left: 36px;
+}
+
+/* Hover-only preview for read comments - hidden by default, shown on hover */
+.comment-node-preview-bubble-hover {
+  opacity: 0;
+  pointer-events: none;
+  transition: left 180ms ease, opacity 150ms ease;
+}
+
+.comment-node-anchor:hover .comment-node-preview-bubble-hover {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.comment-node-preview-text {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: #3a3128;
+  display: -webkit-box;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 12px;
+  line-clamp: 2;
+  line-height: 18px;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+/* Thinking shimmer for comment thread loading state */
+.comment-node-thinking-text {
+  display: flex;
+  align-items: center;
+}
+
+.comment-node-thinking-shimmer {
+  animation: comment-node-thinking-shimmer 2s ease-in-out infinite;
+  background: linear-gradient(90deg, #8B7F73 0%, #B8ADA3 50%, #8B7F73 100%);
+  background-clip: text;
+  background-size: 200% 100%;
+  color: transparent;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes comment-node-thinking-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+}
