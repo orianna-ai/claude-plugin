@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import argparse
 import pathlib
-import uuid
 import urllib.request
+import uuid
 
 
 def upload_file(
@@ -12,15 +12,17 @@ def upload_file(
         path = pathlib.Path(path)
 
     boundary = uuid.uuid4().hex
-    
-    body = b"\r\n".join([
-        f"--{boundary}".encode(),
-        f'Content-Disposition: form-data; name="file"; filename="{path.name}"'.encode(),
-        b"",
-        path.read_bytes(),
-        f"--{boundary}--".encode(),
-        b"",
-    ])
+
+    body = b"\r\n".join(
+        [
+            f"--{boundary}".encode(),
+            f'Content-Disposition: form-data; name="file"; filename="{path.name}"'.encode(),
+            b"",
+            path.read_bytes(),
+            f"--{boundary}--".encode(),
+            b"",
+        ]
+    )
 
     request = urllib.request.Request(
         "https://drive.orianna.ai/api/v2/upload",
@@ -35,7 +37,7 @@ def upload_file(
     with urllib.request.urlopen(request, timeout=30) as response:
         if response.status >= 400:
             raise RuntimeError(f"failed to upload {path} ({response.status})")
-       
+
         return response.read().decode().strip()
 
 
