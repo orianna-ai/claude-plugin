@@ -327,18 +327,7 @@ The user provides a design problem and the port where the application is already
      current git commit (`git rev-parse HEAD`). Share the `project_url` with the user, then move
      forward.
 
-3. Immediately after the project is created, you must dispatch `listen-for-comments` as a
-   **background** subagent so PM comments get responses
-   automatically. This runs forever:
-
-```
-Run the `listen-for-comments` skill and follow its instructions exactly.
-
-<project_id>{project_id}</project_id>
-<project_description>{problem_statement}</project_description>
-```
-
-4. Afterwards, understand the problem more deeply. Look at the app, explore the codebase, understand
+3. Afterwards, understand the problem more deeply. Look at the app, explore the codebase, understand
    the user flows and tensions. As soon as you have initial observations: create your first explorations (getting slot_ids), then **dispatch `present-canvas` immediately in the background** with your analysis and what you created. After the presenter is dispatched, dispatch
    content-script subagents in parallel. The presenter writes your thinking on the canvas
    and arranges the layout while prototypes generate — the human sees real work appearing
