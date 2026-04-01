@@ -21,6 +21,7 @@ def run_designer(
 <problem_statement>{problem_statement}</problem_statement>
 """,
             model="opus",
+            timeout=1200,
         )
 
 
