@@ -2,37 +2,46 @@ import dataclasses
 import functools
 import json
 import os
-from typing import ClassVar
+import pathlib
+
+
+@functools.cache
+def _config_path() -> pathlib.Path:
+    config_dir = pathlib.Path.home() / ".claude" / "softlight"
+    config_dir.mkdir(parents=True, exist_ok=True)
+
+    session_start_event = os.environ["CLAUDE_CODE_SESSION_START_EVENT"]
+    session_id = json.loads(session_start_event)["session_id"]
+
+    return config_dir / f"{session_id}.json"
 
 
 @dataclasses.dataclass(kw_only=True)
 class Config:
     """Mutable configuration that is preserved across ``claude`` invocations."""
 
-    ENVIRONMENT_VARIABLE: ClassVar[str] = "SOFTLIGHT_CONFIG"
-
     base_url: str | None = None
     project_id: str | None = None
     project_url: str | None = None
 
-    def dump_config(
-        self,
-    ) -> dict[str, str]:
-        return {
-            Config.ENVIRONMENT_VARIABLE: json.dumps(dataclasses.asdict(self)),
-        }
+    def save(self) -> None:
+        config_path = _config_path()
+        config_path.write_text(json.dumps(dataclasses.asdict(self)))
 
 
 @functools.cache
 def load_config() -> Config:
-    if config_json := os.environ.get(Config.ENVIRONMENT_VARIABLE):
-        return Config(**json.loads(config_json))
+    config_path = _config_path()
+
+    if config_path.exists():
+        return Config(**json.loads(config_path.read_text()))
     else:
         return Config()
 
 
 def main() -> None:
     config = load_config()
+
     print(config)
 
 
