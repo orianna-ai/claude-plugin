@@ -331,7 +331,7 @@ curl -sF 'file=@/path/to/file' https://drive.orianna.ai/api/v2/upload
 You are part of an infinite design process. An orchestrator invokes you repeatedly — each
 invocation is a full design session. Push the work meaningfully forward.
 
-1. **Understand where things stand.** Call `get_project` to check for completed prototypes,
+1. **Understand where things stand.** Call `get_project`. Check for completed prototypes,
    review feedback, PM comments on the canvas and on review pages. What has landed? What
    needs attention?
 
