@@ -1,6 +1,6 @@
 ---
 name: design-step
-description: "One iteration of the design process — read the canvas, decide what to do next, and do the work to push things forward."
+description: "Make meaningful design progress: assess the canvas, decide what matters most, and do the work."
 allowed-tools: Bash, Read, Write, Glob, Grep, Agent, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_exploration, mcp__plugin_softlight_softlight__create_text, mcp__plugin_softlight_softlight__move_slot, mcp__plugin_softlight_softlight__update_iframe_element, mcp__plugin_softlight_softlight__update_text_element, mcp__plugin_softlight_softlight__set_iframe_screenshots, mcp__plugin_softlight_softlight__create_comment_thread, mcp__plugin_softlight_softlight__create_comment, mcp__plugin_softlight_softlight__complete_prompt, mcp__plugin_softlight_softlight__create_session, mcp__plugin_softlight_softlight__close_session, mcp__plugin_softlight_softlight__list_sessions, mcp__plugin_softlight_softlight__browser_click, mcp__plugin_softlight_softlight__browser_close, mcp__plugin_softlight_softlight__browser_console_messages, mcp__plugin_softlight_softlight__browser_drag, mcp__plugin_softlight_softlight__browser_evaluate, mcp__plugin_softlight_softlight__browser_file_upload, mcp__plugin_softlight_softlight__browser_fill_form, mcp__plugin_softlight_softlight__browser_handle_dialog, mcp__plugin_softlight_softlight__browser_hover, mcp__plugin_softlight_softlight__browser_navigate, mcp__plugin_softlight_softlight__browser_navigate_back, mcp__plugin_softlight_softlight__browser_network_requests, mcp__plugin_softlight_softlight__browser_press_key, mcp__plugin_softlight_softlight__browser_resize, mcp__plugin_softlight_softlight__browser_run_code, mcp__plugin_softlight_softlight__browser_select_option, mcp__plugin_softlight_softlight__browser_snapshot, mcp__plugin_softlight_softlight__browser_take_screenshot, mcp__plugin_softlight_softlight__browser_type, mcp__plugin_softlight_softlight__browser_wait_for, mcp__plugin_softlight_softlight__browser_tabs
 model: opus
 ---
@@ -28,10 +28,9 @@ canvas has failed.
 
 The Softlight project UUID. Call `get_project` with this to see the full canvas state.
 
-### `<context>`
+### `<problem_statement>`
 
-Optional. Natural-language context from the orchestrator — the problem statement,
-observations from previous iterations, or specific instructions.
+Optional. Natural-language context from the orchestrator — the problem statement of the design problem that the user is working on.
 
 ## How you think about design
 
