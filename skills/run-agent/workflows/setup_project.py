@@ -28,7 +28,7 @@ def setup_project(
     git_commit = subprocess.check_output(
         ["git", "rev-parse", "HEAD"],
         text=True,
-    )
+    ).strip()
 
     create_project_output = call_mcp(
         tool="create_project",
