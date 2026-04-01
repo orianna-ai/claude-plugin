@@ -22,3 +22,10 @@ python3 -m workflows.setup_project \
   --port '<port>' \
   --problem-statement '<problem_statement>'
 ```
+
+2. Run the following from the directory containing this skill:
+
+```bash
+python3 -m workflows.run_designer \
+  --problem-statement '<problem_statement>'
+```
