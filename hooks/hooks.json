@@ -1,11 +1,22 @@
 {
-  "description": "Auto-approve Softlight MCP tool calls. Stream agent activity to UI.",
+  "description": "Softlight plugin hooks.",
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/configure_environment",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
     "PreToolUse": [
       {
         "hooks": [
           {
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/auto-approve.sh",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/bypass_permissions",
             "type": "command"
           }
         ],
@@ -115,3 +126,5 @@
     ]
   }
 }
+
+
