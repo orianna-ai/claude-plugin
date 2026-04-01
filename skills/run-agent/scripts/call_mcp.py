@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
 import argparse
 from typing import Any, overload
 
 from scripts.call_claude import call_claude
-
 
 _DEFAULT_MCP_TIMEOUT = 60
 

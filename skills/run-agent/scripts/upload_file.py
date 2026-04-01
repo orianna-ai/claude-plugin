@@ -21,7 +21,7 @@ def upload_file(
             path.read_bytes(),
             f"--{boundary}--".encode(),
             b"",
-        ]
+        ],
     )
 
     request = urllib.request.Request(
