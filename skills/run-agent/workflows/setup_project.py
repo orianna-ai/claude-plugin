@@ -66,6 +66,8 @@ def setup_project(
     config.base_url = base_url
     print(f"{base_url=}")
 
+    config.save()
+
 
 def main() -> None:
     parser = argparse.ArgumentParser()
