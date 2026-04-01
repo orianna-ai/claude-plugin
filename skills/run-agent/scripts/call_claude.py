@@ -1,9 +1,8 @@
-#!/usr/bin/env python3
 import argparse
+import functools
 import json
 import os
 import shlex
-import functools
 import subprocess
 from typing import Any, overload
 
@@ -92,7 +91,7 @@ def call_claude(
             )
 
         cmd.append("--fork-session")
-        
+
     if system_prompt:
         cmd.extend(
             [
@@ -153,10 +152,7 @@ def call_claude(
         capture_output=True,
         cwd=_claude_code_cwd(),
         env={
-            **{
-                var: val for var, val in os.environ.items()
-                if var != "CLAUDECODE"
-            },
+            **{var: val for var, val in os.environ.items() if var != "CLAUDECODE"},
             **config.dump_config(),
             "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
         },
