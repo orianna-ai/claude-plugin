@@ -2,3 +2,4 @@
 .activity-debug.log
 .current-project-id
 .transcript-offset-*
+__pycache__
