@@ -1,4 +1,3 @@
-import argparse
 import dataclasses
 import functools
 import json
@@ -12,7 +11,9 @@ class Config:
 
     ENVIRONMENT_VARIABLE: ClassVar[str] = "SOFTLIGHT_CONFIG"
 
+    base_url: str | None = None
     project_id: str | None = None
+    project_url: str | None = None
 
     def dump_config(
         self,
@@ -25,7 +26,7 @@ class Config:
 @functools.cache
 def load_config() -> Config:
     if config_json := os.environ.get(Config.ENVIRONMENT_VARIABLE):
-        return Config(**json.loads(config_json)) 
+        return Config(**json.loads(config_json))
     else:
         return Config()
 
