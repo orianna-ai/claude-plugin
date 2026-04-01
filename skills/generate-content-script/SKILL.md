@@ -104,7 +104,7 @@ re-inject your elements if the application removes or replaces them.
   and build DOM only for genuinely new additions.
 
 - If you must mutate the DOM, use `MutationObserver` to re-apply after framework re-renders. No
-  fixed timeouts.
+  fixed timeouts. Changes to the DOM must be idempotent.
 
 - **Watch for `overflow: hidden` ancestors** — many apps use `overflow: hidden` on flex containers
   to let grids/tables handle their own scrolling. If you insert a new element (e.g., a search bar)
