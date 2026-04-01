@@ -27,5 +27,6 @@ python3 -m workflows.setup_project \
 
 ```bash
 python3 -m workflows.run_designer \
+  --project-id '<project_id>' \
   --problem-statement '<problem_statement>'
 ```
