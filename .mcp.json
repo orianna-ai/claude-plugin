@@ -9,6 +9,10 @@
       "args": [
         "@playwright/mcp@latest",
         "--headless",
+        "--browser",
+        "chromium",
+        "--isolated",
+        "--no-sandbox",
         "--viewport-size", "1512x982"
       ]
     }
