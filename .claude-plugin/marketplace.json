@@ -1,10 +1,13 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "softlight-plugins",
-  "version": "1.0.0",
-  "description": "Softlight plugins for Claude Code",
   "owner": {
-    "name": "Softlight"
+    "name": "Softlight",
+    "email": "ashwin@softlight.com"
+  },
+  "metadata": {
+    "description": "Softlight plugins for Claude Code",
+    "version": "1.0.0"
   },
   "plugins": [
     {
