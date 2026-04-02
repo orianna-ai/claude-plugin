@@ -1,0 +1,6 @@
+{
+  "enabledMcpjsonServers": [
+    "softlight"
+  ],
+  "enableAllProjectMcpServers": true
+}

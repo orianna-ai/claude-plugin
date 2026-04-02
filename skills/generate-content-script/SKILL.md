@@ -10,6 +10,8 @@ injected into a running app that modifies its UI without rebuilding. The script 
 **before any app JS runs**. Synchronous code (mocks, auth, route) runs at evaluation time. DOM
 interactions run after `DOMContentLoaded`.
 
+Every prototype you produce will be evaluated for visual craft — not just functional correctness. The bar is: could this pass as the work of a professional human designer? Study the app's existing design system deeply and extend it naturally.
+
 ## Input
 
 ### `<project_id>`
