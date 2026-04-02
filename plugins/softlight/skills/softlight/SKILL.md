@@ -1,5 +1,5 @@
 ---
-name: designer
+name: softlight
 description: "Set up a Softlight design project — confirm context, explore the problem, capture baseline screenshots, and enter the prompt loop."
 model: opus
 ---
