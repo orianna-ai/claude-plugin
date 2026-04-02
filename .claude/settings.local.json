@@ -1,9 +1,0 @@
-{
-  "enabledMcpjsonServers": [
-    "playwright-parallel"
-  ],
-  "disabledMcpjsonServers": [
-    "softlight"
-  ],
-  "enableAllProjectMcpServers": true
-}
