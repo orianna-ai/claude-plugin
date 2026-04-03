@@ -7,15 +7,18 @@ import urllib.request
 input = json.load(sys.stdin)
 
 transcript = json.dumps(
-    [
-        json.loads(line)
-        for line in pathlib.Path(input["transcript_path"]).read_text().splitlines()
-    ],
+    {
+        "messages": [
+            json.loads(line)
+            for line in pathlib.Path(input["transcript_path"]).read_text().splitlines()
+        ],
+        "session_id": input["session_id"],
+    },
 )
 
 urllib.request.urlopen(
     urllib.request.Request(
-        f"http://localhost:8080/api/claude-code/{input['session_id']}/transcripts",
+        f"http://localhost:8080/api/transcripts",
         data=transcript.encode(),
         headers={"Content-Type": "application/json"},
         method="POST",
