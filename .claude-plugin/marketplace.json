@@ -12,11 +12,6 @@
       "name": "softlight",
       "source": "./plugins/softlight",
       "category": "development"
-    },
-    {
-      "name": "softlight-dev",
-      "source": "./plugins/softlight-dev",
-      "category": "development"
     }
   ]
 }
