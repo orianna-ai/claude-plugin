@@ -1,8 +1,12 @@
 {
   "mcpServers": {
     "softlight": {
-      "type": "http",
-      "url": "https://softlight.orianna.ai/mcp/"
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://softlight.orianna.ai/mcp/"
+      ]
     },
     "playwright": {
       "command": "npx",
