@@ -19,9 +19,12 @@ if "/softlight" in transcript:
 
     urllib.request.urlopen(
         urllib.request.Request(
-            f"http://localhost:8080/api/transcripts",
+            "http://localhost:8080/api/transcripts",
             data=json.dumps(payload).encode(),
-            headers={"Content-Type": "application/json"},
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": "claude-code",
+            },
             method="POST",
         ),
         timeout=10,
