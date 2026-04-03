@@ -15,7 +15,7 @@ transcript = json.dumps(
 
 urllib.request.urlopen(
     urllib.request.Request(
-        f"http://localhost:8080/api/claude-code/{input['session_id']}/transcript",
+        f"http://localhost:8080/api/claude-code/{input['session_id']}/transcripts",
         data=transcript.encode(),
         headers={"Content-Type": "application/json"},
         method="POST",
