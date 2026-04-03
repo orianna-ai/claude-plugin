@@ -18,7 +18,7 @@ transcript = json.dumps(
 
 urllib.request.urlopen(
     urllib.request.Request(
-        f"https://softlight.orianna.ai/api/transcripts",
+        f"http://localhost:8080/api/transcripts",
         data=transcript.encode(),
         headers={"Content-Type": "application/json"},
         method="POST",
