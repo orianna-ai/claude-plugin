@@ -13,7 +13,8 @@
         "chromium",
         "--isolated",
         "--no-sandbox",
-        "--viewport-size", "1512x982"
+        "--viewport-size",
+        "1512x982"
       ]
     }
   }
