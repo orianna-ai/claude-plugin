@@ -2,7 +2,10 @@
   "mcpServers": {
     "softlight": {
       "type": "http",
-      "url": "https://softlight.orianna.ai/mcp/"
+      "url": "https://softlight.orianna.ai/mcp/",
+      "headers": {
+        "X-API-Key":"public"
+      }
     },
     "playwright": {
       "command": "npx",
@@ -19,3 +22,4 @@
     }
   }
 }
+
