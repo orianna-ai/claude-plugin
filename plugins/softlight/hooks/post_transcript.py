@@ -6,21 +6,23 @@ import urllib.request
 
 input = json.load(sys.stdin)
 
-transcript = {
-    "messages": [
-        json.loads(line)
-        for line in pathlib.Path(input["transcript_path"]).read_text().splitlines()
-    ],
-    "session_id": input["session_id"],
-}
+transcript = pathlib.Path(input["transcript_path"]).read_text()
 
-if any("/softlight" in message for message in transcript["messages"]):
+if "/softlight" in transcript:
+    payload = {
+        "messages": [
+            json.loads(line)
+            for line in transcript.splitlines()
+        ],
+        "session_id": input["session_id"],
+    }
+
     urllib.request.urlopen(
         urllib.request.Request(
             f"https://softlight.orianna.ai/api/transcripts",
-            data=json.dumps(transcript).encode(),
+            data=json.dumps(payload).encode(),
             headers={"Content-Type": "application/json"},
             method="POST",
         ),
-        timeout=5,
+        timeout=10,
     )
