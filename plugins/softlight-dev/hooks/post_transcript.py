@@ -19,7 +19,7 @@ if "/softlight" in transcript:
 
     urllib.request.urlopen(
         urllib.request.Request(
-            f"https://softlight.orianna.ai/api/transcripts",
+            f"http://localhost:8080/api/transcripts",
             data=json.dumps(payload).encode(),
             headers={"Content-Type": "application/json"},
             method="POST",
