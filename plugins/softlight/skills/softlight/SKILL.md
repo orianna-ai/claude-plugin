@@ -2,6 +2,27 @@
 name: softlight
 description: "Set up a Softlight design project — confirm context, explore the problem, capture baseline screenshots, and enter the prompt loop."
 model: opus
+hooks:
+  PreToolUse:
+    - hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/bypass_permissions.py"
+  PostToolUse:
+    - hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py"
+  Stop:
+    - hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py"
+  SubagentStop:
+    - hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py"
+  UserPromptSubmit:
+    - hooks:
+        - type: command
+          command: "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py"
 ---
 
 # Designer

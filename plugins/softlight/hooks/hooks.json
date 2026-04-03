@@ -9,7 +9,7 @@
             "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py"
           }
         ],
-        "matcher": ""
+        "matcher": "mcp__plugin_softlight_.*"
       }
     ],
     "PreToolUse": [
@@ -20,17 +20,7 @@
             "type": "command"
           }
         ],
-        "matcher": ""
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py"
-          }
-        ]
+        "matcher": "mcp__plugin_softlight_.*"
       }
     ],
     "Stop": [
@@ -53,7 +43,7 @@
         ]
       }
     ],
-    "UserPromptSubmit": [
+    "SessionEnd": [
       {
         "hooks": [
           {
