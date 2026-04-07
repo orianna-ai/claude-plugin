@@ -6,14 +6,15 @@ import pathlib
 
 
 @functools.cache
-def _config_path() -> pathlib.Path:
+def _config_path() -> pathlib.Path | None:
     config_dir = pathlib.Path.home() / ".claude" / "softlight"
     config_dir.mkdir(parents=True, exist_ok=True)
 
-    session_start_event = os.environ["CLAUDE_CODE_SESSION_START_EVENT"]
-    session_id = json.loads(session_start_event)["session_id"]
-
-    return config_dir / f"{session_id}.json"
+    if session_start_event := os.environ.get("CLAUDE_CODE_SESSION_START_EVENT"):
+        session_id = json.loads(session_start_event)["session_id"]
+        return config_dir / f"{session_id}.json"
+    else:
+        return None
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -39,15 +40,15 @@ class Config:
             print(f"{k}={v!r}")
 
     def save(self) -> None:
-        config_path = _config_path()
-        config_path.write_text(json.dumps(dataclasses.asdict(self)))
+        if config_path := _config_path():
+            config_path.write_text(json.dumps(dataclasses.asdict(self)))
 
 
 @functools.cache
 def load_config() -> Config:
     config_path = _config_path()
 
-    if config_path.exists():
+    if config_path is not None and config_path.exists():
         return Config(**json.loads(config_path.read_text()))
     else:
         return Config()

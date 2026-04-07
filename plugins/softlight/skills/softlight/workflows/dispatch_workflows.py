@@ -19,8 +19,8 @@ def _run_workflow(
 
 def dispatch_workflows() -> None:
     config = load_config()
-    assert config.project_id is not None, "`project_id` is not configured"
-    assert config.base_url is not None, "`base_url` is not configured"
+    assert config.project_id is not None
+    assert config.base_url is not None
 
     cursor = 0
 

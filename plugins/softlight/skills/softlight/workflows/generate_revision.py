@@ -76,13 +76,12 @@ def _generate_caption(
 
 def generate_revision() -> None:
     with load_config() as config:
-        project_id = config.project_id
-        assert project_id is not None, "`project_id` is not configured"
+        assert config.project_id is not None
 
         generate_specs_output = call_claude(
             prompt=f"""\
 /generate-specs
-<project_id>{project_id}</project_id>
+<project_id>{config.project_id}</project_id>
 <problem_statement>{config.problem_statement}</problem_statement>
 """,
             json_schema={
@@ -104,7 +103,7 @@ def generate_revision() -> None:
         create_revision_output = call_mcp(
             tool="create_revision",
             input={
-                "project_id": project_id,
+                "project_id": config.project_id,
                 "prototype_count": str(len(generate_specs_output["specs"])),
             },
             json_schema={
@@ -140,7 +139,7 @@ def generate_revision() -> None:
                 futures.append(
                     executor.submit(
                         _generate_prototype,
-                        project_id=project_id,
+                        project_id=config.project_id,
                         slot_id=placeholder["prototype_slot_id"],
                         spec=spec,
                     ),
@@ -149,7 +148,7 @@ def generate_revision() -> None:
                 futures.append(
                     executor.submit(
                         _generate_caption,
-                        project_id=project_id,
+                        project_id=config.project_id,
                         slot_id=placeholder["caption_slot_id"],
                         spec=spec,
                     ),

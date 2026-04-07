@@ -10,9 +10,8 @@ def post_events(
     events: list[dict[str, Any]],
 ) -> None:
     config = load_config()
-
-    if config.project_id is None or config.base_url is None:
-        raise ValueError("`project_id` and `base_url` must both be configured to post events")
+    assert config.project_id is not None
+    assert config.base_url is not None
 
     request = urllib.request.Request(
         f"{config.base_url}/api/projects/{config.project_id}/events",

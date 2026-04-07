@@ -1,12 +1,13 @@
 import argparse
 import io
+import multiprocessing
 import os
 import pathlib
 import platform
+import signal
 import subprocess
 import tarfile
 import tempfile
-import threading
 import time
 import urllib.error
 import urllib.request
@@ -86,25 +87,44 @@ def _frpc_process(
     port: int,
 ) -> subprocess.Popen:
     binary = _frpc_binary()
+
     config = _frpc_config(tunnel_id, port)
 
-    return subprocess.Popen(
+    frpc = subprocess.Popen(
         [str(binary), "-c", str(config)],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE,
     )
 
+    frpc_reaper = multiprocessing.Process(
+        target=_frpc_reaper,
+        args=(frpc.pid, port),
+        daemon=True,
+    )
+
+    frpc_reaper.start()
+
+    return frpc
+
 
 def _frpc_reaper(
-    process: subprocess.Popen,
+    pid: int,
     port: int,
 ) -> None:
-    while process.poll() is None:
+    while True:
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return
+
         time.sleep(10)
 
         if not _is_accessible(port):
-            process.terminate()
-            process.wait(timeout=5)
+            try:
+                os.kill(pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+
             return
 
 
@@ -140,9 +160,6 @@ def start_tunnel(
 
         frpc = _frpc_process(tunnel_id, port)
         config.frpc_pid = frpc.pid
-
-        thread = threading.Thread(target=_frpc_reaper, args=(frpc, port), daemon=True)
-        thread.start()
 
         return tunnel_id
 
