@@ -8,9 +8,11 @@
       "type": "stdio",
       "command": "npx",
       "args": [
-        "playwright-parallel-mcp"
+        "-y",
+        "playwright-parallel-mcp@latest"
       ],
       "env": {
+        "PLAYWRIGHT_MCP_BROWSER": "chromium",
         "PLAYWRIGHT_MCP_ISOLATED": "true",
         "MAX_SESSIONS": "100"
       }
