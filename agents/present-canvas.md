@@ -142,3 +142,7 @@ Canvas units:
 - Text line heights: h1 ~135, h2 ~112, h3 ~90, p ~60, small ~42.
 - Allow ~400-600 vertical units between sections.
 - Allow ~200-400 vertical units between a text block and the exploration below it.
+- The default text width (1720) works for most text. Eye tracking is hard the wider it gets,
+  so you should rarely be going wider than the default, if ever. When showing fewer than 3
+  prototypes side by side, keep narrative text at the default 1720 width — don't stretch it
+  to match the exploration width.

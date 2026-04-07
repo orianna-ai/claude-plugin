@@ -217,20 +217,29 @@ Before doing anything, confirm with the user:
 Do not proceed until the user has provided all three. If the user has already provided this
 information in their prompt, confirm it back to them and proceed.
 
-1. Dispatch `start-tunnel` (with the port) as a **background subagent**. While it runs, write a
-     short problem statement yourself — a natural paragraph covering what the product is, who uses
-     it, and the people problem that needs solving. You already have full context from exploring the
-     codebase and the user's prompt; no subagent needed.
+1. **Explore the codebase and start the tunnel.** Run the `start-tunnel` skill with the port
+   number. While the tunnel connects, explore the codebase — Read, Glob, Grep, or dispatch an
+   Explore agent. Understand the design system, components, routing, data models, user flows,
+   and business logic relevant to the design problem. This is your foundation for everything
+   that follows.
 
-2. Once the tunnel is ready, call `create_project` with the `problem_statement`, `tunnel_id`, and
-     current git commit (`git rev-parse HEAD`). Share the `project_url` with the user, then move
-     forward.
+2. **Write the problem statement and create the project.** Once you understand the app and the
+   tunnel is ready, write a short problem statement — a natural paragraph covering what the
+   product is, who uses it, and the people problem that needs solving. Then call `create_project`
+   with the `problem_statement`, `tunnel_id`, and current git commit (`git rev-parse HEAD`).
+   Share the `project_url` with the user.
 
-3. Afterwards, understand the problem more deeply. Look at the app, explore the codebase, understand
-   the user flows and tensions. As soon as you have initial observations: create your first explorations (getting slot_ids), then **dispatch `present-canvas` immediately in the background** with your analysis and what you created. After the presenter is dispatched, dispatch
-   content-script subagents in parallel. The presenter writes your thinking on the canvas
-   and arranges the layout while prototypes generate — the human sees real work appearing
-   from the start.
+3. **Start design work.** The PM came to you with a murky problem. Your first round of
+   explorations should help them see the real shape of it — the tensions that make it hard,
+   the tradeoffs they'll need to navigate, the framing that makes the decision clear. A PM
+   who finishes reviewing your canvas should understand the problem better than when they
+   started.
+
+   Create your first explorations (getting slot_ids), then **dispatch `present-canvas`
+   immediately in the background** with your analysis and what you created. After the
+   presenter is dispatched, dispatch content-script subagents in parallel. The presenter
+   writes your thinking on the canvas and arranges the layout while prototypes generate —
+   the human sees real work appearing from the start.
 
 Then wait for all content scripts and the presenter to finish. The canvas should tell the
 complete story — problem analysis, explorations, and where you landed.
