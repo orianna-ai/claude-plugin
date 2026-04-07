@@ -1,37 +1,37 @@
-#!/usr/bin/env python3
 import argparse
 import io
+import multiprocessing
 import os
 import pathlib
 import platform
+import signal
 import subprocess
 import tarfile
 import tempfile
-import threading
 import time
 import urllib.error
 import urllib.request
 import uuid
 
+from scripts.load_config import load_config
+
 _FRPC_VERSION = "0.67.0"
 
 
-def _frpc_binary_name() -> str:
-    match (platform.system(), platform.machine()):
-        case ("Linux", "x86_64"):
-            return f"frp_{_FRPC_VERSION}_linux_amd64"
-        case ("Linux", "aarch64"):
-            return f"frp_{_FRPC_VERSION}_linux_arm64"
-        case ("Darwin", "x86_64"):
-            return f"frp_{_FRPC_VERSION}_darwin_amd64"
-        case ("Darwin", "arm64"):
-            return f"frp_{_FRPC_VERSION}_darwin_arm64"
-        case (system, machine):
-            raise ValueError(f"frpc is not supported on {system} {machine}")
+_FRPC_BINARY_NAME = {
+    ("Linux", "x86_64"):
+        f"frp_{_FRPC_VERSION}_linux_amd64",
+    ("Linux", "aarch64"):
+        f"frp_{_FRPC_VERSION}_linux_arm64",
+    ("Darwin", "x86_64"):
+        f"frp_{_FRPC_VERSION}_darwin_amd64",
+    ("Darwin", "arm64"):
+        f"frp_{_FRPC_VERSION}_darwin_arm64",
+}
 
 
 def _frpc_binary() -> pathlib.Path:
-    binary_name = _frpc_binary_name()
+    binary_name = _FRPC_BINARY_NAME[(platform.system(), platform.machine())]
 
     path = pathlib.Path(tempfile.gettempdir()) / binary_name / "frpc"
 
@@ -87,25 +87,44 @@ def _frpc_process(
     port: int,
 ) -> subprocess.Popen:
     binary = _frpc_binary()
+
     config = _frpc_config(tunnel_id, port)
 
-    return subprocess.Popen(
+    frpc = subprocess.Popen(
         [str(binary), "-c", str(config)],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE,
     )
 
+    frpc_reaper = multiprocessing.Process(
+        target=_frpc_reaper,
+        args=(frpc.pid, port),
+        daemon=True,
+    )
+
+    frpc_reaper.start()
+
+    return frpc
+
 
 def _frpc_reaper(
-    process: subprocess.Popen,
+    pid: int,
     port: int,
 ) -> None:
-    while process.poll() is None:
+    while True:
+        try:
+            os.kill(pid, 0)
+        except ProcessLookupError:
+            return
+
         time.sleep(10)
 
         if not _is_accessible(port):
-            process.terminate()
-            process.wait(timeout=5)
+            try:
+                os.kill(pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+
             return
 
 
@@ -135,16 +154,14 @@ def start_tunnel(
     if not _is_accessible(port):
         raise ValueError(f"application running on port {port} is not accessible")
 
-    tunnel_id = str(uuid.uuid4())
-    print(f"{tunnel_id=}")
+    with load_config() as config:
+        tunnel_id = str(uuid.uuid4())
+        config.tunnel_id = tunnel_id
 
-    frpc = _frpc_process(tunnel_id, port)
-    print(f"{frpc.pid=}")
+        frpc = _frpc_process(tunnel_id, port)
+        config.frpc_pid = frpc.pid
 
-    thread = threading.Thread(target=_frpc_reaper, args=(frpc, port), daemon=True)
-    thread.start()
-
-    return tunnel_id
+        return tunnel_id
 
 
 def main() -> None:

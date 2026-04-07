@@ -1,66 +1,33 @@
 ---
 name: softlight
-description: "Set up a Softlight design project — confirm context, explore the problem, capture baseline screenshots, and enter the prompt loop."
-model: opus
+description: Create a Softlight project backed by a long-running agent.
 ---
 
-# Designer
+# Input
 
-You are setting up a Softlight design project from scratch. Your job is to understand the design
-problem, capture the current state of the running application, create a project, and then enter
-the prompt loop so the project is live and interactive.
+## `<port>`
 
-## Step 1: Confirm baseline context
+Port where their application is running locally (e.g., `3000`).
 
-Before doing anything, confirm with the user:
+# Steps
 
-- **What application** is being changed
-- **What port** it's running on
-- **What design problem** they want to solve
+1. Clarify the design problem the user is trying to solve. Quickly explore the codebase to
+   understand the business context, user journey, and product domain and use this information to
+   write a short `<problem_statement>` that you will subsequently use as the basis of your design
+   work. Only explore the parts of the codebase that are relevant to the running application. Feel
+   free to ask questions if you are not sure what application is running or where its source code is
+   located in the codebase.
 
-Do not proceed until the user has provided all three. If the user has already provided this
-information in their prompt, confirm it back to them and proceed.
+2. Run the following from the directory containing this skill.
 
-## Step 2: Explore the codebase to understand the stated design problem and user flow, and write the problem statement
+```bash
+python3 -m workflows.setup_project \
+  --port '<port>' \
+  --problem-statement '<problem_statement>'
+```
 
-You have access to the full codebase. Use it to understand the business context, the user
-journey, and the product domain. You must write a short problem statement — a natural paragraph
-covering what the product is, who uses it, and the people problem that needs solving.
+3. Run the following from the directory containing this skill. It will run forever.
 
-This step runs before screenshots because understanding the codebase tells you which states of
-the application to capture.
-
-## Step 3: Capture screenshots and create the Softlight project
-
-Your task is to take screenshots of the states of the application that show the design problem.
-
-Use the **Playwright MCP** tools to browse the running application at `http://localhost:{port}`.
-Resize the viewport to 1512x982 (MacBook Pro 14"). Interact with the application to get it into
-the states where the design problem is visible, and take screenshots of those states.
-
-1. Call `browser_navigate` to `http://localhost:{port}` (the port from Step 1)
-2. Call `browser_resize` to set the viewport to 1512x982
-3. Interact with the application to find and navigate to the states that show the design problem.
-4. Take screenshots with `browser_take_screenshot`. The tool saves the screenshot file and
-   returns the path.
-5. Upload each screenshot to Drive:
-   ```bash
-   curl -sF 'file=@/path/to/screenshot.png' https://drive.orianna.ai/api/v2/upload
-   ```
-6. Call `create_project` with:
-   - The `problem_statement` from Step 2
-   - The screenshot URLs from Drive
-7. Share the `project_url` with the user, and remember the `project_id`
-8. Call the `generate_mock_revision` tool in a **background** subagent.
-
-## Step 4: Wait-for-prompt loop
-
-Enter the prompt loop indefinitely:
-
-a. Call the `wait_for_prompt` tool with the `project_id` from Step 3 and `prompt_id` from the
-   last time you called the tool.
-
-b. Handle the prompt in a **background** subagent. You must instruct the subagent to call the
-   `complete_prompt` tool after it is done handling the prompt.
-
-c. Loop back to step (a) immediately. Never wait for the subagent to complete.
+```bash
+python3 -m workflows.dispatch_workflows
+```
