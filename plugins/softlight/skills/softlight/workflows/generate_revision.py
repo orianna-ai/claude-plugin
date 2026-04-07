@@ -107,6 +107,7 @@ def generate_revision() -> None:
                 "project_id": config.project_id,
                 "prototype_count": str(len(generate_specs_output["specs"])),
             },
+            timeout=300,
             json_schema={
                 "type": "object",
                 "properties": {
