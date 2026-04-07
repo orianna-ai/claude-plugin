@@ -114,12 +114,11 @@ Write a content script that implements `<spec>` and save it to `<path>`. Do not 
     }
     ```
 
-  - The application will continue to render after your script loads, but do not use
-    `MutationObserver` to re-inject DOM modifications on re-render. Inject a `<style>` that triggers
-    `animationstart` on matching elements instead. This pattern works better with frameworks like
-    React that assume they have full control over the DOM. Never include transient state in the
-    observe selector. Observe stable structural elements and check transient state inside the
-    listener.
+  - The application will continue to render after your script loads. Inject a `<style>` that
+    triggers `animationstart` on matching elements to re-inject DOM modifications after a re-render.
+    Do not use a `MutationObserver`. This pattern works better with frameworks like React that
+    assume they have full control over the DOM. Never include transient state in the observe
+    selector. Observe stable structural elements and check transient state inside the listener.
 
     ```js
     function observe(selector, listener, signal) {
