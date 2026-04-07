@@ -10,9 +10,7 @@
   "plugins": [
     {
       "name": "softlight",
-      "description": "Design with Softlight",
-      "source": "./plugins/softlight",
-      "category": "development"
+      "source": "./plugins/softlight"
     }
   ]
 }
