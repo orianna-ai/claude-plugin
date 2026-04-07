@@ -217,10 +217,10 @@ Before doing anything, confirm with the user:
 Do not proceed until the user has provided all three. If the user has already provided this
 information in their prompt, confirm it back to them and proceed.
 
-1. Dispatch `start-tunnel` (with the port) as a **background subagent**. While it runs, write a
-     short problem statement yourself — a natural paragraph covering what the product is, who uses
-     it, and the people problem that needs solving. You already have full context from exploring the
-     codebase and the user's prompt; no subagent needed.
+1. Run the `start-tunnel` skill with the port number. It returns a `TUNNEL_ID` and `PID`.
+     While it runs, write a short problem statement yourself — a natural paragraph covering what
+     the product is, who uses it, and the people problem that needs solving. You already have
+     full context from exploring the codebase and the user's prompt; no subagent needed.
 
 2. Once the tunnel is ready, call `create_project` with the `problem_statement`, `tunnel_id`, and
      current git commit (`git rev-parse HEAD`). Share the `project_url` with the user, then move
