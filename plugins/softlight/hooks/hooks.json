@@ -1,4 +1,5 @@
 {
+  "description": "Softlight plugin hooks.",
   "hooks": {
     "PostToolUse": [
       {
