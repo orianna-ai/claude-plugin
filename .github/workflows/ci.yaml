@@ -18,6 +18,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.head_ref }}
       - uses: actions/setup-python@v6
         with:
           python-version: 3.11
@@ -25,6 +27,6 @@ jobs:
         env:
           SKIP: no-commit-to-branch
       - if: failure()
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: 'chore: run pre-commit'
