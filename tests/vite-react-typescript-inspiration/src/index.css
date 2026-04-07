@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@300;500;700&display=swap');
+@import "@radix-ui/themes/styles.css";
+
+html,
+body,
+#root {
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.radix-themes {
+  --default-font-family: Figtree, ui-sans-serif, sans-serif;
+  --heading-font-family: Figtree, ui-sans-serif, sans-serif;
+  --code-font-family: Figtree, ui-sans-serif, sans-serif;
+  --em-font-family: Figtree, ui-sans-serif, sans-serif;
+  --quote-font-family: Figtree, ui-sans-serif, sans-serif;
+
+  --font-weight-light: 300;
+  --font-weight-regular: 500;
+  --font-weight-medium: 500;
+  --font-weight-bold: 600;
+
+  --default-line-height: 22px;
+
+  --color-panel: #F9F7F4;
+}

@@ -1,0 +1,11 @@
+/* Dynamically loaded stylesheet — proves <link> createElement rewrite works */
+.dynamic-css-loaded {
+  border: 3px solid #10b981 !important;
+  padding: 8px !important;
+}
+
+.dynamic-css-loaded::after {
+  content: " (CSS loaded via createElement link)";
+  color: #10b981;
+  font-weight: bold;
+}
