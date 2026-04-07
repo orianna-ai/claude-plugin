@@ -1,26 +1,12 @@
 {
   "mcpServers": {
     "softlight": {
-      "command": "npx",
       "args": [
         "-y",
         "mcp-remote",
-        "https://softlight.orianna.ai/mcp/"
-      ]
-    },
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@latest",
-        "--headless",
-        "--browser",
-        "chromium",
-        "--isolated",
-        "--no-sandbox",
-        "--viewport-size",
-        "1512x982"
-      ]
+        "http://localhost:8080/mcp/"
+      ],
+      "command": "npx"
     }
   }
 }
-

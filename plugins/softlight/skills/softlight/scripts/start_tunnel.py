@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import argparse
 import io
 import os
@@ -13,25 +12,25 @@ import urllib.error
 import urllib.request
 import uuid
 
+from scripts.load_config import load_config
+
 _FRPC_VERSION = "0.67.0"
 
 
-def _frpc_binary_name() -> str:
-    match (platform.system(), platform.machine()):
-        case ("Linux", "x86_64"):
-            return f"frp_{_FRPC_VERSION}_linux_amd64"
-        case ("Linux", "aarch64"):
-            return f"frp_{_FRPC_VERSION}_linux_arm64"
-        case ("Darwin", "x86_64"):
-            return f"frp_{_FRPC_VERSION}_darwin_amd64"
-        case ("Darwin", "arm64"):
-            return f"frp_{_FRPC_VERSION}_darwin_arm64"
-        case (system, machine):
-            raise ValueError(f"frpc is not supported on {system} {machine}")
+_FRPC_BINARY_NAME = {
+    ("Linux", "x86_64"):
+        f"frp_{_FRPC_VERSION}_linux_amd64",
+    ("Linux", "aarch64"):
+        f"frp_{_FRPC_VERSION}_linux_arm64",
+    ("Darwin", "x86_64"):
+        f"frp_{_FRPC_VERSION}_darwin_amd64",
+    ("Darwin", "arm64"):
+        f"frp_{_FRPC_VERSION}_darwin_arm64",
+}
 
 
 def _frpc_binary() -> pathlib.Path:
-    binary_name = _frpc_binary_name()
+    binary_name = _FRPC_BINARY_NAME[(platform.system(), platform.machine())]
 
     path = pathlib.Path(tempfile.gettempdir()) / binary_name / "frpc"
 
@@ -135,16 +134,17 @@ def start_tunnel(
     if not _is_accessible(port):
         raise ValueError(f"application running on port {port} is not accessible")
 
-    tunnel_id = str(uuid.uuid4())
-    print(f"{tunnel_id=}")
+    with load_config() as config:
+        tunnel_id = str(uuid.uuid4())
+        config.tunnel_id = tunnel_id
 
-    frpc = _frpc_process(tunnel_id, port)
-    print(f"{frpc.pid=}")
+        frpc = _frpc_process(tunnel_id, port)
+        config.frpc_pid = frpc.pid
 
-    thread = threading.Thread(target=_frpc_reaper, args=(frpc, port), daemon=True)
-    thread.start()
+        thread = threading.Thread(target=_frpc_reaper, args=(frpc, port), daemon=True)
+        thread.start()
 
-    return tunnel_id
+        return tunnel_id
 
 
 def main() -> None:

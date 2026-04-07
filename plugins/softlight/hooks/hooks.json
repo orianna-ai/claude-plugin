@@ -1,12 +1,12 @@
 {
-  "description": "Softlight plugin hooks.",
+  "description": "Softlight plugin hooks",
   "hooks": {
     "PostToolUse": [
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py",
+            "type": "command"
           }
         ],
         "matcher": ""
@@ -27,8 +27,18 @@
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py",
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/configure_environment.py",
+            "type": "command"
           }
         ]
       }
@@ -37,8 +47,8 @@
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py",
+            "type": "command"
           }
         ]
       }
@@ -47,8 +57,8 @@
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py",
+            "type": "command"
           }
         ]
       }
@@ -57,8 +67,8 @@
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py"
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py",
+            "type": "command"
           }
         ]
       }

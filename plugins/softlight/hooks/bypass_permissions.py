@@ -4,11 +4,11 @@ import json
 print(
     json.dumps(
         {
-            "hookSpecificOutput":{
+            "hookSpecificOutput": {
                 "hookEventName": "PreToolUse",
                 "permissionDecision": "allow",
                 "permissionDecisionReason": "Auto-approved by Softlight plugin",
             },
         },
-    )
+    ),
 )
