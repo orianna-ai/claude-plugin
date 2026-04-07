@@ -76,7 +76,7 @@ Write a content script that implements `<spec>` and save it to `<path>`. Do not 
 
   - Mock every endpoint that the content script or application requires to demonstrate the `<spec>`.
 
-  - Mock data must be statically defined.
+  - Mock data must be statically defined. Never use `fetch` to seed mock data.
 
   - You should always provide realistic mock data. Include enough data to demonstrate the `<spec>`.
 
@@ -117,8 +117,7 @@ Write a content script that implements `<spec>` and save it to `<path>`. Do not 
   - The application will continue to render after your script loads. Inject a `<style>` that
     triggers `animationstart` on matching elements to re-inject DOM modifications after a re-render.
     Do not use a `MutationObserver`. This pattern works better with frameworks like React that
-    assume they have full control over the DOM. Never include transient state in the observe
-    selector. Observe stable structural elements and check transient state inside the listener.
+    assume they have full control over the DOM.
 
     ```js
     function observe(selector, listener, signal) {
@@ -146,6 +145,25 @@ Write a content script that implements `<spec>` and save it to `<path>`. Do not 
     const controller = new AbortController();
     observe('.my-button', (el) => { el.style.backgroundColor = 'red'; }, controller.signal);
     window.addEventListener('unload', () => controller.abort());
+    ```
+
+  - The `observe` selector must ONLY match on stable, structural attributes (e.g., tag names, roles,
+    static class names, or IDs that do not change at runtime). Never use attributes that reflect
+    runtime state such as `data-state`, `aria-selected`, `aria-expanded`, `aria-checked`,
+    `disabled`, `:checked`, `.active`, or similar. These values change as the user interacts with
+    the page, which means the `animationstart` approach will either never fire (if the state isn't
+    set yet when the element mounts) or fire at the wrong time. Instead, observe the stable,
+    structural element and gate on transient state inside the listener callback:
+
+    ```js
+    // WRONG — data-state is transient, animation may never fire
+    observe('[data-state="active"].tab-content', (el) => { ... }, signal);
+
+    // RIGHT — observe the stable element, check state in the callback
+    observe('.tab-content', (el) => {
+      if (el.dataset.state !== 'active') return;
+      // ...
+    }, signal);
     ```
 
   - Before making DOM modificationsj, double-check that the change will actually be visible. For

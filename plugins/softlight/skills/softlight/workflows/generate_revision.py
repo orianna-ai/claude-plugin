@@ -35,6 +35,7 @@ def _generate_prototype(
                 "content_script_url": content_script_url,
                 "project_id": project_id,
                 "slot_id": slot_id,
+                "spec": spec,
             },
         )
 
