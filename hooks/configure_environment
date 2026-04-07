@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+# load the session start event
+CLAUDE_CODE_SESSION_START_EVENT=$(cat)
+
+# inject it into conversation context so the model can see it
+jq -n --arg ctx "CLAUDE_CODE_SESSION_START_EVENT=$CLAUDE_CODE_SESSION_START_EVENT" \
+  '{ hookSpecificOutput: { hookEventName: "SessionStart", additionalContext: $ctx } }'
+
+# inject into shell environment so Bash tool calls can use it
+if [[ -n "$CLAUDE_ENV_FILE" ]] && ! grep -q "CLAUDE_CODE_SESSION_START_EVENT" "$CLAUDE_ENV_FILE" 2>/dev/null; then
+  printf 'export CLAUDE_CODE_SESSION_START_EVENT=%q\n' "$CLAUDE_CODE_SESSION_START_EVENT" >>"$CLAUDE_ENV_FILE"
+fi
