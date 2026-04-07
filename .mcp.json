@@ -3,6 +3,19 @@
     "softlight": {
       "type": "http",
       "url": "http://localhost:8080/mcp/"
+    },
+    "playwright-parallel": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "playwright-parallel-mcp@latest"
+      ],
+      "env": {
+        "PLAYWRIGHT_MCP_BROWSER": "chromium",
+        "PLAYWRIGHT_MCP_ISOLATED": "true",
+        "MAX_SESSIONS": "100"
+      }
     }
   }
 }

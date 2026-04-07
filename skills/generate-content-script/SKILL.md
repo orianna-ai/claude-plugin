@@ -139,10 +139,9 @@ The response is the public URL of the uploaded file (e.g., `https://drive.oriann
 ## Phase 3: Place the content script on the canvas
 
 Call the `update_iframe_element` MCP tool with `project_id`, `slot_id`, `content_script_url`
-(the URL from Phase 2), and `spec_url` (the `<spec_url>` from your input — pass it through
-unchanged). This replaces the placeholder slot with an iframe that loads the app with your
-content script injected. All other iframe fields (`git_commit`, `tunnel_id`, `git_patch`)
-are inherited from `problem.baseline` automatically so you don't have to fill them in.
+(the URL from Phase 2), `spec_url` (the `<spec_url>` from your input — pass it through
+unchanged), and `tunnel_id` (the `<tunnel_id>` from your input). The `git_commit` and
+`git_patch` fields are inherited from `problem.baseline` automatically.
 
 ## Phase 4: Fill in the caption
 
