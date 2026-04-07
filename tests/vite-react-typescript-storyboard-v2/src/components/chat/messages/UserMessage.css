@@ -1,0 +1,41 @@
+.user-message {
+  display: grid;
+  justify-items: end;
+}
+
+.user-message-bubble {
+  background: #E5E0DB;
+  border-radius: 12px;
+  max-width: 350px;
+  padding: 12px;
+}
+
+.user-message-text {
+  color: #453321;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 22px;
+  white-space: pre-wrap;
+}
+
+.user-message-images {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.user-message-images img {
+  border-radius: 8px;
+  border: 1px solid rgba(26, 26, 26, 0.08);
+  cursor: zoom-in;
+  height: 80px;
+  object-fit: cover;
+  transition: opacity 0.15s ease;
+  width: 80px;
+}
+
+.user-message-images img:hover {
+  opacity: 0.9;
+}

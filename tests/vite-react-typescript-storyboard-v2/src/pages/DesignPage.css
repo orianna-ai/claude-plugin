@@ -1,0 +1,531 @@
+.design-page {
+  align-items: stretch;
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.design-page-chat {
+  background: #F5F1ED;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
+  max-width: 600px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.design-page-resizer {
+  width: 1px;
+  flex: 0 0 auto;
+  cursor: col-resize;
+  background: #E5E2DC;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.design-page-resizer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -8px;
+  right: -8px;
+  cursor: col-resize;
+}
+
+.design-page-canvas {
+  background: #F5F1ED;
+  flex: 1 1 auto;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+.design-page-loading {
+  align-items: center;
+  background: #F5F1ED;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  width: 100%;
+}
+
+.design-page-loading-spinner {
+  animation: design-page-spin 1s linear infinite;
+  color: #201A14;
+  height: 48px;
+  width: 48px;
+}
+
+@keyframes design-page-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.design-page-floating-bar {
+  align-items: flex-start;
+  bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.1));
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  z-index: 100;
+}
+
+.design-page-progress-section {
+  animation: design-page-progress-enter 300ms ease forwards;
+  background: #F9F7F4;
+  border: 1px solid #ADB693;
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  box-sizing: border-box;
+  margin-left: 13px;
+  max-height: 250px;
+  overflow: visible;
+  padding: 8px 12px;
+  transition: background-color 300ms ease, border-color 300ms ease, padding 300ms ease;
+  width: 376px;
+  z-index: 1;
+}
+
+.design-page-progress-content {
+  overflow: visible;
+}
+
+@keyframes design-page-progress-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.design-page-progress-section-exit {
+  animation: design-page-progress-exit 300ms ease forwards;
+}
+
+@keyframes design-page-progress-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+.design-page-progress-section-success {
+  background: #627532;
+  border-color: #627532;
+  max-height: none;
+  overflow: visible;
+  padding: 8px 12px;
+}
+
+.design-page-success-content {
+  align-items: center;
+  animation: design-page-success-fade-in 300ms ease forwards;
+  color: #F9F7F4;
+  display: flex;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 12px;
+  gap: 12px;
+  line-height: 18px;
+  width: 100%;
+}
+
+@keyframes design-page-success-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.design-page-success-text {
+  flex: 1;
+}
+
+.design-page-success-view {
+  color: #F9F7F4;
+  font-weight: 600;
+}
+
+.design-page-success-close {
+  align-items: center;
+  color: #F9F7F4;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  opacity: 0.6;
+  transition: opacity 180ms ease;
+}
+
+.design-page-success-close:hover {
+  opacity: 1;
+}
+
+.design-page-design-button-container {
+  align-items: stretch;
+  background: #F9F7F4;
+  border: 1px solid #DBD5CE;
+  border-radius: 12px;
+  box-sizing: border-box;
+  display: flex;
+  padding: 8px;
+  position: relative;
+  width: auto;
+  z-index: 2;
+}
+
+.design-page-main-button-section {
+  flex: 0 0 auto;
+  margin-right: 8px;
+  width: 380px;
+}
+
+.design-page-mode-separator {
+  background: #DBD5CE;
+  flex: 0 0 1px;
+  margin: -8px 0;
+  width: 1px;
+}
+
+.design-page-mode-selector {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 2px;
+  margin-left: 8px;
+}
+
+.design-page-mode-button {
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: #453321;
+  cursor: pointer;
+  display: flex;
+  height: 48px;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.15s, color 0.15s;
+  width: 48px;
+}
+
+.design-page-mode-button:hover {
+  background: #e5e0db;
+}
+
+.design-page-mode-button-active {
+  background: #DBDDCD;
+  color: #627532;
+}
+
+.design-page-mode-button-active:hover {
+  background: #DBDDCD;
+}
+
+
+.design-page-pending-design {
+  align-items: center;
+  background: #E5E0DB;
+  border-radius: 8px;
+  box-sizing: border-box;
+  display: flex;
+  gap: 8px;
+  height: 48px;
+  justify-content: center;
+  padding: 0 12px;
+  position: relative;
+  width: 100%;
+}
+
+.design-page-pending-icon {
+  animation: design-page-pending-icon-shimmer 2s ease-in-out infinite;
+  color: #8B7F73;
+  flex-shrink: 0;
+  height: 18px;
+  width: 18px;
+}
+
+@keyframes design-page-pending-icon-shimmer {
+  0% {
+    color: #8B7F73;
+  }
+
+  50% {
+    color: #B8AEA4;
+  }
+
+  100% {
+    color: #8B7F73;
+  }
+}
+
+.design-page-pending-title {
+  animation: design-page-pending-shimmer 2s ease-in-out infinite;
+  background: linear-gradient(90deg, #8B7F73 0%, #B8AEA4 50%, #8B7F73 100%);
+  background-clip: text;
+  background-size: 200% 100%;
+  color: transparent;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 22px;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes design-page-pending-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.design-page-stop-text {
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #453321;
+  cursor: pointer;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  padding: 4px 8px;
+  position: absolute;
+  right: 12px;
+  transition: background-color 180ms ease;
+}
+
+.design-page-stop-text:hover {
+  background: rgba(69, 51, 33, 0.1);
+}
+
+.design-page-timeout-section {
+  padding: 2px 0;
+}
+
+.design-page-timeout-text {
+  color: #5C544A;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.design-page-timeout-link {
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.15s ease;
+}
+
+.design-page-timeout-link:hover {
+  color: #3D3630;
+}
+
+.design-page-pending-title-wrapper {
+  position: relative;
+}
+
+.design-page-pending-title-shimmer {
+  animation: design-page-shimmer 2s ease-in-out infinite;
+  background: linear-gradient(90deg,
+      #8B7F73 0%,
+      #B8AEA4 50%,
+      #8B7F73 100%);
+  background-clip: text;
+  background-size: 200% 100%;
+  color: transparent;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.design-page-pending-title-overlay {
+  color: transparent;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  left: 0;
+  line-height: 22px;
+  position: absolute;
+  top: 0;
+}
+
+@keyframes design-page-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+.design-page-design-button {
+  align-items: center;
+  background: #E5E0DB;
+  border-radius: 8px;
+  border: none;
+  color: #8B7F73;
+  cursor: default;
+  display: flex;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  gap: 8px;
+  height: 48px;
+  justify-content: center;
+  line-height: 22px;
+  position: relative;
+  transition: background-color 180ms ease;
+  width: 100%;
+}
+
+.design-page-design-button-active {
+  background: #627532;
+  color: #F9F7F4;
+  cursor: pointer;
+}
+
+.design-page-design-button-active:hover {
+  background: #566b2b;
+}
+
+.design-page-design-button-icon {
+  flex-shrink: 0;
+  height: 18px;
+  width: 18px;
+}
+
+.design-page-design-button-text {
+  white-space: nowrap;
+}
+
+.design-page-design-button-shortcut {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 18px;
+  opacity: 0.7;
+  position: absolute;
+  right: 16px;
+}
+
+
+.design-page-comment-prompt {
+  align-items: center;
+  background: #E5E0DB;
+  border-radius: 8px;
+  color: #8B7F73;
+  display: flex;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  gap: 8px;
+  height: 48px;
+  justify-content: center;
+  line-height: 22px;
+  width: 100%;
+}
+
+.design-page-comment-prompt-icon {
+  flex-shrink: 0;
+}
+
+.design-page-multi-iteration {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.design-page-multi-iteration-icon {
+  align-items: center;
+  color: #627532;
+  display: flex;
+  justify-content: center;
+}
+
+.design-page-multi-iteration-icon svg {
+  animation: design-page-multi-iteration-sweep 2s ease-in-out infinite;
+  transform-origin: top right;
+}
+
+@keyframes design-page-multi-iteration-sweep {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  25% {
+    transform: rotate(25deg);
+  }
+
+  35% {
+    transform: rotate(30deg);
+  }
+
+  50% {
+    transform: rotate(25deg);
+  }
+
+  75% {
+    transform: rotate(-5deg);
+  }
+
+  85% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.design-page-multi-iteration-text {
+  animation: design-page-multi-iteration-shimmer 2s ease-in-out infinite;
+  background: linear-gradient(90deg, #A89F94 0%, #453321 50%, #A89F94 100%);
+  background-clip: text;
+  background-size: 200% 100%;
+  color: transparent;
+  font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 18px;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes design-page-multi-iteration-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+}

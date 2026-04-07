@@ -1,0 +1,192 @@
+.reasoning-summary-block {
+  width: 100%;
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 0 0 auto;
+  background: #F9F7F4;
+  box-sizing: border-box;
+  border: 1px solid #E5E2DC !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  box-shadow: none !important;
+  transition: border-color 0.2s;
+}
+
+.reasoning-summary-block:has(.reasoning-summary-block-header:hover) {
+  border-color: #BDB5AE !important;
+}
+
+.reasoning-summary-block>* {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.reasoning-summary-block-thinking {
+  position: relative;
+  display: inline-block;
+  color: #453321;
+}
+
+.reasoning-summary-block-shimmer {
+  background: linear-gradient(90deg, rgba(111, 94, 79, 0.2), rgba(111, 94, 79, 1), rgba(111, 94, 79, 0.2));
+  background-size: 420px 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: reasoning-summary-block-shimmer 4.8s infinite ease-in-out;
+}
+
+@keyframes reasoning-summary-block-shimmer {
+  0% {
+    background-position: -420px 0;
+  }
+
+  50% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 420px 0;
+  }
+}
+
+.reasoning-summary-block-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100% !important;
+  height: auto !important;
+  border: none;
+  background-color: transparent !important;
+  cursor: pointer;
+  padding: 16px !important;
+  border-radius: 0 !important;
+}
+
+.reasoning-summary-block.done .reasoning-summary-block-header[data-state="closed"] {
+  background-color: #F5F1ED !important;
+}
+
+.reasoning-summary-block-content[data-state="open"]~* {
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.reasoning-summary-block:has(.reasoning-summary-block-content[data-state="open"]) {
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.chat-page-side-panel-visible .reasoning-summary-block.done .reasoning-summary-block-header[data-state="closed"] {
+  background-color: #F9F7F4 !important;
+}
+
+.reasoning-summary-block-caret {
+  display: inline-flex;
+  transform: rotate(-90deg);
+  transition: transform 180ms ease;
+  color: #8B7F73;
+}
+
+.reasoning-summary-block-header[data-state="open"] .reasoning-summary-block-caret {
+  transform: rotate(0deg);
+}
+
+.reasoning-summary-block-title {
+  font-size: 14px;
+  color: #453321;
+  text-align: left;
+  width: 100%;
+}
+
+.reasoning-summary-block.done .reasoning-summary-block-title {
+  color: #8B7F73;
+  font-size: 14px;
+}
+
+.reasoning-summary-block-content {
+  margin-top: 0;
+  padding: 0;
+  border-top: none;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.reasoning-summary-block-content[data-state="open"] {
+  padding: 0;
+  border-top: 1px solid #E5E2DC;
+  max-height: 280px;
+  animation: reasoning-summary-block-slide-down 300ms cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+.reasoning-summary-block-content[data-state="closed"] {
+  animation: reasoning-summary-block-slide-up 300ms cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+@keyframes reasoning-summary-block-slide-down {
+  from {
+    max-height: 0;
+  }
+
+  to {
+    max-height: 280px;
+  }
+}
+
+@keyframes reasoning-summary-block-slide-up {
+  from {
+    max-height: 280px;
+  }
+
+  to {
+    max-height: 0;
+  }
+}
+
+.reasoning-summary-block-reasoning {
+  color: #453321;
+  font-size: 12px;
+  padding: 0 16px;
+}
+
+.reasoning-summary-block-scroll {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.reasoning-summary-block-scroll>* {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.reasoning-summary-block-scroll-view::before,
+.reasoning-summary-block-scroll-view::after {
+  content: "";
+  display: block;
+  height: 16px;
+}
+
+.reasoning-summary-block-scroll-follow {
+  display: none;
+}
+
+.reasoning-summary-block-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: #453321;
+  font-size: 14px;
+}
+
+.reasoning-summary-block-paragraph {
+  font-size: 14px;
+  color: #453321;
+  margin: 0 0 12px 0;
+  white-space: pre-wrap;
+}

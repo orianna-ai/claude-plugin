@@ -1,0 +1,124 @@
+.feedback-message {
+    display: grid;
+    justify-items: end;
+}
+
+.feedback-message-container {
+    background: #E5E0DB;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 100%;
+}
+
+.feedback-message-header {
+    align-items: center;
+    border-bottom: 1px solid rgba(69, 51, 33, 0.1);
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 12px;
+}
+
+.feedback-message-title {
+    color: #8B7F73;
+    font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 18px;
+}
+
+.feedback-message-count {
+    color: #8B7F73;
+    font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 12px;
+    line-height: 18px;
+}
+
+.feedback-message-items {
+    display: flex;
+    flex-direction: column;
+}
+
+.feedback-message-item {
+    align-items: flex-start;
+    background: transparent;
+    border: none;
+    color: #3a3128;
+    cursor: pointer;
+    display: flex;
+    font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 14px;
+    gap: 12px;
+    line-height: 22px;
+    padding: 8px 12px;
+    text-align: left;
+    transition: background-color 180ms ease;
+    width: 100%;
+}
+
+.feedback-message-item:hover {
+    background: rgba(69, 51, 33, 0.05);
+}
+
+.feedback-message-item-icon {
+    color: #8B7F73;
+    flex-shrink: 0;
+    height: 16px;
+    margin-top: 2px;
+    width: 16px;
+}
+
+.feedback-message-item span {
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    display: -webkit-box;
+    line-clamp: 1;
+    overflow: hidden;
+}
+
+.feedback-message-more {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 300ms cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+.feedback-message-more-open {
+    grid-template-rows: 1fr;
+}
+
+.feedback-message-more-inner {
+    overflow: hidden;
+}
+
+.feedback-message-more-toggle {
+    align-items: center;
+    background: transparent;
+    border: none;
+    border-top: 1px solid rgba(69, 51, 33, 0.1);
+    color: #8B7F73;
+    cursor: pointer;
+    display: flex;
+    font-family: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 12px;
+    gap: 4px;
+    justify-content: center;
+    line-height: 18px;
+    padding: 8px 12px;
+    transition: background-color 180ms ease;
+    width: 100%;
+}
+
+.feedback-message-more-toggle:hover {
+    background: rgba(69, 51, 33, 0.05);
+}
+
+.feedback-message-more-toggle svg {
+    flex-shrink: 0;
+    transform: rotate(0deg);
+    transition: transform 180ms ease;
+}
+
+.feedback-message-more-toggle-open svg {
+    transform: rotate(180deg);
+}
