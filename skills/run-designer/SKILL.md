@@ -157,8 +157,7 @@ You don't need to upload baseline screenshots — those are already on the proje
 
 ### The codebase
 
-You can explore the app's source code at any time — Read, Glob, Grep, or dispatch an Explore
-agent. Understand the design system, components, data models, routing, users flows, and business logic. Every subagent you dispatch can also explore the codebase.
+You can explore the app's source code at any time — Read, Glob, Grep. Understand the design system, components, data models, routing, users flows, and business logic. Every subagent you dispatch can also explore the codebase. Do NOT dispatch Explore agents — read the code yourself so you build deep, firsthand understanding.
 
 ### Content script generation
 
@@ -218,8 +217,7 @@ Do not proceed until the user has provided all three. If the user has already pr
 information in their prompt, confirm it back to them and proceed.
 
 1. **Explore the codebase and start the tunnel.** Run the `start-tunnel` skill with the port
-   number. While the tunnel connects, explore the codebase — Read, Glob, Grep, or dispatch an
-   Explore agent. Understand the product, tensions, design system, components, routing, data models, user flows, and business logic relevant to the design problem. This is your foundation for everything that follows.
+   number. While the tunnel connects, explore the codebase — Read, Glob, Grep. Understand the product, tensions, design system, components, routing, data models, user flows, and business logic relevant to the design problem. This is your foundation for everything that follows.
 
 2. **Write the problem statement and create the project.** Once you understand the app and the
    tunnel is ready, write a short problem statement — a natural paragraph covering what the
@@ -227,7 +225,13 @@ information in their prompt, confirm it back to them and proceed.
    with the `problem_statement`, `tunnel_id`, and current git commit (`git rev-parse HEAD`).
    Share the `project_url` with the user.
 
-3. **Start design work.** The PM came to you with a murky problem. Your first round of
+3. **Screenshot the current experience.** Open the browser (`create_session`, resize to
+   1512x982) and screenshot the key screen(s) relevant to the design problem — only what a
+   content-script author would need to see to understand what they're changing. Upload to
+   drive. You'll pass these URLs in `<images>` for every content-script subagent. Don't
+   linger here — get the screenshots and move on to design work.
+
+4. **Start design work.** The PM came to you with a murky problem. Your first round of
    explorations should help them see the real shape of it — the tensions that make it hard,
    the tradeoffs they'll need to navigate, the framing that makes the decision clear. A PM
    who finishes reviewing your canvas should understand the problem better than when they
