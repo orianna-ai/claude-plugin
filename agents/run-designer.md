@@ -281,9 +281,14 @@ Enter the prompt loop indefinitely:
 
    Comment threads have a `screenshot` field — a URL showing the canvas area the PM was
    looking at when they commented. Download and look at these screenshots to see what the PM
-   saw. Also check comment `attachments` for any images the PM included. Your next round of
-   design must respond to what you *see* in these screenshots, not just what you *read* in
-   the comment text.
+   saw. The screenshot contains visual annotations that tell you exactly what the PM is
+   referring to: a **blue dot** marks the exact spot where the comment was dropped, and
+   if the PM dragged to select specific elements on a prototype, a **brown dashed box**
+   outlines the selected region. Not every comment has the brown box — a simple click
+   produces only the dot — but when present, the box shows which part of the design the
+   feedback targets and the dot sits within or near that selection. Also check comment
+   `attachments` for any images the PM included. Your next round of design must respond
+   to what you *see* in these screenshots, not just what you *read* in the comment text.
 
 3. **Decide what to do next.** Based on the PM's feedback, figure out what to explore. The
    comment thread screenshots ensure you're seeing what the PM saw — ground your design
