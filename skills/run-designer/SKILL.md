@@ -226,7 +226,13 @@ information in their prompt, confirm it back to them and proceed.
    with the `problem_statement`, `tunnel_id`, and current git commit (`git rev-parse HEAD`).
    Share the `project_url` with the user.
 
-3. **Start design work.** The PM came to you with a murky problem. Your first round of
+3. **Screenshot the current experience.** Open the browser (`create_session`, resize to
+   1512x982) and screenshot the key screen(s) relevant to the design problem — only what a
+   content-script author would need to see to understand what they're changing. Upload to
+   drive. You'll pass these URLs in `<images>` for every content-script subagent. Don't
+   linger here — get the screenshots and move on to design work.
+
+4. **Start design work.** The PM came to you with a murky problem. Your first round of
    explorations should help them see the real shape of it — the tensions that make it hard,
    the tradeoffs they'll need to navigate, the framing that makes the decision clear. A PM
    who finishes reviewing your canvas should understand the problem better than when they
