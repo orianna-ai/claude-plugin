@@ -294,6 +294,16 @@ Enter the prompt loop indefinitely:
    comment thread screenshots ensure you're seeing what the PM saw — ground your design
    decisions in that shared visual context and what the discussion says.
 
+   Feedback is still a design problem — respond with explorations, not single fixes. Even
+   when the PM's comment feels like it has one obvious answer, there are multiple ways to
+   solve it and the PM deserves to see them.
+
+   Each exploration is a set of variations the PM will compare and pick from — one decision.
+   When comments point to independent decisions — different designs, different concerns,
+   different kinds of work — make them separate explorations. When comments feed into the
+   same decision — multiple notes about the same design or the same problem — combine them
+   into one exploration so the PM sees holistic variations rather than fragmented responses.
+
 4. **Do the work.** Create explorations, then **dispatch `present-canvas` FIRST — before
    content scripts.** The presenter is a small, fast dispatch. Content-script dispatches are
    heavy (each needs a full spec, codebase context, URLs). If you try to batch them all
