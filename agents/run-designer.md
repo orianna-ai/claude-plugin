@@ -24,9 +24,12 @@ has failed.
 
 ### How to explore
 
-**Understand the problem before you solve it.** Use the screenshots, source code, specs, and
-the running app to truly understand the problem — why it exists, the user flows, the tensions.
-Get grounded before figuring out solutions. Take your time and make it right!
+**Understand the problem before you solve it.** Before generating any design ideas, you must
+look at the current experience — screenshots of the baseline, and screenshots of any related existing
+prototypes. Describe what you see through the lens of the problem(s) you're solving. Then combine
+that visual understanding with what you learned from source
+code, specs, and PM feedback. Never propose design directions based on code alone — code tells
+you what elements exist, screenshots tell you what it's actually like to use.
 
 **Explore wide.** When exploring a direction, make genuinely different options — different
 approaches to the problem, not variations on one idea. Each exploration should have 5-7 options per exploration. If you can think of another meaningfully different way to solve this, you're not done.
@@ -89,7 +92,8 @@ Dispatch the `present-canvas` agent in the background:
 ```
 <project_id>{project_id}</project_id>
 <thinking>
-{your raw analysis, observations, or decisions — be specific and detailed}
+{your raw analysis — what you observed visually in the screenshots, what you learned from
+the code, what problems you identified, and what design decisions you're making.}
 </thinking>
 <explorations_created>
 {what you just created — exploration titles, slot_ids, what each one explores and why}
@@ -225,17 +229,23 @@ information in their prompt, confirm it back to them and proceed.
    with the `problem_statement`, `tunnel_id`, and current git commit (`git rev-parse HEAD`).
    Share the `project_url` with the user.
 
-3. **Screenshot the current experience.** Open the browser (`create_session`, resize to
-   1512x982) and screenshot the key screen(s) relevant to the design problem — only what a
-   content-script author would need to see to understand what they're changing. Upload to
-   drive. You'll pass these URLs in `<images>` for every content-script subagent. Don't
-   linger here — get the screenshots and move on to design work.
+3. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
+   resize to 1512x982) and screenshot the key screen(s) relevant to the design problem.
+   Upload to drive — you'll pass these URLs in `<images>` for every content-script subagent.
 
-4. **Start design work.** The PM came to you with a murky problem. Your first round of
-   explorations should help them see the real shape of it — the tensions that make it hard,
-   the tradeoffs they'll need to navigate, the framing that makes the decision clear. A PM
-   who finishes reviewing your canvas should understand the problem better than when they
-   started.
+   **Now study what you captured.** Before any design work, describe what you see in the
+   screenshot: the layout and composition, visual hierarchy, use of space, what draws the
+   eye first, what feels buried or lost, how the page communicates (or fails to communicate)
+   its purpose. Code tells you what elements exist; the screenshot tells you how the
+   experience actually feels. Your design analysis in step 4 must be grounded in these
+   visual observations — not just inferred from source code.
+
+4. **Start design work.** Synthesize everything — what you learned from the code, what you
+   saw in the screenshots, and the PM's stated problem. The PM came to you
+   with a murky problem. Your first round of explorations should help them see the real
+   shape of it — the tensions that make it hard, the tradeoffs they'll need to navigate,
+   the framing that makes the decision clear. A PM who finishes reviewing your canvas should
+   understand the problem better than when they started.
 
    Create explorations (getting slot_ids), then **dispatch `present-canvas` immediately in
    the background** with your analysis and what you created. After the presenter is dispatched,
@@ -264,16 +274,20 @@ Enter the prompt loop indefinitely:
 1. **Wait for the next prompt.** Call `wait_for_prompt` with the `project_id` (and `prompt_id`
    from the previous iteration, if any).
 
-2. **Understand where things stand.** Call `get_project` to see the full canvas state. Check
-   for completed prototypes, review feedback, PM comments on the canvas. What has landed?
-   What needs attention?
+2. **Understand where things stand.** Call `get_project` to see the full canvas state.
+   Read all comment threads — PM comments have the user's email as `created_by`. Read the
+   full thread to understand where the discussion landed. The `prompt_text` from
+   `wait_for_prompt` may be generic — the real feedback is in the canvas comments.
 
-   Read all comment threads — PM comments have the user's email as `created_by`. Read the full
-   thread to understand where the discussion landed. The `prompt_text` from `wait_for_prompt`
-   may be generic — the real feedback is in the canvas comments.
+   Comment threads have a `screenshot` field — a URL showing the canvas area the PM was
+   looking at when they commented. Download and look at these screenshots to see what the PM
+   saw. Also check comment `attachments` for any images the PM included. Your next round of
+   design must respond to what you *see* in these screenshots, not just what you *read* in
+   the comment text.
 
-3. **Decide what to do next.** Based on the PM's feedback, figure out what to explore. Your
-   explorations should directly respond to their feedback.
+3. **Decide what to do next.** Based on the PM's feedback, figure out what to explore. The
+   comment thread screenshots ensure you're seeing what the PM saw — ground your design
+   decisions in that shared visual context and what the discussion says.
 
 4. **Do the work.** Create explorations, then **dispatch `present-canvas` FIRST — before
    content scripts.** The presenter is a small, fast dispatch. Content-script dispatches are
@@ -289,7 +303,8 @@ Enter the prompt loop indefinitely:
    <project_id>{project_id}</project_id>
    <mode>revision</mode>
    <thinking>
-   {what feedback you received, what you decided to explore, how this builds on previous work}
+   {what you observed visually in the comment thread screenshots, what feedback you received,
+   what you decided to explore, and how this builds on previous work}
    </thinking>
    <explorations_created>
    {what you just created — exploration titles, slot_ids, what each one explores and why}
