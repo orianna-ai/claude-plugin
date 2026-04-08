@@ -15,8 +15,8 @@ Port where their application is running locally (e.g., `3000`).
    understand the business context, user journey, and product domain and use this information to
    write a short `<problem_statement>` that you will subsequently use as the basis of your design
    work. Only explore the parts of the codebase that are relevant to the running application. Feel
-   free to ask questions if you are not sure what application is running or where its source code is
-   located in the codebase.
+   free to use the AskUserQuestion tool if you are not sure what application is running or where its
+   source code is located in the codebase.
 
 2. Run the following from the directory containing this skill.
 
@@ -26,7 +26,12 @@ python3 -m workflows.setup_project \
   --problem-statement '<problem_statement>'
 ```
 
-3. Run the following from the directory containing this skill. It will run forever.
+3. Share the `tunnel_url` with the user as a clickable link and then use the AskUserQuestion tool to
+   ask the user to log in. Wait for the user to indicate that they have before proceeding.
+
+4. Share the `project_url` with the user as a clickable link.
+
+5. Run the following from the directory containing this skill. It will run forever.
 
 ```bash
 python3 -m workflows.dispatch_workflows

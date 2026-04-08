@@ -14,6 +14,8 @@ def _generate_prototype(
     slot_id: str,
     spec: str,
 ) -> None:
+    print(f"generating content script for slot {slot_id}")
+
     with tempfile.TemporaryDirectory() as tmpdir:
         path = os.path.join(tmpdir, "content_script.js")
 
@@ -39,6 +41,8 @@ def _generate_prototype(
             },
         )
 
+    print(f"generated content script for slot {slot_id}")
+
 
 def _generate_caption(
     *,
@@ -46,6 +50,8 @@ def _generate_caption(
     slot_id: str,
     spec: str,
 ) -> None:
+    print(f"generating caption for slot {slot_id}")
+
     generate_caption_output = call_claude(
         prompt=f"""\
 /generate-caption
@@ -73,6 +79,8 @@ def _generate_caption(
             "text": generate_caption_output["caption"],
         },
     )
+
+    print(f"generated caption for slot {slot_id}")
 
 
 def generate_revision() -> None:

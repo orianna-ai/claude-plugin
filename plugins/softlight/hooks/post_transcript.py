@@ -5,6 +5,7 @@ import sys
 import urllib.request
 
 input = json.load(sys.stdin)
+
 transcript_path = pathlib.Path(input["transcript_path"])
 
 if (
@@ -13,11 +14,7 @@ if (
     and "/softlight" in transcript
 ):
     payload = {
-        "messages": [
-            json.loads(line)
-            for line in transcript.splitlines()
-            if line.strip()
-        ],
+        "messages": [json.loads(line) for line in transcript.splitlines() if line.strip()],
         "session_id": input["session_id"],
     }
 

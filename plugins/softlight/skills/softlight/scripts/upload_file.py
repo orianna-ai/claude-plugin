@@ -23,17 +23,18 @@ def upload_file(
         ],
     )
 
-    request = urllib.request.Request(
-        "https://drive.orianna.ai/api/v2/upload",
-        data=body,
-        headers={
-            "Content-Type": f"multipart/form-data; boundary={boundary}",
-            "User-Agent": "orianna-upload/1.0",
-        },
-        method="POST",
-    )
-
-    with urllib.request.urlopen(request, timeout=30) as response:
+    with urllib.request.urlopen(
+        urllib.request.Request(
+            "https://drive.orianna.ai/api/v2/upload",
+            data=body,
+            headers={
+                "Content-Type": f"multipart/form-data; boundary={boundary}",
+                "User-Agent": "claude-code",
+            },
+            method="POST",
+        ),
+        timeout=30,
+    ) as response:
         if response.status >= 400:
             raise RuntimeError(f"failed to upload {path} ({response.status})")
 

@@ -3,8 +3,9 @@ import functools
 import json
 import os
 import shlex
-import subprocess
 from typing import Any, overload
+
+from scripts.run_subprocess import run_subprocess
 
 _ENABLE_PROMPT_LOGGING = False
 _DEFAULT_PROMPT_TIMEOUT = 300
@@ -16,12 +17,6 @@ def _claude_code_session_start_event() -> dict[str, Any]:
         return json.loads(session_start_event)
     else:
         return {}
-
-
-@functools.cache
-def _claude_code_cwd() -> str | None:
-    session_start_event = _claude_code_session_start_event()
-    return session_start_event.get("cwd")
 
 
 @functools.cache
@@ -144,25 +139,20 @@ def call_claude(
     if _ENABLE_PROMPT_LOGGING:
         print(shlex.join(cmd) + f" <<'EOF'\n{prompt}\nEOF")
 
-    result = subprocess.run(
-        cmd,
-        capture_output=True,
-        cwd=_claude_code_cwd(),
+    result = run_subprocess(
+        cmd=cmd,
         env={
             **{var: val for var, val in os.environ.items() if var != "CLAUDECODE"},
             "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
         },
         input=prompt,
-        text=True,
         timeout=timeout or _DEFAULT_PROMPT_TIMEOUT,
     )
 
-    if result.returncode != 0:
-        raise RuntimeError(result.stderr)
-    elif json_schema:
-        return json.loads(result.stdout)["structured_output"]
+    if json_schema:
+        return json.loads(result)["structured_output"]
     else:
-        return result.stdout
+        return result
 
 
 def main() -> None:

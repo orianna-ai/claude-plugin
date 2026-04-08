@@ -28,6 +28,7 @@ class Config:
     project_id: str | None = None
     project_url: str | None = None
     tunnel_id: str | None = None
+    tunnel_url: str | None = None
 
     def __enter__(self) -> "Config":
         return self

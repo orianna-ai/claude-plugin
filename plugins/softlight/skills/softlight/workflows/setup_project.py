@@ -1,9 +1,9 @@
 import argparse
-import subprocess
 import urllib.parse
 
 from scripts.call_mcp import call_mcp
 from scripts.load_config import load_config
+from scripts.run_subprocess import run_subprocess
 from scripts.start_tunnel import start_tunnel
 
 
@@ -23,10 +23,9 @@ def setup_project(
         port=port,
     )
 
-    git_commit = subprocess.check_output(
+    git_commit = run_subprocess(
         ["git", "rev-parse", "HEAD"],
-        text=True,
-    ).strip()
+    )
 
     create_project_output = call_mcp(
         tool="create_project",
@@ -52,12 +51,16 @@ def setup_project(
         },
     )
 
+    base_url = _base_url(create_project_output["project_url"])
+
     with load_config() as config:
-        config.base_url = _base_url(create_project_output["project_url"])
+        config.base_url = base_url
         config.port = port
         config.problem_statement = problem_statement
         config.project_id = create_project_output["project_id"]
         config.project_url = create_project_output["project_url"]
+        config.tunnel_id = tunnel_id
+        config.tunnel_url = f"{base_url}/api/tunnel/{tunnel_id}/"
         config.display()
 
 

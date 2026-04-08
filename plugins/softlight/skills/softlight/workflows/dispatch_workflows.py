@@ -28,6 +28,10 @@ def dispatch_workflows() -> None:
         with urllib.request.urlopen(
             urllib.request.Request(
                 f"{config.base_url}/api/projects/{config.project_id}/events",
+                headers={
+                    "Content-Type": "application/json",
+                    "User-Agent": "claude-code",
+                },
             ),
         ) as response:
             events = json.loads(response.read())
