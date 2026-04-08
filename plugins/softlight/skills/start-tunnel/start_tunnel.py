@@ -13,20 +13,14 @@ import urllib.error
 import urllib.request
 import uuid
 
-from scripts.load_config import load_config
-
 _FRPC_VERSION = "0.67.0"
 
 
 _FRPC_BINARY_NAME = {
-    ("Linux", "x86_64"):
-        f"frp_{_FRPC_VERSION}_linux_amd64",
-    ("Linux", "aarch64"):
-        f"frp_{_FRPC_VERSION}_linux_arm64",
-    ("Darwin", "x86_64"):
-        f"frp_{_FRPC_VERSION}_darwin_amd64",
-    ("Darwin", "arm64"):
-        f"frp_{_FRPC_VERSION}_darwin_arm64",
+    ("Linux", "x86_64"): f"frp_{_FRPC_VERSION}_linux_amd64",
+    ("Linux", "aarch64"): f"frp_{_FRPC_VERSION}_linux_arm64",
+    ("Darwin", "x86_64"): f"frp_{_FRPC_VERSION}_darwin_amd64",
+    ("Darwin", "arm64"): f"frp_{_FRPC_VERSION}_darwin_arm64",
 }
 
 
@@ -154,14 +148,12 @@ def start_tunnel(
     if not _is_accessible(port):
         raise ValueError(f"application running on port {port} is not accessible")
 
-    with load_config() as config:
-        tunnel_id = str(uuid.uuid4())
-        config.tunnel_id = tunnel_id
+    tunnel_id = str(uuid.uuid4())
+    print(tunnel_id)
+    
+    _frpc_process(tunnel_id, port)
 
-        frpc = _frpc_process(tunnel_id, port)
-        config.frpc_pid = frpc.pid
-
-        return tunnel_id
+    return tunnel_id
 
 
 def main() -> None:
