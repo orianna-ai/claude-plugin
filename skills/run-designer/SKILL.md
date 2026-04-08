@@ -220,16 +220,33 @@ Before doing anything, confirm with the user:
 Do not proceed until the user has provided all three. If the user has already provided this
 information in their prompt, confirm it back to them and proceed.
 
-1. **Explore the codebase and start the tunnel.** Run the `start-tunnel` skill with the port
-   number. While the tunnel connects, explore the codebase — Read, Glob, Grep. Understand the product, tensions, design system, components, routing, data models, user flows, and business logic relevant to the design problem. This is your foundation for everything that follows.
+1. **Start the tunnel and ask the user to log in.** Run the `start-tunnel` skill with the port
+   number. The moment the tunnel is up, print the tunnel URL as a clickable link in a regular
+   message first, then immediately follow up with AskUserQuestion asking the user to open it
+   and log in. Include the URL as text in the question too — some interfaces don't allow
+   highlighting links inside questions.
 
-2. **Write the problem statement and create the project.** Once you understand the app and the
-   tunnel is ready, write a short problem statement — a natural paragraph covering what the
+   ```
+   https://softlight.orianna.ai/api/tunnel/{tunnel_id}/
+   ```
+
+   Do not proceed until the user confirms they have logged in — the agent's browser runs
+   server-side and relies on the user's session cookies to access authenticated pages.
+
+   **This must be the very first thing you do after the tunnel is up** — before exploring the
+   codebase, writing the problem statement, or any other work.
+
+2. **Explore the codebase.** Read, Glob, Grep. Understand the product, tensions, design
+   system, components, routing, data models, user flows, and business logic relevant to the
+   design problem. This is your foundation for everything that follows.
+
+3. **Write the problem statement and create the project.** Once you understand the app and the
+   user has logged in, write a short problem statement — a natural paragraph covering what the
    product is, who uses it, and the people problem that needs solving. Then call `create_project`
    with the `problem_statement`, `tunnel_id`, and current git commit (`git rev-parse HEAD`).
    Share the `project_url` with the user.
 
-3. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
+4. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
    resize to 1512x982) and screenshot the key screen(s) relevant to the design problem.
    Upload to drive — you'll pass these URLs in `<images>` for every content-script subagent.
 
@@ -237,10 +254,10 @@ information in their prompt, confirm it back to them and proceed.
    screenshot: the layout and composition, visual hierarchy, use of space, what draws the
    eye first, what feels buried or lost, how the page communicates (or fails to communicate)
    its purpose. Code tells you what elements exist; the screenshot tells you how the
-   experience actually feels. Your design analysis in step 4 must be grounded in these
+   experience actually feels. Your design analysis in step 5 must be grounded in these
    visual observations — not just inferred from source code.
 
-4. **Start design work.** Synthesize everything — what you learned from the code, what you
+5. **Start design work.** Synthesize everything — what you learned from the code, what you
    saw in the screenshots, and the PM's stated problem. The PM came to you
    with a murky problem. Your first round of explorations should help them see the real
    shape of it — the tensions that make it hard, the tradeoffs they'll need to navigate,
