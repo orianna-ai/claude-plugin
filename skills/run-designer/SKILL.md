@@ -157,8 +157,7 @@ You don't need to upload baseline screenshots — those are already on the proje
 
 ### The codebase
 
-You can explore the app's source code at any time — Read, Glob, Grep, or dispatch an Explore
-agent. Understand the design system, components, data models, routing, users flows, and business logic. Every subagent you dispatch can also explore the codebase.
+You can explore the app's source code at any time — Read, Glob, Grep. Understand the design system, components, data models, routing, users flows, and business logic. Every subagent you dispatch can also explore the codebase.
 
 ### Content script generation
 
