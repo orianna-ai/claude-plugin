@@ -1,10 +1,7 @@
-import argparse
 import io
-import multiprocessing
 import os
 import pathlib
 import platform
-import signal
 import subprocess
 import tarfile
 import tempfile
@@ -12,6 +9,8 @@ import time
 import urllib.error
 import urllib.request
 import uuid
+
+from scripts.load_config import load_config
 
 _FRPC_VERSION = "0.67.0"
 
@@ -90,36 +89,7 @@ def _frpc_process(
         stderr=subprocess.PIPE,
     )
 
-    frpc_reaper = multiprocessing.Process(
-        target=_frpc_reaper,
-        args=(frpc.pid, port),
-        daemon=True,
-    )
-
-    frpc_reaper.start()
-
     return frpc
-
-
-def _frpc_reaper(
-    pid: int,
-    port: int,
-) -> None:
-    while True:
-        try:
-            os.kill(pid, 0)
-        except ProcessLookupError:
-            return
-
-        time.sleep(10)
-
-        if not _is_accessible(port):
-            try:
-                os.kill(pid, signal.SIGTERM)
-            except ProcessLookupError:
-                pass
-
-            return
 
 
 def _is_accessible(
@@ -141,33 +111,26 @@ def _is_accessible(
     return False
 
 
-def start_tunnel(
-    *,
-    port: int,
-) -> str:
-    if not _is_accessible(port):
-        raise ValueError(f"application running on port {port} is not accessible")
+def setup_tunnel() -> None:
+    with load_config() as config:
+        assert config.app_url is not None
+        assert config.app_port is not None
 
-    tunnel_id = str(uuid.uuid4())
+        if not _is_accessible(config.app_port):
+            raise ValueError(f"application running on port {config.app_port} is not accessible")
 
-    _frpc_process(tunnel_id, port)
+        print(f"creating tunnel to {config.app_url}")
 
-    return tunnel_id
+        tunnel_id = str(uuid.uuid4())
+        config.tunnel_id = tunnel_id
+        config.tunnel_url = f"{config.base_url}/api/tunnel/{tunnel_id}/"
+
+        frpc = _frpc_process(tunnel_id, config.app_port)
+        config.pids.append(frpc.pid)
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--port",
-        required=True,
-        type=int,
-        help="The port on which the application is running",
-    )
-    args = parser.parse_args()
-
-    start_tunnel(
-        port=args.port,
-    )
+    setup_tunnel()
 
 
 if __name__ == "__main__":

@@ -8,6 +8,13 @@ description: >
 
 # Input
 
+## `<workspace>`
+
+Absolute path to the application source tree. All references to "the application" in this skill
+mean the code rooted at `<workspace>` — use it to inspect the existing design system, component
+library, CSS classes, and DOM output you need to match or interact with. Scope all file exploration
+and reads to files under this directory; do not read files outside it.
+
 ## `<path>`
 
 Path at which to write the generated content script.

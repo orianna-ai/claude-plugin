@@ -16,7 +16,6 @@ Generate a caption for the `<spec>` that summarizes the change to the applicatio
 ## Guidelines
 
 - The caption will be shown to the user so it should be written in language that is comprehensible
-  to someone that has context about the design problem but does not know and does not need to know
-  how it is written.
+  to someone that has context about the design problem but does not have a technical background.
 
 - Your output should not be longer than 3 sentences. Keep it descriptive but concise.

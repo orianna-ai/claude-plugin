@@ -1,4 +1,3 @@
-import argparse
 import pathlib
 import urllib.request
 import uuid
@@ -39,21 +38,3 @@ def upload_file(
             raise RuntimeError(f"failed to upload {path} ({response.status})")
 
         return response.read().decode().strip()
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "path",
-        type=pathlib.Path,
-        help="The path to the file to upload",
-    )
-    args = parser.parse_args()
-
-    upload_file(
-        path=args.path,
-    )
-
-
-if __name__ == "__main__":
-    main()

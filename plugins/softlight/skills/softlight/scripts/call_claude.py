@@ -1,9 +1,8 @@
-import argparse
 import functools
 import json
 import os
 import shlex
-from typing import Any, overload
+from typing import Any, Literal, overload
 
 from scripts.run_subprocess import run_subprocess
 
@@ -29,9 +28,10 @@ def _claude_code_session_id() -> str | None:
 def call_claude(
     prompt: str,
     *,
-    allowed_tools: list[str] | None = None,
-    effort: str | None = ...,
-    fork: bool = ...,
+    add_dirs: list[str] | None = ...,
+    allowed_tools: list[str] | None = ...,
+    effort: Literal["low", "medium", "high", "max"] | None = ...,
+    fork_session: bool = ...,
     json_schema: dict[str, Any],
     model: str | None = ...,
     system_prompt: str | None = ...,
@@ -44,9 +44,10 @@ def call_claude(
 def call_claude(
     prompt: str,
     *,
-    allowed_tools: list[str] | None = None,
-    effort: str | None = ...,
-    fork: bool = ...,
+    add_dirs: list[str] | None = ...,
+    allowed_tools: list[str] | None = ...,
+    effort: Literal["low", "medium", "high", "max"] | None = ...,
+    fork_session: bool = ...,
     json_schema: None = ...,
     model: str | None = ...,
     system_prompt: str | None = ...,
@@ -58,9 +59,10 @@ def call_claude(
 def call_claude(
     prompt: str,
     *,
+    add_dirs: list[str] | None = None,
     allowed_tools: list[str] | None = None,
-    effort: str | None = None,
-    fork: bool = True,
+    effort: Literal["low", "medium", "high", "max"] | None = None,
+    fork_session: bool = True,
     json_schema: dict[str, Any] | None = None,
     model: str | None = None,
     system_prompt: str | None = None,
@@ -73,7 +75,7 @@ def call_claude(
         "--no-session-persistence",
     ]
 
-    if fork:
+    if fork_session:
         if session_id := _claude_code_session_id():
             cmd.extend(
                 [
@@ -124,6 +126,14 @@ def call_claude(
             ],
         )
 
+    if add_dirs:
+        cmd.extend(
+            [
+                "--add-dir",
+                *add_dirs,
+            ],
+        )
+
     if json_schema:
         cmd.extend(
             [
@@ -153,66 +163,3 @@ def call_claude(
         return json.loads(result)["structured_output"]
     else:
         return result
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--prompt",
-        required=True,
-        help="The prompt to send to Claude",
-    )
-    parser.add_argument(
-        "--allowed-tools",
-        nargs="*",
-        default=None,
-        help="Tools to allow without requiring user approval",
-    )
-    parser.add_argument(
-        "--effort",
-        default=None,
-        help="Thinking effort level (e.g. 'low', 'medium', 'high')",
-    )
-    parser.add_argument(
-        "--json-schema",
-        default=None,
-        help="JSON schema string to enforce structured output",
-    )
-    parser.add_argument(
-        "--model",
-        default=None,
-        help="Model to use (e.g. 'haiku', 'sonnet', 'opus')",
-    )
-    parser.add_argument(
-        "--system-prompt",
-        default=None,
-        help="System prompt to set context for Claude",
-    )
-    parser.add_argument(
-        "--timeout",
-        type=int,
-        default=None,
-        help="Timeout in seconds (default: 300)",
-    )
-    parser.add_argument(
-        "--tools",
-        nargs="*",
-        default=None,
-        help="Tools to make available to Claude",
-    )
-    args = parser.parse_args()
-
-    call_claude(
-        prompt=args.prompt,
-        allowed_tools=args.allowed_tools,
-        effort=args.effort,
-        json_schema=json.loads(args.json_schema) if args.json_schema else None,
-        model=args.model,
-        system_prompt=args.system_prompt,
-        timeout=args.timeout,
-        tools=args.tools,
-    )
-
-
-if __name__ == "__main__":
-    main()

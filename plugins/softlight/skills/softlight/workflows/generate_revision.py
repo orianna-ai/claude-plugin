@@ -10,89 +10,93 @@ from scripts.upload_file import upload_file
 
 def _generate_prototype(
     *,
-    project_id: str,
     slot_id: str,
     spec: str,
 ) -> None:
-    print(f"generating content script for slot {slot_id}")
+    with load_config() as config:
+        assert config.project_id is not None
+        assert config.app_workspace is not None
 
-    with tempfile.TemporaryDirectory() as tmpdir:
-        path = os.path.join(tmpdir, "content_script.js")
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = os.path.join(tmpdir, "content_script.js")
 
-        call_claude(
-            prompt=f"""\
+            call_claude(
+                prompt=f"""\
 /generate-content-script
+<workspace>{config.app_workspace}</workspace>
 <path>{path}</path>
 <spec>{spec}</spec>
 """,
-            model="opus",
-            timeout=1800,
-        )
+                add_dirs=[config.app_workspace, tmpdir],
+                effort="max",
+                model="opus",
+                timeout=600,
+            )
 
-        content_script_url = upload_file(path)
+            content_script_url = upload_file(path)
 
-        call_mcp(
-            tool="update_iframe_element",
-            input={
-                "content_script_url": content_script_url,
-                "project_id": project_id,
-                "slot_id": slot_id,
-                "spec": spec,
-            },
-        )
-
-    print(f"generated content script for slot {slot_id}")
+            call_mcp(
+                tool="update_iframe_element",
+                input={
+                    "content_script_url": content_script_url,
+                    "project_id": config.project_id,
+                    "slot_id": slot_id,
+                    "spec": spec,
+                },
+            )
 
 
 def _generate_caption(
     *,
-    project_id: str,
     slot_id: str,
     spec: str,
 ) -> None:
-    print(f"generating caption for slot {slot_id}")
+    with load_config() as config:
+        assert config.project_id is not None
 
-    generate_caption_output = call_claude(
-        prompt=f"""\
+        generate_caption_output = call_claude(
+            prompt=f"""\
 /generate-caption
 <spec>{spec}</spec>
 """,
-        allowed_tools=[],
-        json_schema={
-            "type": "object",
-            "properties": {
-                "caption": {
-                    "type": "string",
+            allowed_tools=[],
+            json_schema={
+                "type": "object",
+                "properties": {
+                    "caption": {
+                        "type": "string",
+                    },
                 },
+                "required": ["caption"],
             },
-            "required": ["caption"],
-        },
-        model="sonnet",
-        tools=[],
-    )
+            effort="low",
+            model="sonnet",
+            tools=[],
+        )
 
-    call_mcp(
-        tool="update_text_element",
-        input={
-            "project_id": project_id,
-            "slot_id": slot_id,
-            "text": generate_caption_output["caption"],
-        },
-    )
-
-    print(f"generated caption for slot {slot_id}")
+        call_mcp(
+            tool="update_text_element",
+            input={
+                "project_id": config.project_id,
+                "slot_id": slot_id,
+                "text": generate_caption_output["caption"],
+            },
+        )
 
 
 def generate_revision() -> None:
     with load_config() as config:
         assert config.project_id is not None
+        assert config.app_workspace is not None
+        assert config.problem is not None
 
         generate_specs_output = call_claude(
             prompt=f"""\
 /generate-specs
-<project_id>{config.project_id}</project_id>
-<problem_statement>{config.problem_statement}</problem_statement>
+<workspace>{config.app_workspace}</workspace>
+<problem>{config.problem}</problem>
 """,
+            add_dirs=[config.app_workspace],
             json_schema={
                 "type": "object",
                 "properties": {
@@ -105,6 +109,7 @@ def generate_revision() -> None:
                 },
                 "required": ["specs"],
             },
+            effort="max",
             model="opus",
             timeout=600,
         )
@@ -139,7 +144,7 @@ def generate_revision() -> None:
             },
         )
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=12) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=32) as executor:
             futures = []
 
             for spec, placeholder in zip(
@@ -149,7 +154,6 @@ def generate_revision() -> None:
                 futures.append(
                     executor.submit(
                         _generate_prototype,
-                        project_id=config.project_id,
                         slot_id=placeholder["prototype_slot_id"],
                         spec=spec,
                     ),
@@ -158,7 +162,6 @@ def generate_revision() -> None:
                 futures.append(
                     executor.submit(
                         _generate_caption,
-                        project_id=config.project_id,
                         slot_id=placeholder["caption_slot_id"],
                         spec=spec,
                     ),

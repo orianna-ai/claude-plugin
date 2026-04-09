@@ -1,4 +1,3 @@
-import argparse
 from typing import Any, overload
 
 from scripts.call_claude import call_claude
@@ -47,43 +46,9 @@ Call the `mcp__plugin_softlight_softlight__{tool}` MCP tool with these exact arg
 """,
         allowed_tools=[f"mcp__plugin_softlight_softlight__{tool}"],
         effort="low",
-        fork=False,
+        fork_session=False,
         json_schema=json_schema,
         model="haiku",
         timeout=timeout or _DEFAULT_MCP_TIMEOUT,
         tools=[],
     )
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--tool",
-        required=True,
-        help="The MCP tool to call (e.g. 'create_project')",
-    )
-    parser.add_argument(
-        "--input",
-        required=True,
-        nargs=2,
-        action="append",
-        metavar=("KEY", "VALUE"),
-        help="Key-value pair to pass as tool input (can be repeated)",
-    )
-    parser.add_argument(
-        "--timeout",
-        type=int,
-        default=None,
-        help="Timeout in seconds (default: 300)",
-    )
-    args = parser.parse_args()
-
-    call_mcp(
-        tool=args.tool,
-        input=dict(args.input),
-        timeout=args.timeout,
-    )
-
-
-if __name__ == "__main__":
-    main()

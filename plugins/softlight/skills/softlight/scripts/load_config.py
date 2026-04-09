@@ -21,10 +21,12 @@ def _config_path() -> pathlib.Path | None:
 class Config:
     """Mutable configuration that is preserved across ``claude`` invocations."""
 
-    base_url: str | None = None
-    frpc_pid: int | None = None
-    port: int | None = None
-    problem_statement: str | None = None
+    app_port: int | None = None
+    app_url: str | None = None
+    app_workspace: str | None = None
+    base_url: str = "http://localhost:8080"
+    pids: list[int] = dataclasses.field(default_factory=list)
+    problem: str | None = None
     project_id: str | None = None
     project_url: str | None = None
     tunnel_id: str | None = None
@@ -53,13 +55,3 @@ def load_config() -> Config:
         return Config(**json.loads(config_path.read_text()))
     else:
         return Config()
-
-
-def main() -> None:
-    config = load_config()
-
-    config.display()
-
-
-if __name__ == "__main__":
-    main()
