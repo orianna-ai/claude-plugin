@@ -220,9 +220,9 @@ Before doing anything, confirm with the user:
 Do not proceed until the user has provided all three. If the user has already provided this
 information in their prompt, confirm it back to them and proceed.
 
-1. **Clone the app.** Dispatch the `clone-app` agent with the path to the application source code
-   and the design problem. Wait for it to finish — it will return the port number the app is running
-   on.
+1. **Clone the app.** Dispatch the `clone-app-codegen` agent with the path to the application source
+   code and the design problem. Wait for it to finish — it will return the port number the app is
+   running on.
 
 2. **Start the tunnel.** Run the `start-tunnel` skill with the port number. The moment the tunnel is
    up, print the tunnel URL as a clickable link in a regular message first.
