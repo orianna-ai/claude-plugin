@@ -87,15 +87,15 @@ arranged relative to each other, where narrative text goes, how sections are str
    reference dimensions below). In revision mode, find the bottom edge of existing content
    and plan new content below it.
 
-3. **Refine positions with `move_slots` and `move_slot` — do this BEFORE creating any text.**
+3. **Refine positions with `move_slots` — do this BEFORE creating any text.**
    The designer's explorations start at rough auto-placed positions (stacked below existing content). In initial mode, reposition every slot. In revision mode, only reposition the slots from `<explorations_created>` — do not move existing slots. Move titles, prototypes, and captions into the layout you've planned. Each exploration consists of a title slot, N prototype slots in a row, and N caption slots below them. Move them all as a group, preserving their relative spacing (title at top, prototypes
    160 units below title, each prototype 1840 apart horizontally, captions 1160 below
    prototypes). Complete ALL positioning before creating any text — this ensures
    explorations are in their final positions before narrative appears, so the canvas never
-   looks broken mid-update. You have `move_slots` for moving multiple slots in one batch, and `move_slot` for moving a single slot.
+   looks broken mid-update.
 
-4. **Then write narrative text with `create_text`.** Place each element at specific x,y coordinates
-   that don't overlap with anything. Choose the right typographic variant:
+4. **Then write narrative text with `create_text_element`.** Place each element at specific x,y
+   coordinates that don't overlap with anything. Choose the right typographic variant:
    - `h1` — the problem being solved, major section headers
    - `h2` — key questions, section headers for sub-problems
    - `h3` — aspects of a problem, sub-questions
