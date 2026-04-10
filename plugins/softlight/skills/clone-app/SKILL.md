@@ -1,51 +1,29 @@
 ---
 name: clone-app
-description: >
-  Clone elements of an existing application to demonstrate a design problem and to use as the basis
-  for future design work.
+description: "Clone an existing application to demonstrate a design problem"
 ---
 
-# Input
+Your task is to locate the directory containing the source code for the application related to the
+`<problem>`, clone it to the `<path>`, and modify the cloned application so it can run without
+access to its backend or any other third-party services and using standard frontend development
+tools. Then, run the application in the background and return the pid of the process and the port
+number the application is listening on.
 
-## `<path>`
+1. Use the Bash command to copy the source code of the application to the `<path>`. Use `cp -r` to
+   copy the entire application source tree at once. Do not read any files - just copy everything.
+   Preserve the directory structure so that relative imports continue to resolve. Make sure you copy
+   the `package.json` and `tsconfig.json` over as well.
 
-Directory in which to generate the clone.
+2. Install third-party dependencies.
 
-## `<problem>`
+3. Replace all networks requests in the cloned application with mock data. The cloned application
+   will run without access to the backend, but all interactions in the application that are relevant
+   to the design problem must continue to work.
 
-Description of a design problem the user is exploring in the application.
+4. Remove authentication from the cloned application.
 
-# Output
+5. Migrate the cloned application to Vite if it uses a non-standard frontend build system.
 
-Your task is to generate a clone of the application described by the `<problem>` under the `<path>`
-directory.
+6. Fix errors until you can successfully build the application and run it in the background.
 
-- The following command has already been run in `<path>` to setup the application scaffolding.
-
-```bash
-npm create vite@latest -- --template react-ts --no-interactive .
-```
-
-- Run the following command at the end to validate your changes. Fix errors but ignore warnings.
-
-```bash
-cd <path> && npm install --no-audit --no-fund --no-progress --prefer-offline && npm run build
-```
-
-- The clone should contain only the subset of features that are required to demonstrate the
-  `<problem>` and evaluate proposed solutions to it. Work in two phases. First, **discover**: use
-  `ls`, `grep`, and `find` to build a list of every file you will need to read. Second, **ingest**:
-  read every file on that list in a single tool call message containing parallel Read blocks. Avoid
-  reading files one at a time.
-
-- Pin each dependency to the same version as the source project's package.json, but include only
-  packages the cloned code actually imports.
-
-- Replace API calls with hard-coded mock data. Keep mock data minimal: 3–8 rows per entity is enough
-  to demonstrate the problem. Do not build mock data generators or spread mock data across many
-  files unless the problem explicitly requires scale.
-
-- The clone must be a React app that is written in TypeScript and bundled with Vite.
-
-- The clone will not be committed and will never be read by anyone besides you. Do not generate
-  `README.md` and `.gitignore` files and avoid generating comments.
+7. Return the pid of the cloned application and the port number it is listening on.

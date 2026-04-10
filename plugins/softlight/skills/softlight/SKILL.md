@@ -5,7 +5,7 @@ description: Create a Softlight project backed by a long-running agent.
 
 1. Use the `/clarify-problem` skill to identify the `<problem>` the user is working on.
 
-2. Run the following from the directory containing this skill.
+2. Run the following from the directory containing this skill. This can take up to 10 minutes.
 
 ```bash
 python3 -m workflows.setup <problem>

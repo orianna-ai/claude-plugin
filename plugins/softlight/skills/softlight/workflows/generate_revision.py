@@ -24,6 +24,8 @@ def _generate_prototype(
     with tempfile.TemporaryDirectory() as tmpdir:
         path = os.path.join(tmpdir, "content_script.js")
 
+        print(f"generating content script for {slot_id} in {path}")
+
         call_claude(
             prompt=f"""\
 /generate-content-script
@@ -62,6 +64,7 @@ def _present_canvas(
     call_claude(
         prompt=f"""\
 /present-canvas
+<mode>initial</mode>
 <explorations_created>{json.dumps(explorations)}</explorations_created>
 <project_id>{config.project_id}</project_id>
 """,

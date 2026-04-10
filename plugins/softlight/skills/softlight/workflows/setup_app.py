@@ -1,5 +1,4 @@
 import socket
-import subprocess
 import tempfile
 
 from scripts.call_claude import call_claude
@@ -18,68 +17,35 @@ def setup_app() -> None:
 
         tmpdir = tempfile.mkdtemp()
 
-        print(f"scaffolding application in {tmpdir}")
-
-        subprocess.check_call(
-            [
-                "npm",
-                "create",
-                "vite@latest",
-                "--",
-                "--template",
-                "react-ts",
-                "--no-interactive",
-                ".",
-            ],
-            cwd=tmpdir,
-        )
-
-        subprocess.check_call(
-            [
-                "npm",
-                "install",
-                "--no-audit",
-                "--no-fund",
-                "--no-progress",
-                "--prefer-offline",
-            ],
-            cwd=tmpdir,
-        )
-
         print(f"cloning application to {tmpdir}")
 
-        call_claude(
+        clone_app_output = call_claude(
             prompt=f"""\
 /clone-app
 <path>{tmpdir}</path>
 <problem>{config.problem}</problem>
 """,
+            json_schema={
+                "type": "object",
+                "properties": {
+                    "pid": {
+                        "type": "number",
+                    },
+                    "port": {
+                        "type": "number",
+                    },
+                },
+                "required": ["port", "pid"],
+            },
             effort="max",
             model="opus",
-            timeout=2400,
+            timeout=1200,
         )
 
-        port = _select_port()
-
-        print(f"starting application on port {port}")
-
-        devserver = subprocess.Popen(
-            [
-                "npm",
-                "run",
-                "dev",
-                "--",
-                "--port",
-                str(port),
-            ],
-            cwd=tmpdir,
-        )
-
-        if devserver.pid:
-            config.app_url = f"http://localhost:{port}"
-            config.app_workspace = tmpdir
-            config.app_port = port
-            config.pids.append(devserver.pid)
+        config.app_url = f"http://localhost:{clone_app_output['port']}"
+        config.app_workspace = tmpdir
+        config.app_port = clone_app_output["port"]
+        config.pids.append(clone_app_output["pid"])
 
 
 def main() -> None:
