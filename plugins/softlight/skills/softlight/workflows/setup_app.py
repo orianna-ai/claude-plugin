@@ -56,7 +56,7 @@ def setup_app() -> None:
 """,
             effort="max",
             model="opus",
-            timeout=1200,
+            timeout=2400,
         )
 
         port = _select_port()

@@ -1,9 +1,9 @@
 import concurrent.futures
-from importlib.resources import path
+import json
 import os
 import tempfile
 from typing import Any
-import json
+
 from scripts.call_claude import call_claude
 from scripts.call_mcp import call_mcp
 from scripts.load_config import load_config
@@ -58,7 +58,7 @@ def _present_canvas(
         assert config.project_id is not None
 
         call_claude(
-                prompt=f"""\
+            prompt=f"""\
 /present-canvas
 <explorations_created>{json.dumps(explorations)}</explorations_created>
 <project_id>{config.project_id}</project_id>
@@ -68,6 +68,7 @@ def _present_canvas(
             timeout=600,
         )
 
+
 def generate_revision() -> None:
     with load_config() as config:
         assert config.project_id is not None
@@ -76,7 +77,7 @@ def generate_revision() -> None:
 
         generate_exploration_output = call_claude(
             prompt=f"""\
-/generate-exploration
+/generate-explorations
 <workspace>{config.app_workspace}</workspace>
 <problem>{config.problem}</problem>
 """,
