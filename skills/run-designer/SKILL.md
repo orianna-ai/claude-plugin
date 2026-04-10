@@ -215,7 +215,6 @@ curl -sF 'file=@/path/to/file' https://drive.orianna.ai/api/v2/upload
 Before doing anything, confirm with the user:
 
 - **What application** is being changed
-- **What port** it's running on
 - **What design problem** they want to solve
 
 Do not proceed until the user has provided all three. If the user has already provided this
