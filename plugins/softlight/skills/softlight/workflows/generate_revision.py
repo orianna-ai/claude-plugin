@@ -9,6 +9,8 @@ from scripts.call_mcp import call_mcp
 from scripts.load_config import load_config
 from scripts.upload_file import upload_file
 
+_RUN_DESIGNER_SESSION_ID = "run-designer"
+
 
 def _generate_prototype(
     *,
@@ -34,6 +36,7 @@ def _generate_prototype(
                 add_dirs=[config.app_workspace, tmpdir],
                 effort="max",
                 model="opus",
+                parent_session_id=_RUN_DESIGNER_SESSION_ID,
                 timeout=600,
             )
 
@@ -65,6 +68,7 @@ def _present_canvas(
 """,
             effort="max",
             model="opus",
+            parent_session_id=_RUN_DESIGNER_SESSION_ID,
             timeout=600,
         )
 
@@ -75,7 +79,7 @@ def generate_revision() -> None:
         assert config.app_workspace is not None
         assert config.problem is not None
 
-        generate_exploration_output = call_claude(
+        run_designer_output = call_claude(
             prompt=f"""\
 /run-designer
 <workspace>{config.app_workspace}</workspace>
@@ -123,13 +127,14 @@ def generate_revision() -> None:
             },
             effort="max",
             model="opus",
+            session_id=_RUN_DESIGNER_SESSION_ID,
             timeout=600,
         )
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=32) as executor:
             futures = []
 
-            for exploration in generate_exploration_output["explorations"]:
+            for exploration in run_designer_output["explorations"]:
                 for prototype in exploration["prototypes"]:
                     futures.append(
                         executor.submit(
@@ -142,7 +147,7 @@ def generate_revision() -> None:
             futures.append(
                 executor.submit(
                     _present_canvas,
-                    explorations=generate_exploration_output["explorations"],
+                    explorations=run_designer_output["explorations"],
                 ),
             )
 

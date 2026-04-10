@@ -1,12 +1,11 @@
 import functools
 import json
 import os
-import shlex
 from typing import Any, Literal, overload
 
+from scripts.load_config import load_config
 from scripts.run_subprocess import run_subprocess
 
-_ENABLE_PROMPT_LOGGING = False
 _DEFAULT_PROMPT_TIMEOUT = 300
 
 
@@ -31,9 +30,10 @@ def call_claude(
     add_dirs: list[str] | None = ...,
     allowed_tools: list[str] | None = ...,
     effort: Literal["low", "medium", "high", "max"] | None = ...,
-    fork_session: bool = ...,
     json_schema: dict[str, Any],
     model: str | None = ...,
+    parent_session_id: str | None = ...,
+    session_id: str | None = ...,
     system_prompt: str | None = ...,
     timeout: int | None = ...,
     tools: list[str] | None = None,
@@ -47,9 +47,10 @@ def call_claude(
     add_dirs: list[str] | None = ...,
     allowed_tools: list[str] | None = ...,
     effort: Literal["low", "medium", "high", "max"] | None = ...,
-    fork_session: bool = ...,
     json_schema: None = ...,
     model: str | None = ...,
+    parent_session_id: str | None = ...,
+    session_id: str | None = ...,
     system_prompt: str | None = ...,
     timeout: int | None = ...,
     tools: list[str] | None = None,
@@ -62,9 +63,10 @@ def call_claude(
     add_dirs: list[str] | None = None,
     allowed_tools: list[str] | None = None,
     effort: Literal["low", "medium", "high", "max"] | None = None,
-    fork_session: bool = True,
     json_schema: dict[str, Any] | None = None,
     model: str | None = None,
+    parent_session_id: str | None = None,
+    session_id: str | None = None,
     system_prompt: str | None = None,
     timeout: int | None = None,
     tools: list[str] | None = None,
@@ -73,18 +75,12 @@ def call_claude(
         "claude",
         "-p",
         "--no-session-persistence",
+        "--input-format",
+        "stream-json",
+        "--output-format",
+        "stream-json",
+        "--verbose",
     ]
-
-    if fork_session:
-        if session_id := _claude_code_session_id():
-            cmd.extend(
-                [
-                    "--resume",
-                    session_id,
-                ],
-            )
-
-        cmd.append("--fork-session")
 
     if system_prompt:
         cmd.extend(
@@ -139,27 +135,45 @@ def call_claude(
             [
                 "--json-schema",
                 json.dumps(json_schema),
-                "--output-format",
-                "json",
             ],
         )
 
-    prompt = prompt.strip()
+    with load_config() as config:
+        input = []
 
-    if _ENABLE_PROMPT_LOGGING:
-        print(shlex.join(cmd) + f" <<'EOF'\n{prompt}\nEOF")
+        if parent_session_id is not None:
+            input.append(config.transcripts[parent_session_id])
+        elif session_id is not None and session_id in config.transcripts:
+            input.append(config.transcripts[session_id])
 
-    result = run_subprocess(
-        cmd=cmd,
-        env={
-            **{var: val for var, val in os.environ.items() if var != "CLAUDECODE"},
-            "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-        },
-        input=prompt,
-        timeout=timeout or _DEFAULT_PROMPT_TIMEOUT,
-    )
+        input.append(
+            json.dumps(
+                {
+                    "type": "user",
+                    "message": {
+                        "role": "user",
+                        "content": prompt.strip(),
+                    },
+                },
+            ),
+        )
 
-    if json_schema:
-        return json.loads(result)["structured_output"]
-    else:
-        return result
+        output = run_subprocess(
+            cmd=cmd,
+            env={
+                **{var: val for var, val in os.environ.items() if var != "CLAUDECODE"},
+                "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+            },
+            input="\n".join(input),
+            timeout=timeout or _DEFAULT_PROMPT_TIMEOUT,
+        )
+
+        if session_id:
+            config.transcripts[session_id] = output
+
+        last_message = json.loads(output.splitlines()[-1])
+
+        if json_schema:
+            return last_message["structured_output"]
+        else:
+            return last_message["result"]

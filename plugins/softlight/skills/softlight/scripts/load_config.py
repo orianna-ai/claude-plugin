@@ -29,6 +29,7 @@ class Config:
     problem: str | None = None
     project_id: str | None = None
     project_url: str | None = None
+    transcripts: dict[str, str] = dataclasses.field(default_factory=dict)
     tunnel_id: str | None = None
     tunnel_url: str | None = None
 
