@@ -1,50 +1,28 @@
 ---
 name: clone-app
-description: "Clone elements of an existing application to demonstrate a design problem and to use as the basis for future design work."
+description: "Clone an existing application to demonstrate a design problem and to use as the basis for future design work."
 allowed-tools: Bash, Read, Write, Glob, Grep
 model: opus
 ---
 
-# Input
+You will be given a directory containing the source code for a web application and a design problem.
+Your task is to clone, modify, and run the application so that we can use it to explore solutions to
+the problem.
 
-## `<problem>`
+1. Use the Bash command to copy the source code of the application to a temporary directory. Use
+   `cp -r` to copy the entire application source tree at once. Do not read any files - just copy
+   everything. Make sure you copy the `package.json` and `tsconfig.json` over as well.
 
-Description of a design problem the user is exploring in the application.
+2. Install third-party dependencies.
 
-# Output
+3. Replace all networks requests in the cloned application with mock data. The cloned application
+   will run without access to the backend, but all interactions in the application that are relevant
+   to the design problem must continue to work.
 
-Your task is to generate a clone of the application described by the `<problem>` in a temporary
-directory.
+4. Remove authentication from the cloned application.
 
-- Run the following command to setup the application scaffolding.
+5. Migrate the cloned application to Vite if it uses a non-standard frontend build system.
 
-```bash
-npm create vite@latest -- --template react-ts --no-interactive .
-```
+6. Fix errors until you can successfully build the application and run it in the background.
 
-- Run the following command at the end to validate your changes. Fix errors but ignore warnings.
-
-```bash
-npm install --no-audit --no-fund --no-progress --prefer-offline && npm run build
-```
-
-- The clone should contain only the subset of features that are required to demonstrate the
-  `<problem>` and evaluate proposed solutions to it. Work in two phases. First, **discover**: use
-  `ls`, `grep`, and `find` to build a list of every file you will need to read. Second, **ingest**:
-  read every file on that list in a single tool call message containing parallel Read blocks. Avoid
-  reading files one at a time.
-
-- Pin each dependency to the same version as the source project's package.json, but include only
-  packages the cloned code actually imports.
-
-- Replace API calls with hard-coded mock data. Keep mock data minimal: 3–8 rows per entity is enough
-  to demonstrate the problem. Do not build mock data generators or spread mock data across many
-  files unless the problem explicitly requires scale.
-
-- The clone must be a React app that is written in TypeScript and bundled with Vite.
-
-- The clone will not be committed and will never be read by anyone besides you. Do not generate
-  `README.md` and `.gitignore` files and avoid generating comments.
-
-- Run the app in the background using `npm run dev`. Your final message must state the port number
-  the app is running on — this is the only information the caller needs from you.
+7. Report the port number that cloned application is listening on.
