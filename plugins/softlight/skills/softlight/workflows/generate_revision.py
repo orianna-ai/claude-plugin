@@ -77,7 +77,7 @@ def generate_revision() -> None:
 
         generate_exploration_output = call_claude(
             prompt=f"""\
-/generate-explorations
+/run-designer
 <workspace>{config.app_workspace}</workspace>
 <problem>{config.problem}</problem>
 """,
