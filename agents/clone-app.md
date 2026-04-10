@@ -1,8 +1,8 @@
 ---
 name: clone-app
-description: >
-  Clone elements of an existing application to demonstrate a design problem and to use as the basis
-  for future design work.
+description: "Clone elements of an existing application to demonstrate a design problem and to use as the basis for future design work."
+allowed-tools: Bash, Read, Write, Glob, Grep
+model: opus
 ---
 
 # Input
@@ -46,5 +46,5 @@ npm install --no-audit --no-fund --no-progress --prefer-offline && npm run build
 - The clone will not be committed and will never be read by anyone besides you. Do not generate
   `README.md` and `.gitignore` files and avoid generating comments.
 
-- Run the app in the background using `npm run dev` and then output the port number it is running
-  on.
+- Run the app in the background using `npm run dev`. Your final message must state the port number
+  the app is running on — this is the only information the caller needs from you.

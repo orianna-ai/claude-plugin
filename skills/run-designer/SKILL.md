@@ -220,8 +220,12 @@ Before doing anything, confirm with the user:
 Do not proceed until the user has provided all three. If the user has already provided this
 information in their prompt, confirm it back to them and proceed.
 
-1. **Clone the app.** Run the `clone-app` skill with the problem description. It will output the
-   port number that the app is running on.
+1. **Clone the app.** Dispatch the `clone-app` agent with the problem description. Wait for it
+   to finish — it will return the port number the app is running on.
+
+   ```
+   <problem>{problem description}</problem>
+   ```
 
 2. **Start the tunnel.** Run the `start-tunnel` skill with the port number. The moment the tunnel is
    up, print the tunnel URL as a clickable link in a regular message first.
