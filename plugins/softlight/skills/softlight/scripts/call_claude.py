@@ -158,16 +158,17 @@ def call_claude(
             ),
         )
 
-        output = run_subprocess(
-            cmd=cmd,
-            env={
-                **{var: val for var, val in os.environ.items() if var != "CLAUDECODE"},
-                "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-            },
-            input="\n".join(input),
-            timeout=timeout or _DEFAULT_PROMPT_TIMEOUT,
-        )
+    output = run_subprocess(
+        cmd=cmd,
+        env={
+            **{var: val for var, val in os.environ.items() if var != "CLAUDECODE"},
+            "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+        },
+        input="\n".join(input),
+        timeout=timeout or _DEFAULT_PROMPT_TIMEOUT,
+    )
 
+    with load_config() as config:
         if session_id:
             config.transcripts[session_id] = output
 

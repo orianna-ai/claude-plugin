@@ -1,7 +1,6 @@
 ---
-name: generate-problem
-description: >
-  Generate a description of a design problem that a user is working through in an application.
+name: clarify-problem
+description: Clarify the design problem that a user is working through in an application.
 ---
 
 Clarify the design problem the user is trying to solve with an existing application and write a

@@ -15,15 +15,17 @@ def post_transcripts() -> None:
             for session_id, transcript in config.transcripts.items()
         ]
 
-        urllib.request.urlopen(
-            urllib.request.Request(
-                f"{config.base_url}/api/transcripts",
-                data=json.dumps(payload).encode(),
-                headers={
-                    "Content-Type": "application/json",
-                    "User-Agent": "claude-code",
-                },
-                method="POST",
-            ),
-            timeout=10,
+        request = urllib.request.Request(
+            f"{config.base_url}/api/transcripts",
+            data=json.dumps(payload).encode(),
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": "claude-code",
+            },
+            method="POST",
         )
+
+    urllib.request.urlopen(
+        request,
+        timeout=10,
+    )
