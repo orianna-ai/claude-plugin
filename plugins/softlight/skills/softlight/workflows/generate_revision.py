@@ -1,7 +1,9 @@
 import concurrent.futures
+from importlib.resources import path
 import os
 import tempfile
-
+from typing import Any
+import json
 from scripts.call_claude import call_claude
 from scripts.call_mcp import call_mcp
 from scripts.load_config import load_config
@@ -23,9 +25,11 @@ def _generate_prototype(
             call_claude(
                 prompt=f"""\
 /generate-content-script
-<workspace>{config.app_workspace}</workspace>
 <path>{path}</path>
+<project_id>{config.project_id}</project_id>
+<slot_id>{slot_id}</slot_id>
 <spec>{spec}</spec>
+<workspace>{config.app_workspace}</workspace>
 """,
                 add_dirs=[config.app_workspace, tmpdir],
                 effort="max",
@@ -46,43 +50,23 @@ def _generate_prototype(
             )
 
 
-def _generate_caption(
+def _present_canvas(
     *,
-    slot_id: str,
-    spec: str,
+    explorations: list[dict[str, Any]],
 ) -> None:
     with load_config() as config:
         assert config.project_id is not None
 
-        generate_caption_output = call_claude(
-            prompt=f"""\
-/generate-caption
-<spec>{spec}</spec>
+        call_claude(
+                prompt=f"""\
+/present-canvas
+<explorations_created>{json.dumps(explorations)}</explorations_created>
+<project_id>{config.project_id}</project_id>
 """,
-            allowed_tools=[],
-            json_schema={
-                "type": "object",
-                "properties": {
-                    "caption": {
-                        "type": "string",
-                    },
-                },
-                "required": ["caption"],
-            },
-            effort="low",
-            model="sonnet",
-            tools=[],
+            effort="max",
+            model="opus",
+            timeout=600,
         )
-
-        call_mcp(
-            tool="update_text_element",
-            input={
-                "project_id": config.project_id,
-                "slot_id": slot_id,
-                "text": generate_caption_output["caption"],
-            },
-        )
-
 
 def generate_revision() -> None:
     with load_config() as config:
@@ -90,9 +74,9 @@ def generate_revision() -> None:
         assert config.app_workspace is not None
         assert config.problem is not None
 
-        generate_specs_output = call_claude(
+        generate_exploration_output = call_claude(
             prompt=f"""\
-/generate-specs
+/generate-exploration
 <workspace>{config.app_workspace}</workspace>
 <problem>{config.problem}</problem>
 """,
@@ -100,72 +84,66 @@ def generate_revision() -> None:
             json_schema={
                 "type": "object",
                 "properties": {
-                    "specs": {
+                    "explorations": {
                         "type": "array",
                         "items": {
-                            "type": "string",
+                            "type": "object",
+                            "properties": {
+                                "prototypes": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "slot_id": {
+                                                "type": "string",
+                                            },
+                                            "spec": {
+                                                "type": "string",
+                                            },
+                                        },
+                                        "required": ["slot_id", "spec"],
+                                    },
+                                },
+                                "caption_slot_ids": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                    },
+                                },
+                                "title_slot_id": {
+                                    "type": "string",
+                                },
+                            },
+                            "required": ["prototypes", "caption_slot_ids", "title_slot_id"],
                         },
                     },
                 },
-                "required": ["specs"],
+                "required": ["explorations"],
             },
             effort="max",
             model="opus",
             timeout=600,
         )
 
-        create_revision_output = call_mcp(
-            tool="create_revision",
-            input={
-                "project_id": config.project_id,
-                "prototype_count": str(len(generate_specs_output["specs"])),
-            },
-            timeout=300,
-            json_schema={
-                "type": "object",
-                "properties": {
-                    "placeholders": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "prototype_slot_id": {
-                                    "type": "string",
-                                },
-                                "caption_slot_id": {
-                                    "type": "string",
-                                },
-                            },
-                            "required": ["prototype_slot_id", "caption_slot_id"],
-                        },
-                    },
-                },
-                "required": ["placeholders"],
-            },
-        )
-
         with concurrent.futures.ThreadPoolExecutor(max_workers=32) as executor:
             futures = []
 
-            for spec, placeholder in zip(
-                generate_specs_output["specs"],
-                create_revision_output["placeholders"],
-            ):
-                futures.append(
-                    executor.submit(
-                        _generate_prototype,
-                        slot_id=placeholder["prototype_slot_id"],
-                        spec=spec,
-                    ),
-                )
+            for exploration in generate_exploration_output["explorations"]:
+                for prototype in exploration["prototypes"]:
+                    futures.append(
+                        executor.submit(
+                            _generate_prototype,
+                            slot_id=prototype["slot_id"],
+                            spec=prototype["spec"],
+                        ),
+                    )
 
-                futures.append(
-                    executor.submit(
-                        _generate_caption,
-                        slot_id=placeholder["caption_slot_id"],
-                        spec=spec,
-                    ),
-                )
+            futures.append(
+                executor.submit(
+                    _present_canvas,
+                    explorations=generate_exploration_output["explorations"],
+                ),
+            )
 
             errors = []
 
