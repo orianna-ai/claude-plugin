@@ -17,7 +17,7 @@ and reads to files under this directory; do not read files outside it.
 
 ## `<path>`
 
-Path at which to write the generated content script.
+Absolute path at which to write the generated content script.
 
 ## `<spec>`
 

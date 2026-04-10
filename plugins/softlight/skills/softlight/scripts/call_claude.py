@@ -27,9 +27,9 @@ def _claude_code_session_id() -> str | None:
 def call_claude(
     prompt: str,
     *,
-    add_dirs: list[str] | None = ...,
     allowed_tools: list[str] | None = ...,
     effort: Literal["low", "medium", "high", "max"] | None = ...,
+    fork_session: bool = ...,
     json_schema: dict[str, Any],
     model: str | None = ...,
     parent_session_id: str | None = ...,
@@ -44,9 +44,9 @@ def call_claude(
 def call_claude(
     prompt: str,
     *,
-    add_dirs: list[str] | None = ...,
     allowed_tools: list[str] | None = ...,
     effort: Literal["low", "medium", "high", "max"] | None = ...,
+    fork_session: bool = ...,
     json_schema: None = ...,
     model: str | None = ...,
     parent_session_id: str | None = ...,
@@ -60,9 +60,9 @@ def call_claude(
 def call_claude(
     prompt: str,
     *,
-    add_dirs: list[str] | None = None,
     allowed_tools: list[str] | None = None,
     effort: Literal["low", "medium", "high", "max"] | None = None,
+    fork_session: bool = True,
     json_schema: dict[str, Any] | None = None,
     model: str | None = None,
     parent_session_id: str | None = None,
@@ -81,6 +81,17 @@ def call_claude(
         "stream-json",
         "--verbose",
     ]
+
+    if fork_session:
+        if session_id := _claude_code_session_id():
+            cmd.extend(
+                [
+                    "--resume",
+                    session_id,
+                ],
+            )
+
+        cmd.append("--fork-session")
 
     if system_prompt:
         cmd.extend(
@@ -119,14 +130,6 @@ def call_claude(
             [
                 "--allowed-tools",
                 *allowed_tools,
-            ],
-        )
-
-    if add_dirs:
-        cmd.extend(
-            [
-                "--add-dir",
-                *add_dirs,
             ],
         )
 

@@ -46,6 +46,7 @@ Call the `mcp__plugin_softlight_softlight__{tool}` MCP tool with these exact arg
 """,
         allowed_tools=[f"mcp__plugin_softlight_softlight__{tool}"],
         effort="low",
+        fork_session=False,
         json_schema=json_schema,
         model="haiku",
         timeout=timeout or _DEFAULT_MCP_TIMEOUT,

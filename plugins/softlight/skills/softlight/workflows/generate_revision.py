@@ -33,7 +33,6 @@ def _generate_prototype(
 <spec>{spec}</spec>
 <workspace>{config.app_workspace}</workspace>
 """,
-            add_dirs=[config.app_workspace, tmpdir],
             effort="max",
             model="opus",
             parent_session_id=_RUN_DESIGNER_SESSION_ID,
@@ -86,7 +85,6 @@ def generate_revision() -> None:
 <problem>{config.problem}</problem>
 <project_id>{config.project_id}</project_id>
 """,
-        add_dirs=[config.app_workspace],
         json_schema={
             "type": "object",
             "properties": {
