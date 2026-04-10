@@ -3,6 +3,7 @@ name: clone-app
 description: "Clone elements of an existing application to demonstrate a design problem and to use as the basis for future design work."
 allowed-tools: Bash, Read, Write, Glob, Grep
 model: opus
+effort: max
 ---
 
 # Input
