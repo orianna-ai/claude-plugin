@@ -2,6 +2,7 @@
 name: generate-content-script
 description: Generate a content script — a self-contained JavaScript file that can be injected into a running application to prototype a design idea without rebuilding.
 model: opus
+effort: max
 ---
 
 # Generate Content Script
