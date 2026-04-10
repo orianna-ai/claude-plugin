@@ -1,5 +1,18 @@
 {
   "mcpServers": {
+    "playwright-parallel": {
+      "args": [
+        "-y",
+        "playwright-parallel-mcp@latest"
+      ],
+      "command": "npx",
+      "env": {
+        "MAX_SESSIONS": "100",
+        "PLAYWRIGHT_MCP_BROWSER": "chromium",
+        "PLAYWRIGHT_MCP_ISOLATED": "true"
+      },
+      "type": "stdio"
+    },
     "softlight": {
       "args": [
         "-y",
