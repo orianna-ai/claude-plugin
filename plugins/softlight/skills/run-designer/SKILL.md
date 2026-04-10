@@ -165,7 +165,7 @@ produce the first set of explorations that help the PM see the real shape of the
    resize to 1512x982) and screenshot the key screen(s) relevant to the design problem.
 
    **Study what you captured.** Describe what you see in the context of the problem you're
-   solving. Code tells you what elements exist; the screenshot tells you how the
+   solving. Code tells you what how the product and business work; the screenshot tells you how the
    experience actually feels. Your design analysis in the next step must be grounded in these
    visual observations — not just inferred from source code.
 
