@@ -80,6 +80,7 @@ def generate_revision() -> None:
 /run-designer
 <workspace>{config.app_workspace}</workspace>
 <problem>{config.problem}</problem>
+<project_id>{config.project_id}</project_id>
 """,
             add_dirs=[config.app_workspace],
             json_schema={
