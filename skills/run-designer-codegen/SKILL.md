@@ -178,7 +178,6 @@ Run the `generate-prototype` skill and follow its instructions exactly.
 <images>
 {image_urls, one per line — screenshots, mocks, references}
 </images>
-<prototype_dir>{existing prototype directory, if refining}</prototype_dir>
 <context>
 {what you learned about the app: routing, auth, data fetching, response shapes, styling}
 </context>
