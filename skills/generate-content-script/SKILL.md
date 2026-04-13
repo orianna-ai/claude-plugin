@@ -41,6 +41,12 @@ registering the prototype (see Phase 4).
 The directory path of the baseline clone — the already-built, runnable app created by
 `clone-app-codegen`. This is your starting point.
 
+### `<prototype_dir>`
+
+Optional. If this prototype is a revision of an existing one, the directory path of the
+previous prototype app. Start from there instead of copying the baseline fresh — it already
+has the prior design changes applied.
+
 ### `<context>`
 
 Optional pre-explored source code and analysis from the caller. May cover routing, auth, data
@@ -51,9 +57,10 @@ whatever you need about the app. Read local source files, not the tunnel URL.
 
 ## Phase 1: Create the prototype app
 
-1. **Copy the baseline.** Copy the baseline clone to a new directory:
+1. **Copy the source.** If `<prototype_dir>` was provided (revising an existing prototype),
+   copy that directory — it already has the prior design changes. Otherwise, copy the baseline:
    ```bash
-   cp -r <baseline_dir> /tmp/prototype_<slot_id>
+   cp -r <prototype_dir or baseline_dir> /tmp/prototype_<slot_id>
    ```
    Symlink `node_modules` instead of copying to save disk and time:
    ```bash
