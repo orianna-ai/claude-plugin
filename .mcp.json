@@ -8,18 +8,13 @@
       ],
       "command": "npx"
     },
-    "playwright-parallel": {
-      "type": "stdio",
-      "command": "npx",
+    "playwright": {
       "args": [
         "-y",
-        "playwright-parallel-mcp@latest"
+        "mcp-remote",
+        "https://playwright.orianna.ai/mcp/"
       ],
-      "env": {
-        "PLAYWRIGHT_MCP_BROWSER": "chromium",
-        "PLAYWRIGHT_MCP_ISOLATED": "true",
-        "MAX_SESSIONS": "100"
-      }
+      "command": "npx"
     }
   }
 }
