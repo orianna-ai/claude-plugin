@@ -141,7 +141,7 @@ https://softlight.orianna.ai/api/tunnel/{tunnel_id}/
 
 To view a design change from a prototype:
 1. Navigate to the prototype URL
-2. Check that the page loaded, then find the design changes described in the spec. You may need to interact with the application to get the app into a state where the design change is visible.
+2. Check that the page loaded, then find the design changes described in the spec. You may need to interact with the application to get the app into a state where the design change is visible. Reminder: pages could be broken or stuck loading. If that happens, move on — do not wait indefinitely.
 3. Take a screenshot of the design change with `browser_take_screenshot` (`fullPage` set to `true`). It returns a drive URL directly.
 
 When you're done with the browser, call `close_session` to clean up.

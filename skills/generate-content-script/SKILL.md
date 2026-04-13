@@ -62,10 +62,9 @@ whatever you need about the app. Read local source files, not the tunnel URL.
    ```bash
    cp -r <prototype_dir or baseline_dir> /tmp/prototype_<slot_id>
    ```
-   Symlink `node_modules` instead of copying to save disk and time:
+   Install dependencies with `pnpm` (fast, deduplicates across prototypes automatically):
    ```bash
-   rm -rf /tmp/prototype_<slot_id>/node_modules
-   ln -s <baseline_dir>/node_modules /tmp/prototype_<slot_id>/node_modules
+   cd /tmp/prototype_<slot_id> && pnpm install
    ```
 
 2. **Read the spec.** Download `<spec_url>` with `curl`, extract the `spec` field. View any
@@ -91,12 +90,8 @@ whatever you need about the app. Read local source files, not the tunnel URL.
 
 ## Phase 2: Start a tunnel
 
-Start a tunnel to expose this prototype's dev server:
-```bash
-start_tunnel.sh $PORT
-```
-The script prints `TUNNEL_ID=...` and `PID=...`. Capture the `tunnel_id` — you'll need it for
-Phase 3 and Phase 5.
+Run the `start-tunnel` skill with the port number from Phase 1. It returns a `tunnel_id` and
+`PID`. Capture the `tunnel_id` — you'll need it for Phase 3 and Phase 5.
 
 ## Phase 3: Register on the canvas
 
