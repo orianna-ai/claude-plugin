@@ -79,6 +79,10 @@ whatever you need about the app. Read local source files, not the tunnel URL.
    should feel like a well-designed, fully functioning app — not a rough mockup. If your
    changes introduce new UI that needs data, seed realistic mock data.
 
+   **Preserve the app's design system** — any new UI elements must match the app's existing
+   aesthetics. Use the app's CSS variables, theme tokens, or class patterns — never hardcode
+   approximate color values. Never load external CSS frameworks or component libraries when the app already has its own.
+
 5. **Start the app.** Run the prototype's dev server on a free port:
    ```bash
    cd /tmp/prototype_<slot_id> && npx vite --port 0 &
