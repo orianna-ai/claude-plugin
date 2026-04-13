@@ -1,0 +1,20 @@
+{
+  "name": "softlight-plugins",
+  "interface": {
+    "displayName": "Softlight Plugins"
+  },
+  "plugins": [
+    {
+      "name": "softlight",
+      "source": {
+        "source": "local",
+        "path": "./plugins/softlight"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Design"
+    }
+  ]
+}

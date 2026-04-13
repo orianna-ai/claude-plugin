@@ -1,0 +1,42 @@
+{
+  "name": "softlight",
+  "version": "4.96.1",
+  "description": "Generate and implement design directions for product design problems. Explores alternatives, makes code changes, and wires the app so you can see results immediately.",
+  "author": {
+    "name": "Softlight",
+    "url": "https://softlight.com"
+  },
+  "homepage": "https://app.softlight.com",
+  "repository": "https://github.com/orianna-ai/claude-plugin",
+  "license": "UNLICENSED",
+  "keywords": [
+    "design",
+    "ui",
+    "prototyping",
+    "implementation"
+  ],
+  "skills": "./skills/",
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Softlight",
+    "shortDescription": "Generate and implement design directions",
+    "longDescription": "Use Softlight to explore design directions, make code changes, and wire the app so results are visible immediately.",
+    "developerName": "Softlight",
+    "category": "Design",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://app.softlight.com",
+    "privacyPolicyURL": "https://softlight.com",
+    "termsOfServiceURL": "https://softlight.com",
+    "defaultPrompt": [
+      "Explore design directions for this product problem",
+      "Implement a selected UI direction in this codebase",
+      "Wire the app so I can preview the result"
+    ],
+    "brandColor": "#1F6FEB",
+    "screenshots": []
+  }
+}
