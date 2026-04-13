@@ -1,16 +1,15 @@
 ---
-name: generate-content-script
-description: Generate a content script — a self-contained JavaScript file that can be injected into a running application to prototype a design idea without rebuilding.
+name: generate-prototype
+description: Build a standalone prototype app from the baseline clone that implements a design idea, run it on its own port, and register it on the canvas.
 model: opus
 effort: max
 ---
 
-# Generate Content Script
+# Generate Prototype
 
-You are implementing design feedback as a **content script** — a self-contained JavaScript file
-injected into a running app that modifies its UI without rebuilding. The script is injected
-**before any app JS runs**. Synchronous code (mocks, auth, route) runs at evaluation time. DOM
-interactions run after `DOMContentLoaded`.
+You are building a standalone prototype — a copy of the baseline app with design changes made
+directly in the source code. Each prototype is its own running application with its own tunnel,
+not a script injected into a shared app.
 
 ## Input
 
@@ -35,15 +34,17 @@ Optional. Image URLs or local file paths, one per line. If these are passed, vie
 ### `<caption_slot_id>`
 
 Optional. Canvas slot UUID for the caption below this prototype. If provided, fill it in after
-placing the content script (see Phase 4).
+registering the prototype (see Phase 4).
 
-### `<tunnel_id>`
+### `<baseline_dir>`
 
-The tunnel ID for the running application. Used to construct the prototype URL for screenshotting.
+The directory path of the baseline clone — the already-built, runnable app created by
+`clone-app-codegen`. This is your starting point.
 
-### `<content_script_url>`
+### `<prototype_dir>`
 
-Optional. Drive URL of an existing content script. If this exists, download the content script it and edit from there instead of starting from scratch.
+Optional. If this prototype was previously generated, this is the directory path of the existing
+prototype app. Edit from there instead of copying the baseline fresh.
 
 ### `<context>`
 
@@ -53,97 +54,50 @@ fetching, response shapes, and styling patterns.
 **Explore the codebase yourself.** You have full access to the source code — use it to understand
 whatever you need about the app. Read local source files, not the tunnel URL.
 
-## Phase 1: Write the content script
+## Phase 1: Create the prototype app
 
-Write a content script that modifies the running app to implement `<spec>`. The app has its own
-routing, components, data fetching, and design system — use them. Mock routes, auth, and API
-responses so the app renders the desired state itself.
+1. **Copy the baseline.** If `<prototype_dir>` was provided (refining an existing prototype),
+   work in that directory. Otherwise, copy the baseline clone to a new directory:
+   ```bash
+   cp -r <baseline_dir> /tmp/prototype_<slot_id>
+   ```
+   Symlink `node_modules` instead of copying to save disk and time:
+   ```bash
+   rm -rf /tmp/prototype_<slot_id>/node_modules
+   ln -s <baseline_dir>/node_modules /tmp/prototype_<slot_id>/node_modules
+   ```
 
-### Script structure
+2. **Read the spec.** Download `<spec_url>` with `curl`, extract the `spec` field. View any
+   referenced images. Understand what design change is being requested.
 
-Write the script to `/tmp/content_script_<slot_id>.js` — multiple agents run in parallel so it needs a unique file path.
+3. **Explore the codebase.** Read the baseline clone's files and the original application
+   source to understand the component structure, design system, routing, data shapes, and
+   styling. You need deep understanding to make changes that feel native to the app.
 
-Wrap everything in a strict-mode IIFE. The script is injected before the app's own JavaScript, so
-synchronous code at the top level (auth, routing, fetch mocks) takes effect before the app boots.
-Any code that touches the DOM should wait for `DOMContentLoaded`. DOM overlays are injected into a
-live application that continues to render after your script loads. Never assume the DOM is stable
-after `DOMContentLoaded`. Wait for your target container to appear, and use a `MutationObserver` to
-re-inject your elements if the application removes or replaces them.
+4. **Make the design changes.** Edit the prototype's files to implement the spec. The result
+   should feel like a well-designed, fully functioning app — not a rough mockup. If your
+   changes introduce new UI that needs data, seed realistic mock data.
 
-### Fetch mocking
+5. **Start the app.** Run the prototype's dev server on a free port:
+   ```bash
+   cd /tmp/prototype_<slot_id> && npx vite --port 0 &
+   ```
+   Wait for the server to print the port it's listening on. Capture that port number.
 
-- Save the original `window.fetch` and fall through to it for URLs you don't mock.
+## Phase 2: Start a tunnel
 
-- Handle `url` being a `Request` object — use `url instanceof Request ? url.url : String(url)`.
+Start a tunnel to expose this prototype's dev server:
+```bash
+start_tunnel.sh $PORT
+```
+The script prints `TUNNEL_ID=...` and `PID=...`. Capture the `tunnel_id` — you'll need it for
+Phase 3 and Phase 5.
 
-- Mock every endpoint the target screen fetches on mount.
+## Phase 3: Register on the canvas
 
-- Always provide realistic mock data — never rely on the app's live database having enough
-  (or any) data. Seed enough rows to make the prototype visually convincing (8–15 records
-  with varied, realistic values). This ensures the prototype works regardless of database state.
-
-- Match response shapes to what the components actually use, including nesting and array wrappers.
-
-- Check how the app builds URLs — fetch clients may prepend env vars like `VITE_API_URL`.
-
-- Seed auth before changing the route — the app may redirect to login without it.
-
-### Working with the DOM
-
-- **Data layer is the default** — mock fetch so the framework re-renders natively. Only touch the
-  DOM when there is no data-layer alternative (e.g., injecting a new UI element that doesn't exist
-  in the app).
-
-- **Never hide or replace the app's root** — no `root.style.display = "none"`, no `innerHTML = ""`,
-  no `replaceChildren()`. You are a guest in the app's page.
-
-- **Never rebuild existing UI** — work with the app's own components through data or interactions.
-  Do not create a parallel version of UI the app already provides (navigation, tables, grids, etc.).
-
-- **DOM overlays for new features are fine** — if the design calls for UI that doesn't exist in the
-  app (a sidebar panel, a grouping overlay, a new toolbar), building it with `createElement` is the
-  right approach. The key distinction: use the app's components for things the app already renders,
-  and build DOM only for genuinely new additions.
-
-- If you must mutate the DOM, use `MutationObserver` to re-apply after framework re-renders. No
-  fixed timeouts. Changes to the DOM must be idempotent.
-
-- **Watch for `overflow: hidden` ancestors** — many apps use `overflow: hidden` on flex containers
-  to let grids/tables handle their own scrolling. If you insert a new element (e.g., a search bar)
-  into one of these containers, it will be clipped. Before inserting, walk up the ancestor chain
-  and check for `overflow: hidden` on any parent that uses `flex: 1` or a fixed height. Either
-  insert your element *above* the `overflow: hidden` boundary, or temporarily adjust the container
-  to `overflow: visible` / add space for your element.
-
-- **Reuse existing CSS classes** — when building DOM overlays, apply the app's own CSS classes instead of writing inline styles. This inherits the app's theme (dark/light mode, colors,
-  typography) automatically. Only fall back to CSS variables or inline styles for genuinely new
-  elements that have no app equivalent.
-
-- **Preserve the app's design system** — any new UI elements must match the app's existing
-  aesthetics. Use the app's CSS variables, theme tokens, or class patterns — never hardcode
-  approximate color values. Never load external CSS frameworks or component libraries when the app already has its own.
-
-- You can import third-party libraries at runtime via `esm.sh`, e.g.:
-  - `await import("https://esm.sh/@testing-library/dom")` for querying elements
-  - `await import("https://esm.sh/@testing-library/user-event")` for simulating interactions
-
-
-## Phase 2: Upload the content script
-
-You MUST save the content script to a **unique file path** that includes the slot ID — e.g.,
-`/tmp/content_script_<slot_id>.js`. Multiple content scripts may be generated in parallel, so
-using a generic path like `/tmp/content_script.js` will cause race conditions where agents
-overwrite each other's files.
-
-Upload the content script via multipart form POST to `https://drive.orianna.ai/api/v2/upload`.
-The response is the public URL of the uploaded file (e.g., `https://drive.orianna.ai/<hash>.js`).
-
-## Phase 3: Place the content script on the canvas
-
-Call the `update_iframe_element` MCP tool with `project_id`, `slot_id`, `content_script_url`
-(the URL from Phase 2), `spec_url` (the `<spec_url>` from your input — pass it through
-unchanged), and `tunnel_id` (the `<tunnel_id>` from your input). The `git_commit` and
-`git_patch` fields are inherited from `problem.baseline` automatically.
+Call the `update_iframe_element` MCP tool with `project_id`, `slot_id`, `tunnel_id` (the new
+tunnel from Phase 2), and `spec_url` (the `<spec_url>` from your input — pass it through
+unchanged).
 
 ## Phase 4: Fill in the caption
 
@@ -153,22 +107,22 @@ this prototype does, how it solves the problem, and what its tradeoffs are.
 
 ## Phase 5: Screenshot the prototype
 
-Open the prototype in a browser and screenshot it so reviewers can see the design changes. The task is to take screenshot(s) if the prototype in states where the design change(s) are visible.
+Open the prototype in a browser tab and screenshot it so reviewers can see it on the canvas.
 
-Content scripts can sometimes leave the page stuck loading or crash the browser
-tab. If the page isn't loading or the browser becomes unresponsive, don't keep retrying —
-return whatever screenshots you managed to capture (even none) and move on. The content
-script is already on the canvas from Phase 3.
-
-You have access to a headless browser via Softlight MCP `playwright` tools - a thin wrapper around Playwright MCP that gives each session its own isolated browser. All standard Playwright browser tools are available.
+You have access to a headless browser via Softlight MCP `playwright` tools - a thin wrapper
+around Playwright MCP that gives each session its own isolated browser. All standard Playwright
+browser tools are available.
 
 Call `create_session` to get an isolated browser instance. Resize the viewport to 1512x982
-(MacBook Pro 14"). Ensure you find the design change(s) so you can screenshot the design
-changes and look at it. You may need to interact with the prototype to find all the design
-changes to screenshot them (the codebase, spec_url, and content_script can help you figure out what screenshots you need to take).
+(MacBook Pro 14"). Ensure you find the design change(s) so you can screenshot them. You may
+need to interact with the prototype to find all the design changes (the codebase, spec, and
+source code can help you figure out what screenshots you need to take).
 
-1. Navigate to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/?content_script_url={content_script_url}`
-2. Check that the page loaded, then find the design changes described in the spec. You  may need to interact with the application to get the app into a state where the design change is visible. Reminder: pages could be broken or stuck loading. If that happens, move on — do not wait indefinitely.
-3. Take a screenshot with `browser_take_screenshot` (`fullPage` set to `true`). It returns a drive URL directly.
+1. Navigate to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`
+2. Check that the page loaded, then find the design changes described in the spec. You may need
+   to interact with the application to get it into a state where the design change is visible.
+   If the page isn't loading, check the dev server output for build errors, fix them, and retry.
+3. Take a screenshot with `browser_take_screenshot` (`fullPage` set to `true`). It returns a
+   drive URL directly.
 4. Call `set_iframe_screenshots` with `project_id`, `slot_id`, and `screenshot_urls`
 5. Call `close_session` to clean up the browser

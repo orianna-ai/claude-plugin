@@ -71,22 +71,22 @@ was explored, what survived, and why.
 
 ### Presenting your work
 
-You create explorations and kick off content scripts. The `present-canvas` agent handles
+You create explorations and kick off prototype subagents. The `present-canvas` agent handles
 everything the human reads — narrative text, spatial organization, and critique.
 
-**Dispatch `present-canvas` FIRST — before content scripts.** The presenter is a small,
-fast dispatch. Content-script dispatches are heavy (each needs a full spec, codebase context,
-URLs). If you try to batch them all together, the presenter gets stuck behind 10 content
-scripts and the canvas stays bare for minutes. Always dispatch the presenter as its own
-separate step, then dispatch content scripts after.
+**Dispatch `present-canvas` FIRST — before prototypes.** The presenter is a small,
+fast dispatch. Prototype dispatches are heavy (each needs a full spec, codebase context,
+and builds a standalone app). If you try to batch them all together, the presenter gets stuck
+behind 10 prototypes and the canvas stays bare for minutes. Always dispatch the presenter as
+its own separate step, then dispatch prototypes after.
 
 The flow:
 1. Analyze your context, create explorations (you get slot_ids immediately)
 2. Dispatch `present-canvas` in the background with your analysis and what you created
-3. Then dispatch content-script subagents in parallel
+3. Then dispatch prototype subagents in parallel
 
-The presenter writes narrative on the canvas and arranges the layout while your content
-scripts generate.
+The presenter writes narrative on the canvas and arranges the layout while your prototypes
+generate.
 
 Dispatch the `present-canvas` agent in the background:
 
@@ -114,11 +114,8 @@ Slots on the canvas can be prototypes, comments, text, or images. Each prototype
 element) has:
 - **`spec_url`** — download with `curl`. Returns JSON with a `spec` field describing the design
   intent, plus any image URLs referenced in the spec. Download and Read images for visual context.
-- **`content_script.url`** — download with `curl`. The JS that implements the prototype. Read this
-  to understand what was built. Pass it to content script generators when refining so they edit
-  the existing script rather than starting from scratch.
 - **`screenshots`** — drive URLs. Download and Read to see what the prototype looks like.
-- **`tunnel_id`** — shared across all prototypes. Used to construct URLs for viewing in the browser.
+- **`tunnel_id`** — each prototype has its own tunnel pointing to its own standalone app.
 
 Canvas tools:
 - `create_exploration` — create an exploration (titled row of prototype slots). Returns `slot_ids` and `caption_slot_ids`. The presenter handles positioning
@@ -134,26 +131,17 @@ can browse different prototypes in parallel without conflicts. All standard Play
 
 Call `create_session` to get an isolated browser. Resize the viewport to 1512x982 (MacBook Pro
 14"). Ensure you find the design change(s) so you can screenshot the design changes and look
-at it. You may need to interact with the prototype to find all the design changes (the codebase,
-spec_url, and content_script can help you figure out what screenshots you need to take).
+at it. You may need to interact with the prototype to find all the design changes (the codebase
+and spec_url can help you figure out what screenshots you need to take).
 
-Prototype URL (with content script injected):
-```
-https://softlight.orianna.ai/api/tunnel/{tunnel_id}/?content_script_url={content_script_url}
-```
-
-Baseline URL (the app as-is, no content script):
+Prototype URL (each prototype has its own tunnel):
 ```
 https://softlight.orianna.ai/api/tunnel/{tunnel_id}/
 ```
 
-Content scripts can sometimes leave the page stuck loading or crash the browser
-tab. If a prototype's page isn't loading or the session becomes unresponsive, don't keep
-retrying — close the session, skip that prototype's screenshots, and move on.
-
 To view a design change from a prototype:
 1. Navigate to the prototype URL
-2. Check that the page loaded, then find the design changes described in the spec. You  may need to interact with the application to get the app into a state where the design change is visible. Reminder: pages could be broken or stuck loading. If that happens, move on — do not wait indefinitely.
+2. Check that the page loaded, then find the design changes described in the spec. You may need to interact with the application to get the app into a state where the design change is visible.
 3. Take a screenshot of the design change with `browser_take_screenshot` (`fullPage` set to `true`). It returns a drive URL directly.
 
 When you're done with the browser, call `close_session` to clean up.
@@ -164,11 +152,12 @@ You don't need to upload baseline screenshots — those are already on the proje
 
 You can explore the app's source code at any time — Read, Glob, Grep. Understand the design system, components, data models, routing, users flows, and business logic. Every subagent you dispatch can also explore the codebase. Do NOT dispatch Explore agents — read the code yourself so you build deep, firsthand understanding.
 
-### Content script generation
+### Prototype generation
 
-To create a prototype, you dispatch a `generate-content-script` subagent. This is the core
-creative act — a content script is JS injected into the running app that modifies its UI without
-rebuilding.
+To create a prototype, you dispatch a `generate-prototype` subagent. Each prototype is a
+standalone copy of the baseline app with design changes made directly in the source code. The
+subagent copies the baseline, edits the source, runs the app on its own port, starts a tunnel,
+and registers it on the canvas.
 
 The subagent needs a spec (what to build) and codebase context (how the app works). Upload
 the spec to drive first:
@@ -179,33 +168,34 @@ curl -sF 'file=@/tmp/spec_<slot_id>.json' https://drive.orianna.ai/api/v2/upload
 
 Then dispatch the subagent with this prompt format:
 ```
-Run the `generate-content-script` skill and follow its instructions exactly.
+Run the `generate-prototype` skill and follow its instructions exactly.
 
 <project_id>{project_id}</project_id>
 <slot_id>{slot_id}</slot_id>
 <caption_slot_id>{caption_slot_id, if available}</caption_slot_id>
-<tunnel_id>{tunnel_id}</tunnel_id>
+<baseline_dir>{baseline_dir}</baseline_dir>
 <spec_url>{spec_url}</spec_url>
 <images>
 {image_urls, one per line — screenshots, mocks, references}
 </images>
-<content_script_url>{existing content script URL, if refining}</content_script_url>
+<prototype_dir>{existing prototype directory, if refining}</prototype_dir>
 <context>
 {what you learned about the app: routing, auth, data fetching, response shapes, styling}
 </context>
 ```
 
-The subagent writes the content script, uploads it, calls `update_iframe_element` to place
-it on the canvas, fills in the caption, and screenshots the prototype — all automatically.
-Dispatch multiple subagents in parallel when generating multiple prototypes. 
+The subagent copies the baseline, makes the design changes in the source code, runs the app,
+starts a tunnel, calls `update_iframe_element` to register it on the canvas, fills in the
+caption, and screenshots the prototype — all automatically. Dispatch multiple subagents in
+parallel when generating multiple prototypes.
 
-Content scripts can take a while — don't halt all work and wait for them. Dispatch them in
-the background and continue with other work while they generate.
+Prototypes can take a while — don't halt all work and wait for them. Dispatch them in the
+background and continue with other work while they generate.
 
 ### Drive
 
-Drive URLs (like `spec_url`, `content_script.url`, `screenshots`) are regular URLs — download
-them with `curl` to read their contents. Upload any file to get a shareable URL:
+Drive URLs (like `spec_url`, `screenshots`) are regular URLs — download them with `curl` to
+read their contents. Upload any file to get a shareable URL:
 ```bash
 curl -sF 'file=@/path/to/file' https://drive.orianna.ai/api/v2/upload
 ```
@@ -221,8 +211,9 @@ Do not proceed until the user has provided all three. If the user has already pr
 information in their prompt, confirm it back to them and proceed.
 
 1. **Clone the app.** Dispatch the `clone-app-codegen` agent with the path to the application source
-   code and the design problem. Wait for it to finish — it will return the port number the app is
-   running on.
+   code and the design problem. Wait for it to finish — it will return the port number and the
+   directory path of the baseline clone. Save the directory path as `baseline_dir` — every
+   prototype subagent needs it.
 
 2. **Start the tunnel.** Run the `start-tunnel` skill with the port number. The moment the tunnel is
    up, print the tunnel URL as a clickable link in a regular message first.
@@ -239,7 +230,7 @@ information in their prompt, confirm it back to them and proceed.
 
 5. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
    resize to 1512x982) and screenshot the key screen(s) relevant to the design problem.
-   Upload to drive — you'll pass these URLs in `<images>` for every content-script subagent.
+   Upload to drive — you'll pass these URLs in `<images>` for every prototype subagent.
 
    **Now study what you captured.** Before any design work, describe what you see in the
    screenshot: the layout and composition, visual hierarchy, use of space, what draws the
@@ -257,11 +248,11 @@ information in their prompt, confirm it back to them and proceed.
 
    Create explorations (getting slot_ids), then **dispatch `present-canvas` immediately in
    the background** with your analysis and what you created. After the presenter is dispatched,
-   dispatch content-script subagents in parallel. The presenter writes your thinking on the
+   dispatch prototype subagents in parallel. The presenter writes your thinking on the
    canvas and arranges the layout while prototypes generate — the human sees real work
    appearing from the start.
 
-Then wait for all content scripts and the presenter to finish. The canvas should tell the
+Then wait for all prototypes and the presenter to finish. The canvas should tell the
 complete story — problem analysis, explorations, and where you landed.
 
 ## After the initial exploration: the prompt loop
@@ -270,11 +261,11 @@ The initial exploration is done — but you're not done. The PM will review the 
 comments, and click the green button to request the next round. When that happens,
 `wait_for_prompt` returns and **you have a new design mandate.** Treat every prompt as a full
 round of design work — read the feedback, create new explorations, dispatch the presenter and
-content scripts. This is the same depth of work as the initial exploration, targeted at what
+prototypes. This is the same depth of work as the initial exploration, targeted at what
 the PM asked for.
 
 **CRITICAL: Do NOT call `complete_prompt` until you have created new explorations, dispatched
-`present-canvas`, and dispatched content-script subagents. Every prompt requires real design
+`present-canvas`, and dispatched prototype subagents. Every prompt requires real design
 work — never dismiss a prompt without doing the work.**
 
 Enter the prompt loop indefinitely:
@@ -313,12 +304,12 @@ Enter the prompt loop indefinitely:
    into one exploration so the PM sees holistic variations rather than fragmented responses.
 
 4. **Do the work.** Create explorations, then **dispatch `present-canvas` FIRST — before
-   content scripts.** The presenter is a small, fast dispatch. Content-script dispatches are
-   heavy (each needs a full spec, codebase context, URLs). If you try to batch them all
-   together, the presenter gets stuck behind 10 content scripts and the canvas stays bare for
-   minutes. Always dispatch the presenter as its own separate step, then dispatch content
-   scripts after. When you finish, the canvas should show clear progress on what the PM
-   asked for.
+   prototypes.** The presenter is a small, fast dispatch. Prototype dispatches are heavy
+   (each needs a full spec, codebase context, and builds a standalone app). If you try to
+   batch them all together, the presenter gets stuck behind 10 prototypes and the canvas
+   stays bare for minutes. Always dispatch the presenter as its own separate step, then
+   dispatch prototypes after. When you finish, the canvas should show clear progress on what
+   the PM asked for.
 
    Dispatch `present-canvas` in the background with revision mode:
 
