@@ -159,10 +159,13 @@ standalone copy of the baseline app with design changes made directly in the sou
 subagent copies the baseline, edits the source, runs the app on its own port, starts a tunnel,
 and registers it on the canvas.
 
-The subagent needs a spec (what to build) and codebase context (how the app works). Upload
-the spec to drive first:
+The subagent needs a spec (what to build) and codebase context (how the app works). Write
+the spec to a file and upload it to drive. **Do NOT use `echo`** — specs contain em dashes,
+quotes, and unicode that break shell quoting. Use a heredoc instead:
 ```bash
-echo '{"spec": "<your spec text>"}' > /tmp/spec_<slot_id>.json
+cat <<'SPEC_EOF' > /tmp/spec_<slot_id>.json
+{"spec": "<your spec text>"}
+SPEC_EOF
 curl -sF 'file=@/tmp/spec_<slot_id>.json' https://drive.orianna.ai/api/v2/upload
 ```
 

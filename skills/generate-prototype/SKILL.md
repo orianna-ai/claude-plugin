@@ -82,9 +82,12 @@ whatever you need about the app. Read local source files, not the tunnel URL.
    aesthetics. Use the app's CSS variables, theme tokens, or class patterns — never hardcode
    approximate color values. Never load external CSS frameworks or component libraries when the app already has its own.
 
-5. **Start the app.** Run the prototype's dev server on a free port:
+5. **Start the app.** Run the prototype's dev server on a free port. **Do NOT use the
+   default port (5173)** — multiple prototypes run in parallel and will collide. Find a
+   free port and bind to `127.0.0.1` explicitly (avoid IPv6 `[::1]` ambiguity):
    ```bash
-   cd /tmp/prototype_<slot_id> && npx vite --port 0 &
+   PORT=$(python3 -c "import socket; s=socket.socket(); s.bind(('',0)); print(s.getsockname()[1]); s.close()")
+   cd /tmp/prototype_<slot_id> && npx vite --port $PORT --host 127.0.0.1 --strictPort &
    ```
    Wait for the server to print the port it's listening on. Capture that port number.
 
@@ -120,6 +123,11 @@ changes to screenshot them (the codebase, spec_url, and source code can help you
 
 1. Navigate to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`
 2. Check that the page loaded, then find the design changes described in the spec. You  may need to interact with the application to get the app into a state where the design change is visible. Reminder: pages could be broken or stuck loading. If that happens, move on — do not wait indefinitely.
-3. Take a screenshot with `browser_take_screenshot` (`fullPage` set to `true`). It returns a drive URL directly.
-4. Call `set_iframe_screenshots` with `project_id`, `slot_id`, and `screenshot_urls`
+3. Take a screenshot with `browser_take_screenshot` (`fullPage` set to `true`). This returns
+   a **local filename**, not a URL. Upload it to drive to get a URL:
+   ```bash
+   curl -sF 'file=@<local_screenshot_path>' https://drive.orianna.ai/api/v2/upload
+   ```
+4. Call `set_iframe_screenshots` with `project_id`, `slot_id`, and the **drive URLs** from
+   step 3 as `screenshot_urls`.
 5. Call `close_session` to clean up the browser
