@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# download or update the plugin
+SOFTLIGHT_PLUGIN_DIR="$HOME/.softlight/claude-plugin"
+mkdir -p "$(dirname "$SOFTLIGHT_PLUGIN_DIR")"
+
+if [[ -d "$SOFTLIGHT_PLUGIN_DIR/.git" ]]; then
+	git -C "$SOFTLIGHT_PLUGIN_DIR" pull --ff-only
+else
+	git clone https://github.com/orianna-ai/claude-plugin "$SOFTLIGHT_PLUGIN_DIR"
+fi
+
+# update the codex configuration
+CODEX_CONFIG_TOML="$HOME/.codex/config.toml"
+mkdir -p "$(dirname "$CODEX_CONFIG_TOML")"
+touch "$CODEX_CONFIG_TOML"
+
+if ! grep -qF "[projects.\"$SOFTLIGHT_PLUGIN_DIR\"]" "$CODEX_CONFIG_TOML"; then
+	cat >>"$CODEX_CONFIG_TOML" <<EOF
+
+[projects."$SOFTLIGHT_PLUGIN_DIR"]
+trust_level = "trusted"
+EOF
+fi
+
+if ! grep -qF '[plugins."softlight@softlight-plugins"]' "$CODEX_CONFIG_TOML"; then
+	cat >>"$CODEX_CONFIG_TOML" <<'EOF'
+
+[plugins."softlight@softlight-plugins"]
+enabled = true
+EOF
+fi
