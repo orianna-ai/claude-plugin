@@ -78,9 +78,21 @@ whatever you need about the app. Read local source files, not the tunnel URL.
    should feel like a well-designed, fully functioning app — not a rough mockup. If your
    changes introduce new UI that needs data, seed realistic mock data.
 
-   **Preserve the app's design system** — any new UI elements must match the app's existing
-   aesthetics. Use the app's CSS variables, theme tokens, or class patterns — never hardcode
-   approximate color values. Never load external CSS frameworks or component libraries when the app already has its own.
+   ### Styling rules
+
+   **Use inline styles for layout on new elements.** When you create new containers or
+   wrappers, put layout properties — `display`, `flexDirection`, `alignItems`,
+   `justifyContent`, `gap`, `padding`, `width`, `maxWidth`, `gridTemplateColumns` — directly
+   on the element as inline styles. This keeps layout visible and co-located with the JSX,
+   preventing cascade bugs from a separate CSS file. Do not create new CSS classes for layout.
+
+   **Use the app's existing CSS classes for visual styling.** Colors, fonts, borders, shadows,
+   border-radius, transitions — these come from the app's design system. Read the existing CSS
+   to find the right classes and values. Never hardcode approximate colors. Never load external
+   CSS frameworks or component libraries when the app already has its own.
+
+   **Do not modify existing CSS class definitions.** If you need different behavior, create a
+   new element with inline styles rather than changing a class that other elements depend on.
 
 5. **Start the app.** Run the prototype's dev server on a free port. **Do NOT use the
    default port (5173)** — multiple prototypes run in parallel and will collide. Find a
