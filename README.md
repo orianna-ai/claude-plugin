@@ -10,14 +10,14 @@
 ## Claude Code Desktop App
 
 1. Start in terminal. If they don't have "claude" command, get it installed.
-    1. Step 1: Install Claude Code CLI (if needed)
-        1. # macOS/Linux
+    a. Step 1: Install Claude Code CLI (if needed)
+        i. macOS/Linux
             1. curl -fsSL https://claude.ai/install.sh | bash
-        2. # macOS (Homebrew)
+        ii. macOS (Homebrew)
             1. brew install --cask claude-code
-    2. Step 2: In terminal run the following commands to install the plugin
-        1. /plugin marketplace add orianna-ai/claude-plugin
-        2. /plugin install softlight@orianna-ai-claude-plugin
+    a. Step 2: In terminal run the following commands to install the plugin
+        i. /plugin marketplace add orianna-ai/claude-plugin
+       ii. /plugin install softlight@orianna-ai-claude-plugin
 2. In the desktop app, paste these instructions
 
 ```
