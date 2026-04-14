@@ -17,3 +17,5 @@ mkdir -p "$CURSOR_PLUGINS_DIR"
 
 rm -rf "$CURSOR_PLUGINS_DIR/softlight"
 cp -a "$SOFTLIGHT_PLUGIN_DIR/plugins/softlight" "$CURSOR_PLUGINS_DIR/softlight"
+
+echo 'Restart Cursor or run "Developer: Reload Window" to pick up changes.'
