@@ -169,10 +169,8 @@ SPEC_EOF
 curl -sF 'file=@/tmp/spec_<slot_id>.json' https://drive.orianna.ai/api/v2/upload
 ```
 
-Then dispatch the subagent with this prompt format:
+Then dispatch the `generate-prototype` agent with this prompt:
 ```
-Run the `generate-prototype` skill and follow its instructions exactly.
-
 <project_id>{project_id}</project_id>
 <slot_id>{slot_id}</slot_id>
 <caption_slot_id>{caption_slot_id, if available}</caption_slot_id>
@@ -229,7 +227,10 @@ information in their prompt, confirm it back to them and proceed.
    user has logged in, write a short problem statement — a natural paragraph covering what the
    product is, who uses it, and the people problem that needs solving. Then call `create_project`
    with the `problem_statement`, `tunnel_id`, and current git commit (`git rev-parse HEAD`).
-   Share the `project_url` with the user.
+   CRITICAL: Share the `project_url` with the user and open it in their browser automatically:
+   ```bash
+   ${BROWSER:-open} "$PROJECT_URL" 2>/dev/null || xdg-open "$PROJECT_URL" 2>/dev/null || true
+   ```
 
 5. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
    resize to 1512x982) and screenshot the key screen(s) relevant to the design problem.

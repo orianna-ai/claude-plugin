@@ -74,6 +74,24 @@ graph — utilities, hooks, types, constants, context providers,
 everything. If a file imports "./utils/cn", that utils file must
 be included. Missing files are the #1 cause of build failures.
 
+CRITICAL — output a Vite + React app (client-side only):
+The clone is served through a tunnel proxy that rewrites HTML responses
+(rewriting URLs, injecting scripts). Server-side rendering frameworks
+break in this setup because the proxy modifies the server-rendered HTML,
+causing hydration mismatches on the client. The clone must be a plain
+client-side React app built with Vite. No SSR, no hydration, no server
+rendering. If the source app uses a framework that does server-side
+rendering, fully deframework it — the output must have zero dependencies
+on the original framework.
+
+Start by scaffolding the project:
+```bash
+pnpm create vite@latest /tmp/clone -- --template react-ts
+```
+This gives you a working vite.config.ts, index.html, package.json, and
+entry point. Then replace the scaffold's placeholder components with the
+cloned application code.
+
 CRITICAL — no server-side or Node.js APIs:
 This runs in the browser. You must remove or replace:
 - process.env.* → hardcode the value directly
