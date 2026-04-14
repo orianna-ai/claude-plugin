@@ -1,6 +1,6 @@
 {
   "name": "softlight",
-  "version": "5.2.0",
+  "version": "5.2.8",
   "description": "Generate and implement design directions for product design problems. Explores alternatives, makes code changes, and wires the app so you can see results immediately.",
   "author": {
     "name": "Softlight"
