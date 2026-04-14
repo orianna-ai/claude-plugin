@@ -18,8 +18,9 @@ Your goal is to generate a clone of the application described by the
 see if they opened the real application in their browser right now. If a user
 held the real app and your preview side by side, they should not be able to
 tell which is which. Run the cloned application in the background. Your
-final message must state the port number the app is running on — this is the
-only information the caller needs from you.
+final message must state the port number the app is running on AND the
+absolute path to the clone directory — these are the only two pieces of
+information the caller needs from you.
 
 CRITICAL — always render the FULL PAGE, not just a component:
 

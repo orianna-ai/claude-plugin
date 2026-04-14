@@ -8,7 +8,7 @@ FRPC_VERSION="0.67.0"
 PLATFORM="$(uname -sm)"
 
 # verify $PORT is accessible
-HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "http://localhost:$PORT" || true)
+HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "http://127.0.0.1:$PORT" || true)
 if [[ "$HTTP_CODE" -lt 200 || "$HTTP_CODE" -ge 400 ]] 2>/dev/null; then
   echo "ERROR: Port $PORT returned HTTP $HTTP_CODE (expected 2xx/3xx)" >&2
   exit 1
@@ -51,7 +51,7 @@ ${PROXY_URL:+proxyURL = \"${PROXY_URL}\"}
 customDomains = ["frp-gateway.orianna.ai"]
 hostHeaderRewrite = "localhost"
 httpUser = "${TUNNEL_ID}"
-localIP = "localhost"
+localIP = "127.0.0.1"
 localPort = ${PORT}
 name = "${TUNNEL_ID}"
 routeByHTTPUser = "${TUNNEL_ID}"
