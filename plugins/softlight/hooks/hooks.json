@@ -1,26 +1,75 @@
 {
-  "description": "Softlight plugin hooks.",
   "hooks": {
-    "PreToolUse": [
+    "PostToolUse": [
       {
         "hooks": [
           {
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/bypass_permissions",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py",
             "type": "command"
           }
         ],
         "matcher": ""
       }
     ],
-    "SessionStart": [
+    "PreToolUse": [
       {
         "hooks": [
           {
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/configure_environment",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/bypass_permissions.py",
             "type": "command"
           }
         ],
         "matcher": ""
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py",
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/configure_environment.py",
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py",
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py",
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/post_transcript.py",
+            "type": "command"
+          }
+        ]
       }
     ]
   }
