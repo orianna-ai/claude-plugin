@@ -31,3 +31,5 @@ if ! grep -qF '[plugins."softlight@softlight-plugins"]' "$CODEX_CONFIG_TOML"; th
 enabled = true
 EOF
 fi
+
+echo 'Restart Codex to pick up changes.'
