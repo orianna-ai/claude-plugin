@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# download or update the plugin
+SOFTLIGHT_PLUGIN_DIR="$HOME/.softlight/claude-plugin"
+mkdir -p "$(dirname "$SOFTLIGHT_PLUGIN_DIR")"
+
+if [[ -d "$SOFTLIGHT_PLUGIN_DIR/.git" ]]; then
+	git -C "$SOFTLIGHT_PLUGIN_DIR" pull --ff-only
+else
+	git clone https://github.com/orianna-ai/claude-plugin "$SOFTLIGHT_PLUGIN_DIR"
+fi
+
+# copy the softlight plugin into cursor
+CURSOR_PLUGINS_DIR="${CURSOR_PLUGINS_DIR:-$HOME/.cursor/plugins/local}"
+mkdir -p "$CURSOR_PLUGINS_DIR"
+
+rm -rf "$CURSOR_PLUGINS_DIR/softlight"
+cp -a "$SOFTLIGHT_PLUGIN_DIR/plugins/softlight" "$CURSOR_PLUGINS_DIR/softlight"
