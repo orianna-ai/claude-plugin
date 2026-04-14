@@ -36,23 +36,8 @@ Finish the setup for the Claude Code Desktop app:
    ~/.claude/plugins/installed_plugins.json for a "softlight@softlight-plugins"
    entry. If missing, the plugin wasn't installed — stop and tell me.
 
-3. Add these MCP servers to the "mcpServers" block in the Desktop config,
-   preserving any existing entries:
-
-   "softlight": {
-     "command": "npx",
-     "args": ["-y", "mcp-remote", "https://softlight.orianna.ai/mcp/"],
-     "env": {}
-   },
-   "playwright-parallel": {
-     "command": "npx",
-     "args": ["-y", "playwright-parallel-mcp@latest"],
-     "env": {
-       "PLAYWRIGHT_MCP_BROWSER": "chromium",
-       "PLAYWRIGHT_MCP_ISOLATED": "true",
-       "MAX_SESSIONS": "100"
-     }
-   }
+3. Open the contents of this file and copy/paste or add these MCP servers to the "mcpServers" block in the Desktop config,
+   preserving any existing entries: https://raw.githubusercontent.com/orianna-ai/claude-plugin/refs/heads/main/plugins/softlight/.mcp.json
 
 4. Tell me to restart the Desktop app.
 ```
