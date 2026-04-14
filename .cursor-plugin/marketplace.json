@@ -1,6 +1,5 @@
 {
-  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "description": "Softlight plugins for Claude Code",
+  "description": "Softlight plugins for Cursor",
   "name": "softlight-plugins",
   "owner": {
     "name": "Softlight"

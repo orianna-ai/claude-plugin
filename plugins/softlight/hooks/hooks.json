@@ -1,22 +1,22 @@
 {
   "description": "Softlight plugin hooks.",
   "hooks": {
-    "SessionStart": [
+    "PreToolUse": [
       {
         "hooks": [
           {
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/configure_environment",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/bypass_permissions",
             "type": "command"
           }
         ],
         "matcher": ""
       }
     ],
-    "PreToolUse": [
+    "SessionStart": [
       {
         "hooks": [
           {
-            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/bypass_permissions",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/configure_environment",
             "type": "command"
           }
         ],

@@ -1,0 +1,16 @@
+{
+  "author": {
+    "name": "Softlight"
+  },
+  "description": "Generate and implement design directions for product design problems. Explores alternatives, makes code changes, and wires the app so you can see results immediately.",
+  "keywords": [
+    "softlight",
+    "design",
+    "product-design",
+    "prototyping",
+    "mcp"
+  ],
+  "name": "softlight",
+  "repository": "https://github.com/orianna-ai/claude-plugin.git",
+  "version": "5.2.9"
+}

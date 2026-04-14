@@ -200,7 +200,7 @@ Run the `generate-content-script` skill and follow its instructions exactly.
 
 The subagent writes the content script, uploads it, calls `update_iframe_element` to place
 it on the canvas, fills in the caption, and screenshots the prototype — all automatically.
-Dispatch multiple subagents in parallel when generating multiple prototypes. 
+Dispatch multiple subagents in parallel when generating multiple prototypes.
 
 Content scripts can take a while — don't halt all work and wait for them. Dispatch them in
 the background and continue with other work while they generate.

@@ -9,37 +9,37 @@ PLATFORM="$(uname -sm)"
 
 # verify $PORT is accessible
 HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 5 "http://127.0.0.1:$PORT" || true)
-if [[ "$HTTP_CODE" -lt 200 || "$HTTP_CODE" -ge 400 ]] 2>/dev/null; then
-  echo "ERROR: Port $PORT returned HTTP $HTTP_CODE (expected 2xx/3xx)" >&2
-  exit 1
+if [[ $HTTP_CODE -lt 200 || $HTTP_CODE -ge 400 ]] 2>/dev/null; then
+	echo "ERROR: Port $PORT returned HTTP $HTTP_CODE (expected 2xx/3xx)" >&2
+	exit 1
 fi
 
 # locate the frpc binary
 case "$PLATFORM" in
-  "Linux x86_64")  BINARY_NAME="frp_${FRPC_VERSION}_linux_amd64" ;;
-  "Linux aarch64") BINARY_NAME="frp_${FRPC_VERSION}_linux_arm64" ;;
-  "Darwin x86_64") BINARY_NAME="frp_${FRPC_VERSION}_darwin_amd64" ;;
-  "Darwin arm64")  BINARY_NAME="frp_${FRPC_VERSION}_darwin_arm64" ;;
-  *)
-    echo "ERROR: Unsupported platform '$PLATFORM'. Run 'uname -sm' to verify." >&2
-    exit 1
-    ;;
+"Linux x86_64") BINARY_NAME="frp_${FRPC_VERSION}_linux_amd64" ;;
+"Linux aarch64") BINARY_NAME="frp_${FRPC_VERSION}_linux_arm64" ;;
+"Darwin x86_64") BINARY_NAME="frp_${FRPC_VERSION}_darwin_amd64" ;;
+"Darwin arm64") BINARY_NAME="frp_${FRPC_VERSION}_darwin_arm64" ;;
+*)
+	echo "ERROR: Unsupported platform '$PLATFORM'. Run 'uname -sm' to verify." >&2
+	exit 1
+	;;
 esac
 
 BINARY_URL="https://github.com/fatedier/frp/releases/download/v${FRPC_VERSION}/${BINARY_NAME}.tar.gz"
 
 BINARY="/tmp/${BINARY_NAME}/frpc"
 
-if [[ ! -x "$BINARY" ]]; then
-  echo "Downloading frpc ($BINARY_NAME)..." >&2
-  curl -sL "$BINARY_URL" | tar xz -C /tmp/
+if [[ ! -x $BINARY ]]; then
+	echo "Downloading frpc ($BINARY_NAME)..." >&2
+	curl -sL "$BINARY_URL" | tar xz -C /tmp/
 fi
 
 # run frpc in the background and capture the pid
 CONFIG_FILE="/tmp/frpc-${TUNNEL_ID}.toml"
 PROXY_URL="${HTTPS_PROXY:-${HTTP_PROXY:-${https_proxy:-${http_proxy:-}}}}"
 
-cat > "$CONFIG_FILE" <<TOML
+cat >"$CONFIG_FILE" <<TOML
 serverAddr = "frp.orianna.ai"
 serverPort = 443
 
@@ -64,17 +64,17 @@ PID=$!
 # verify the tunnel is accessible
 sleep 0.5
 for i in 1 2 3 4 5; do
-  HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "https://softlight.orianna.ai/api/tunnel/$TUNNEL_ID/" || true)
-  if [[ "$HTTP_CODE" -ge 200 && "$HTTP_CODE" -lt 400 ]] 2>/dev/null; then
-    break
-  fi
-  if [[ $i -eq 5 ]]; then
-    echo "ERROR: Tunnel did not come up after 5 attempts (last HTTP $HTTP_CODE)" >&2
-    echo "frpc log:" >&2
-    cat "/tmp/frpc-${TUNNEL_ID}.log" >&2
-    exit 1
-  fi
-  sleep 0.5
+	HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "https://softlight.orianna.ai/api/tunnel/$TUNNEL_ID/" || true)
+	if [[ $HTTP_CODE -ge 200 && $HTTP_CODE -lt 400 ]] 2>/dev/null; then
+		break
+	fi
+	if [[ $i -eq 5 ]]; then
+		echo "ERROR: Tunnel did not come up after 5 attempts (last HTTP $HTTP_CODE)" >&2
+		echo "frpc log:" >&2
+		cat "/tmp/frpc-${TUNNEL_ID}.log" >&2
+		exit 1
+	fi
+	sleep 0.5
 done
 
 # print the tunnel details
