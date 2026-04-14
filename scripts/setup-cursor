@@ -12,7 +12,7 @@ else
 fi
 
 # copy the softlight plugin into cursor
-CURSOR_PLUGINS_DIR="${CURSOR_PLUGINS_DIR:-$HOME/.cursor/plugins/local}"
+CURSOR_PLUGINS_DIR="${CURSOR_PLUGINS_DIR:-$HOME/.cursor/plugins/cache}"
 mkdir -p "$CURSOR_PLUGINS_DIR"
 
 rm -rf "$CURSOR_PLUGINS_DIR/softlight"
