@@ -259,28 +259,18 @@ information in their prompt, confirm it back to them and proceed.
 Then wait for all prototypes and the presenter to finish. The canvas should tell the
 complete story — problem analysis, explorations, and where you landed.
 
-## After the initial exploration: the prompt loop
+## After the initial exploration
 
 The initial exploration is done — but you're not done. The PM will review the canvas, leave
 comments, and click the green button to request the next round. When that happens,
-`wait_for_prompt` returns and **you have a new design mandate.** Treat every prompt as a full
+**you have a new design mandate.** Treat every prompt as a full
 round of design work — read the feedback, create new explorations, dispatch the presenter and
 prototypes. This is the same depth of work as the initial exploration, targeted at what
 the PM asked for.
 
-**CRITICAL: Do NOT call `complete_prompt` until you have created new explorations, dispatched
-`present-canvas`, and dispatched prototype subagents. Every prompt requires real design
-work — never dismiss a prompt without doing the work.**
-
-Enter the prompt loop indefinitely:
-
-1. **Wait for the next prompt.** Call `wait_for_prompt` with the `project_id` (and `prompt_id`
-   from the previous iteration, if any).
-
-2. **Understand where things stand.** Call `get_project` to see the full canvas state.
+1. **Understand where things stand.** Call `get_project` to see the full canvas state.
    Read all comment threads — PM comments have the user's email as `created_by`. Read the
-   full thread to understand where the discussion landed. The `prompt_text` from
-   `wait_for_prompt` may be generic — the real feedback is in the canvas comments.
+   full thread to understand where the discussion landed. You prompt may be generic — the real feedback is in the canvas comments.
 
    Comment threads have a `screenshot` field — a URL showing the canvas area the PM was
    looking at when they commented. Download and look at these screenshots to see what the PM
@@ -293,7 +283,7 @@ Enter the prompt loop indefinitely:
    `attachments` for any images the PM included. Your next round of design must respond
    to what you *see* in these screenshots, not just what you *read* in the comment text.
 
-3. **Decide what to do next.** Based on the PM's feedback, figure out what to explore. The
+2. **Decide what to do next.** Based on the PM's feedback, figure out what to explore. The
    comment thread screenshots ensure you're seeing what the PM saw — ground your design
    decisions in that shared visual context and what the discussion says.
 
@@ -307,7 +297,7 @@ Enter the prompt loop indefinitely:
    same decision — multiple notes about the same design or the same problem — combine them
    into one exploration so the PM sees holistic variations rather than fragmented responses.
 
-4. **Do the work.** Create explorations, then **dispatch `present-canvas` FIRST — before
+3. **Do the work.** Create explorations, then **dispatch `present-canvas` FIRST — before
    prototypes.** The presenter is a small, fast dispatch. Prototype dispatches are heavy
    (each needs a full spec, codebase context, and builds a standalone app). If you try to
    batch them all together, the presenter gets stuck behind 10 prototypes and the canvas
@@ -328,8 +318,3 @@ Enter the prompt loop indefinitely:
    {what you just created — exploration titles, slot_ids, what each one explores and why}
    </explorations_created>
    ```
-
-5. **Wait for all work to finish, then call `complete_prompt`** with the `project_id` and
-   `prompt_id` to dismiss the loading state on the canvas.
-
-6. **Loop back to step 1.**
