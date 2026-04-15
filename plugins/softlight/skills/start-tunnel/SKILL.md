@@ -7,4 +7,4 @@ description: Create a tunnel between a local port and Softlight. Requires an app
 
 Run `start_tunnel.sh $PORT [$TUNNEL_ID]` with the port number of the running application. The tunnel ID is optional — if omitted, a new UUID is generated.
 
-The script prints `TUNNEL_ID=...` and `PID=...`. Return those two values to the caller.
+The script prints `TUNNEL_ID=...` and `PID=...`.
