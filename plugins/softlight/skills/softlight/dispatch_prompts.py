@@ -1,10 +1,9 @@
+import argparse
 import concurrent.futures
 import contextlib
 import json
-import sys
 import time
 import urllib.request
-import uuid
 from typing import Any
 
 from scripts.call_claude import call_claude
@@ -54,38 +53,11 @@ non-interactive environment. Do not ask the user questions - they have no way to
         )
 
 
-def _create_project(config: Config, problem_statement: str) -> str:
-    """Create the Softlight project and return its URL."""
-    post_events(
-        config=config,
-        events=[
-            {
-                "type": "project_updated",
-                "problem": {
-                    "text": problem_statement,
-                    "baseline": {
-                        "type": "iframe",
-                        "content_script": None,
-                        "tunnel_id": "",
-                    },
-                    "attachments": [],
-                },
-            },
-        ],
-    )
-
-    return f"{config.base_url}/projects/{config.project_id}"
-
-
-def dispatch_prompts() -> None:
-    problem_statement = sys.argv[1] if len(sys.argv) > 1 else ""
-
-    config = load_config(
-        project_id=str(uuid.uuid4()),
-    )
-
-    project_url = _create_project(config, problem_statement)
-    print(f"PROJECT_URL={project_url}", flush=True)
+def dispatch_prompts(
+    *,
+    project_id: str,
+) -> None:
+    config = load_config(project_id)
 
     post_events(
         config=config,
@@ -138,7 +110,13 @@ project.
 
 
 def main() -> None:
-    dispatch_prompts()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--project-id", required=True)
+    args = parser.parse_args()
+
+    dispatch_prompts(
+        project_id=args.project_id,
+    )
 
 
 if __name__ == "__main__":

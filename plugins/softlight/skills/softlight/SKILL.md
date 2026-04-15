@@ -8,26 +8,29 @@ If the user has already provided the following information in their prompt, conf
 - **What application** is being changed
 - **What design problem** they want to solve
 
-Do not proceed until the user has provided both. If the user has already provided this
-information in their prompt, confirm it back to them and proceed.
+Do not proceed until the user has provided both. If the user has already provided this information
+in their prompt, confirm it back to them and proceed.
 
-Once you have both, run the following script in the background (it will run forever).
-Pass the design problem as a quoted argument:
+Run the following script to setup the Softlight project. The script will output
+`project_id=<project_id>` and `project_url=<project_url>`.
 
 ```bash
-python3 -u -m dispatch_prompts "DESIGN_PROBLEM"
+python3 -m setup_project <<'EOF'
+<problem_statement>
+EOF
 ```
 
-The Shell tool will return an `output_file` path when the command is backgrounded. Read
-the `output_file` with the Read tool (use `offset: -50`) until you see a line starting with
-`PROJECT_URL=`. Extract the URL.
+Open the `<project_url>` in the user's browser by running the following command.
 
-Once you have the URL:
+```bash
+${BROWSER:-open} "$PROJECT_URL" 2>/dev/null || xdg-open "$PROJECT_URL" 2>/dev/null || true
+```
 
-1. Print the full project URL for the user.
-2. Open it in the user's browser:
-   ```bash
-   ${BROWSER:-open} "$PROJECT_URL" 2>/dev/null || xdg-open "$PROJECT_URL" 2>/dev/null || true
-   ```
-3. Tell the user the designer agent is working in the background and they can watch
-   progress on the canvas as explorations and prototypes appear.
+Run the following script in the background (it will run forever).
+
+```bash
+python3 -m dispatch_prompts --project-id <project_id>
+```
+
+Tell the user the designer agent is working in the background and that they can watch progress on
+the canvas as explorations and prototypes appear.
