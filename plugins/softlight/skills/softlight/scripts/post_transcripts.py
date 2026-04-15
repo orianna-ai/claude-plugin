@@ -31,5 +31,5 @@ def post_transcripts(
 
     urllib.request.urlopen(
         request,
-        timeout=10,
+        timeout=30,
     )

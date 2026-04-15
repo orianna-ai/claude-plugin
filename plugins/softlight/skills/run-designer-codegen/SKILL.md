@@ -224,10 +224,12 @@ information in their prompt, confirm it back to them and proceed.
    system, components, routing, data models, user flows, and business logic relevant to the
    design problem. This is your foundation for everything that follows.
 
-4. **Write the problem statement and create the project.** Once you understand the app
+4. **Write the problem statement and update the project.** Once you understand the app
    write a short problem statement — a natural paragraph covering what the
    product is, who uses it, and the people problem that needs solving. Then call `create_project`
-   with the `problem_statement`, and `tunnel_id`. Share the `project_url` with the user.
+   with the `problem_statement`, and `tunnel_id`. The project already exists (it was created
+   by the dispatcher) — this call updates it with your refined problem statement and the
+   baseline tunnel.
 
 5. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
    resize to 1512x982) and screenshot the key screen(s) relevant to the design problem.

@@ -85,11 +85,11 @@ def call_claude(
     ]
 
     if fork_session:
-        if session_id := _claude_code_session_id():
+        if original_session_id := _claude_code_session_id():
             cmd.extend(
                 [
                     "--resume",
-                    session_id,
+                    original_session_id,
                 ],
             )
 

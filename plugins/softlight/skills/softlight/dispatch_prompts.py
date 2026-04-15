@@ -1,5 +1,7 @@
 import concurrent.futures
+import contextlib
 import json
+import sys
 import time
 import urllib.request
 import uuid
@@ -52,10 +54,38 @@ non-interactive environment. Do not ask the user questions - they have no way to
         )
 
 
+def _create_project(config: Config, problem_statement: str) -> str:
+    """Create the Softlight project and return its URL."""
+    post_events(
+        config=config,
+        events=[
+            {
+                "type": "project_updated",
+                "problem": {
+                    "text": problem_statement,
+                    "baseline": {
+                        "type": "iframe",
+                        "content_script": None,
+                        "tunnel_id": "",
+                    },
+                    "attachments": [],
+                },
+            },
+        ],
+    )
+
+    return f"{config.base_url}/projects/{config.project_id}"
+
+
 def dispatch_prompts() -> None:
+    problem_statement = sys.argv[1] if len(sys.argv) > 1 else ""
+
     config = load_config(
         project_id=str(uuid.uuid4()),
     )
+
+    project_url = _create_project(config, problem_statement)
+    print(f"PROJECT_URL={project_url}", flush=True)
 
     post_events(
         config=config,
@@ -103,7 +133,8 @@ project.
 
             time.sleep(10)
 
-            post_transcripts(config)
+            with contextlib.suppress(Exception):
+                post_transcripts(config)
 
 
 def main() -> None:

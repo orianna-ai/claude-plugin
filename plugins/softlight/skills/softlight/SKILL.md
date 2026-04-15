@@ -11,23 +11,23 @@ If the user has already provided the following information in their prompt, conf
 Do not proceed until the user has provided both. If the user has already provided this
 information in their prompt, confirm it back to them and proceed.
 
-Once you have both, run the following script in the background (it will run forever):
+Once you have both, run the following script in the background (it will run forever).
+Pass the design problem as a quoted argument:
 
 ```bash
-python3 -u -m dispatch_prompts
+python3 -u -m dispatch_prompts "DESIGN_PROBLEM"
 ```
 
-The Shell tool will return an `output_file` path when the command is backgrounded. Save that path.
+The Shell tool will return an `output_file` path when the command is backgrounded. Read
+the `output_file` with the Read tool (use `offset: -50`) until you see a line starting with
+`PROJECT_URL=`. Extract the URL.
 
-**Monitoring loop — follow these rules exactly:**
+Once you have the URL:
 
-1. Call the **Read** tool on the `output_file` with `offset` set to **-200**.
-2. The output is a stream of JSON lines. Summarize only what the agent **did** or **produced** since
-   the last read. Never mention polling, monitoring, or your own loop. If nothing meaningful
-   changed, say **absolutely nothing** — just silently call Read again.
-3. Immediately call Read again (step 1). **This is an infinite loop — never exit it.**
-
-**Hard constraints:**
-- Do **NOT** use Bash, Shell, or any command to read or monitor the output file. Only use Read.
-- Do **NOT** use `sleep`, `wc`, `tail`, `cat`, or any other shell command to check progress.
-- Do **NOT** end your turn. If a tool call fails, retry with Read. Never stop polling.
+1. Print the full project URL for the user.
+2. Open it in the user's browser:
+   ```bash
+   ${BROWSER:-open} "$PROJECT_URL" 2>/dev/null || xdg-open "$PROJECT_URL" 2>/dev/null || true
+   ```
+3. Tell the user the designer agent is working in the background and they can watch
+   progress on the canvas as explorations and prototypes appear.
