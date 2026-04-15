@@ -19,7 +19,8 @@ def _handle_prompt(
         call_claude(
             config=config,
             prompt=f"""\
-You are an agent working on Softlight project {config.project_id}.
+You are an agent working on Softlight project {config.project_id}. You are running in a
+non-interactive environment. Do not ask the user questions - they have no way to answer.
 
 {prompt["text"]}
 """,
@@ -63,7 +64,8 @@ def dispatch_prompts() -> None:
                 "type": "prompt_created",
                 "prompt": {
                     "text": """\
-Use the `run-designer-codegen` skill to generate the initial revision.
+Use the `run-designer-codegen` skill to generate the initial revision in the project. Do not stop
+until you have generated every prototype in every exploration that you create in the revision.
 """,
                     "key": "generate_prototypes",
                     "effort": "max",
