@@ -270,7 +270,7 @@ the PM asked for.
 
 1. **Understand where things stand.** Call `get_project` to see the full canvas state.
    Read all comment threads — PM comments have the user's email as `created_by`. Read the
-   full thread to understand where the discussion landed. You prompt may be generic — the real feedback is in the canvas comments.
+   full thread to understand where the discussion landed. The prompt you just received may be generic — the real feedback is in the canvas comments.
 
    Comment threads have a `screenshot` field — a URL showing the canvas area the PM was
    looking at when they commented. Download and look at these screenshots to see what the PM
