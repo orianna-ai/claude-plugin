@@ -64,8 +64,9 @@ def dispatch_prompts() -> None:
                 "type": "prompt_created",
                 "prompt": {
                     "text": """\
-Use the `run-designer-codegen` skill to generate the initial revision in the project. Do not stop
-until you have generated every prototype in every exploration that you create in the revision.
+Use the `run-designer-codegen` skill to create the project and generate the initial explorations. Do
+not stop until you have generated every prototype in every exploration that you create in the
+project.
 """,
                     "key": "generate_prototypes",
                     "effort": "max",
