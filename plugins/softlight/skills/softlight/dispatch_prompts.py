@@ -26,7 +26,7 @@ non-interactive environment. Do not ask the user questions - they have no way to
 """,
             effort=prompt.get("effort"),
             model=prompt.get("model"),
-            session_id=prompt["key"],
+            session_id=f"{config.project_id}:{prompt['key']}",
         )
     except Exception:
         post_events(

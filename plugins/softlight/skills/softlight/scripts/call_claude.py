@@ -139,10 +139,10 @@ def call_claude(
     input = []
 
     if parent_session_id is not None:
-        input.append(config.transcripts[parent_session_id])
+        input.extend(config.transcripts[parent_session_id])
 
     if session_id is not None and session_id in config.transcripts:
-        input.append(config.transcripts[session_id])
+        input.extend(config.transcripts[session_id])
 
     input.append(
         {
