@@ -90,11 +90,15 @@ pnpm create vite@latest /tmp/clone -- --template react-ts
 ```
 This gives you a working vite.config.ts, index.html, package.json, and
 entry point. Then replace the scaffold's placeholder components with the
-cloned application code. Add `server: { prebundle: true }` to vite.config.ts
-so Vite pre-bundles modules instead of serving them individually — the clone
-is served through a tunnel where every request has high latency, and
-unbundled dev mode creates deep module waterfalls that make the page
-extremely slow to load.
+cloned application code.
+
+CRITICAL — always run a production build:
+After installing dependencies, run `pnpm build` and serve the `dist/`
+directory (e.g. `pnpm preview --host`). Do NOT use `pnpm dev` — the dev
+server is significantly slower to load through the tunnel proxy because
+every module is served as a separate request that must be individually
+proxied and rewritten. A production build bundles everything into a
+small number of static files that load much faster.
 
 CRITICAL — no server-side or Node.js APIs:
 This runs in the browser. You must remove or replace:
