@@ -1,7 +1,7 @@
 ---
 name: run-designer-codegen
 description: "Autonomous product designer. Explores the problem space, generates prototypes, self-critiques, and presents the work."
-allowed-tools: Bash, Read, Write, Glob, Grep, Agent, mcp__plugin_softlight_softlight__create_project, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_exploration, mcp__plugin_softlight_softlight__create_text, mcp__plugin_softlight_softlight__move_slot, mcp__plugin_softlight_softlight__update_iframe_element, mcp__plugin_softlight_softlight__update_text_element, mcp__plugin_softlight_softlight__set_iframe_screenshots, mcp__plugin_softlight_softlight__create_comment_thread, mcp__plugin_softlight_softlight__create_comment, mcp__plugin_softlight_softlight__complete_prompt, mcp__plugin_softlight_softlight__wait_for_prompt, mcp__plugin_softlight_softlight__create_session, mcp__plugin_softlight_softlight__close_session, mcp__plugin_softlight_softlight__list_sessions, mcp__plugin_softlight_softlight__browser_click, mcp__plugin_softlight_softlight__browser_close, mcp__plugin_softlight_softlight__browser_console_messages, mcp__plugin_softlight_softlight__browser_drag, mcp__plugin_softlight_softlight__browser_evaluate, mcp__plugin_softlight_softlight__browser_file_upload, mcp__plugin_softlight_softlight__browser_fill_form, mcp__plugin_softlight_softlight__browser_handle_dialog, mcp__plugin_softlight_softlight__browser_hover, mcp__plugin_softlight_softlight__browser_navigate, mcp__plugin_softlight_softlight__browser_navigate_back, mcp__plugin_softlight_softlight__browser_network_requests, mcp__plugin_softlight_softlight__browser_press_key, mcp__plugin_softlight_softlight__browser_resize, mcp__plugin_softlight_softlight__browser_run_code, mcp__plugin_softlight_softlight__browser_select_option, mcp__plugin_softlight_softlight__browser_snapshot, mcp__plugin_softlight_softlight__browser_take_screenshot, mcp__plugin_softlight_softlight__browser_type, mcp__plugin_softlight_softlight__browser_wait_for, mcp__plugin_softlight_softlight__browser_tabs
+allowed-tools: Bash, Read, Write, Glob, Grep, Agent, mcp__plugin_softlight_softlight__create_project, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_exploration, mcp__plugin_softlight_softlight__create_text, mcp__plugin_softlight_softlight__move_slot, mcp__plugin_softlight_softlight__update_iframe_element, mcp__plugin_softlight_softlight__update_text_element, mcp__plugin_softlight_softlight__set_iframe_screenshots, mcp__plugin_softlight_softlight__create_comment_thread, mcp__plugin_softlight_softlight__create_comment, mcp__plugin_softlight_softlight__complete_prompt, mcp__plugin_softlight_softlight__wait_for_prompt, mcp__plugin_softlight_playwright__create_session, mcp__plugin_softlight_playwright__close_session, mcp__plugin_softlight_playwright__list_sessions, mcp__plugin_softlight_playwright__browser_click, mcp__plugin_softlight_playwright__browser_close, mcp__plugin_softlight_playwright__browser_console_messages, mcp__plugin_softlight_playwright__browser_drag, mcp__plugin_softlight_playwright__browser_evaluate, mcp__plugin_softlight_playwright__browser_file_upload, mcp__plugin_softlight_playwright__browser_fill_form, mcp__plugin_softlight_playwright__browser_handle_dialog, mcp__plugin_softlight_playwright__browser_hover, mcp__plugin_softlight_playwright__browser_navigate, mcp__plugin_softlight_playwright__browser_navigate_back, mcp__plugin_softlight_playwright__browser_network_requests, mcp__plugin_softlight_playwright__browser_press_key, mcp__plugin_softlight_playwright__browser_resize, mcp__plugin_softlight_playwright__browser_run_code, mcp__plugin_softlight_playwright__browser_select_option, mcp__plugin_softlight_playwright__browser_snapshot, mcp__plugin_softlight_playwright__browser_take_screenshot, mcp__plugin_softlight_playwright__browser_type, mcp__plugin_softlight_playwright__browser_wait_for, mcp__plugin_softlight_playwright__browser_tabs
 model: opus
 effort: max
 ---
@@ -125,9 +125,11 @@ Canvas tools:
 
 ### The browser
 
-You have access to a headless browser via Softlight MCP `playwright` tools - a thin wrapper around
-Playwright MCP that gives each session its own isolated browser instance, so multiple agents
-can browse different prototypes in parallel without conflicts. All standard Playwright browser tools are available. You can use it to view the running app and rendered prototypes.
+You MUST use the `plugin:softlight:playwright` MCP for all browser interactions. All standard
+Playwright browser tools are available through this MCP. It is a thin wrapper around Playwright
+MCP that gives each session its own isolated browser instance, so multiple agents can browse
+different prototypes in parallel without conflicts. Use it to view the running app and rendered
+prototypes.
 
 Call `create_session` to get an isolated browser. Resize the viewport to 1512x982 (MacBook Pro
 14"). Ensure you find the design change(s) so you can screenshot the design changes and look
@@ -216,21 +218,18 @@ information in their prompt, confirm it back to them and proceed.
    directory path of the baseline clone. Save the directory path as `baseline_dir` — every
    prototype subagent needs it.
 
-2. **Start the tunnel.** Run the `start-tunnel` skill with the port number. The moment the tunnel is
-   up, print the tunnel URL as a clickable link in a regular message first.
+2. **Start the tunnel.** Run the `start-tunnel` skill with the port number.
 
 3. **Explore the codebase.** Read, Glob, Grep. Understand the product, tensions, design
    system, components, routing, data models, user flows, and business logic relevant to the
    design problem. This is your foundation for everything that follows.
 
-4. **Write the problem statement and create the project.** Once you understand the app and the
-   user has logged in, write a short problem statement — a natural paragraph covering what the
+4. **Write the problem statement and update the project.** Once you understand the app
+   write a short problem statement — a natural paragraph covering what the
    product is, who uses it, and the people problem that needs solving. Then call `create_project`
-   with the `problem_statement`, `tunnel_id`, and current git commit (`git rev-parse HEAD`).
-   CRITICAL: Share the `project_url` with the user and open it in their browser automatically:
-   ```bash
-   ${BROWSER:-open} "$PROJECT_URL" 2>/dev/null || xdg-open "$PROJECT_URL" 2>/dev/null || true
-   ```
+   with the `problem_statement`, and `tunnel_id`. The project already exists (it was created
+   by the dispatcher) — this call updates it with your refined problem statement and the
+   baseline tunnel.
 
 5. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
    resize to 1512x982) and screenshot the key screen(s) relevant to the design problem.
@@ -256,31 +255,27 @@ information in their prompt, confirm it back to them and proceed.
    canvas and arranges the layout while prototypes generate — the human sees real work
    appearing from the start.
 
-Then wait for all prototypes and the presenter to finish. The canvas should tell the
-complete story — problem analysis, explorations, and where you landed.
+Then wait for all prototypes and the presenter to finish. The canvas should tell the complete story — problem analysis, explorations, and where you landed.
 
-## After the initial exploration: the prompt loop
+CRITICAL: Once the prototypes and the presenter have finished, open the project in the user's browser:
+```bash
+${BROWSER:-open} "$PROJECT_URL" 2>/dev/null || xdg-open "$PROJECT_URL" 2>/dev/null || true
+```
+
+This is extremely important because if you don't open it, they won't know it's done and won't get the opportunity to review the work.
+
+## After the initial exploration
 
 The initial exploration is done — but you're not done. The PM will review the canvas, leave
 comments, and click the green button to request the next round. When that happens,
-`wait_for_prompt` returns and **you have a new design mandate.** Treat every prompt as a full
+**you have a new design mandate.** Treat every prompt as a full
 round of design work — read the feedback, create new explorations, dispatch the presenter and
 prototypes. This is the same depth of work as the initial exploration, targeted at what
 the PM asked for.
 
-**CRITICAL: Do NOT call `complete_prompt` until you have created new explorations, dispatched
-`present-canvas`, and dispatched prototype subagents. Every prompt requires real design
-work — never dismiss a prompt without doing the work.**
-
-Enter the prompt loop indefinitely:
-
-1. **Wait for the next prompt.** Call `wait_for_prompt` with the `project_id` (and `prompt_id`
-   from the previous iteration, if any).
-
-2. **Understand where things stand.** Call `get_project` to see the full canvas state.
+1. **Understand where things stand.** Call `get_project` to see the full canvas state.
    Read all comment threads — PM comments have the user's email as `created_by`. Read the
-   full thread to understand where the discussion landed. The `prompt_text` from
-   `wait_for_prompt` may be generic — the real feedback is in the canvas comments.
+   full thread to understand where the discussion landed. The prompt you just received may be generic — the real feedback is in the canvas comments.
 
    Comment threads have a `screenshot` field — a URL showing the canvas area the PM was
    looking at when they commented. Download and look at these screenshots to see what the PM
@@ -293,7 +288,7 @@ Enter the prompt loop indefinitely:
    `attachments` for any images the PM included. Your next round of design must respond
    to what you *see* in these screenshots, not just what you *read* in the comment text.
 
-3. **Decide what to do next.** Based on the PM's feedback, figure out what to explore. The
+2. **Decide what to do next.** Based on the PM's feedback, figure out what to explore. The
    comment thread screenshots ensure you're seeing what the PM saw — ground your design
    decisions in that shared visual context and what the discussion says.
 
@@ -307,7 +302,7 @@ Enter the prompt loop indefinitely:
    same decision — multiple notes about the same design or the same problem — combine them
    into one exploration so the PM sees holistic variations rather than fragmented responses.
 
-4. **Do the work.** Create explorations, then **dispatch `present-canvas` FIRST — before
+3. **Do the work.** Create explorations, then **dispatch `present-canvas` FIRST — before
    prototypes.** The presenter is a small, fast dispatch. Prototype dispatches are heavy
    (each needs a full spec, codebase context, and builds a standalone app). If you try to
    batch them all together, the presenter gets stuck behind 10 prototypes and the canvas
@@ -328,8 +323,3 @@ Enter the prompt loop indefinitely:
    {what you just created — exploration titles, slot_ids, what each one explores and why}
    </explorations_created>
    ```
-
-5. **Wait for all work to finish, then call `complete_prompt`** with the `project_id` and
-   `prompt_id` to dismiss the loading state on the canvas.
-
-6. **Loop back to step 1.**
