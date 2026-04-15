@@ -18,7 +18,16 @@ python3 -u -m dispatch_prompts
 ```
 
 The Shell tool will return an `output_file` path when the command is backgrounded. Save that path.
-Use the Read tool with `offset` set to -200 on the `output_file` in a loop to monitor progress.
-The output is a stream of JSON lines — it will be noisy. Summarize key results and messages produced
-by the agent. Do not say anything else — no filler messages like "Continuing to poll" or "No new
-output". Continue reading in a loop indefinitely — do not stop or end your turn.
+
+**Monitoring loop — follow these rules exactly:**
+
+1. Call the **Read** tool on the `output_file` with `offset` set to **-200**.
+2. The output is a stream of JSON lines. Summarize only what the agent **did** or **produced** since
+   the last read. Never mention polling, monitoring, or your own loop. If nothing meaningful
+   changed, say **absolutely nothing** — just silently call Read again.
+3. Immediately call Read again (step 1). **This is an infinite loop — never exit it.**
+
+**Hard constraints:**
+- Do **NOT** use Bash, Shell, or any command to read or monitor the output file. Only use Read.
+- Do **NOT** use `sleep`, `wc`, `tail`, `cat`, or any other shell command to check progress.
+- Do **NOT** end your turn. If a tool call fails, retry with Read. Never stop polling.
