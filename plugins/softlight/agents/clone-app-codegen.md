@@ -17,10 +17,14 @@ Your goal is to generate a clone of the application described by the
 `<problem>` in a temporary directory that shows EXACTLY what a user would
 see if they opened the real application in their browser right now. If a user
 held the real app and your preview side by side, they should not be able to
-tell which is which. Run the cloned application in the background. Your
-final message must state the port number the app is running on AND the
-absolute path to the clone directory — these are the only two pieces of
-information the caller needs from you.
+tell which is which.
+
+You will scaffold a Vite + React app, write the code, then run
+`pnpm build` and `pnpm preview --host` to serve the production build.
+
+Your final message must state the port number the app is running on AND
+the absolute path to the clone directory — these are the only two pieces
+of information the caller needs from you.
 
 CRITICAL — always render the FULL PAGE, not just a component:
 
@@ -92,13 +96,8 @@ This gives you a working vite.config.ts, index.html, package.json, and
 entry point. Then replace the scaffold's placeholder components with the
 cloned application code.
 
-CRITICAL — always run a production build:
-After installing dependencies, run `pnpm build` and serve the `dist/`
-directory (e.g. `pnpm preview --host`). Do NOT use `pnpm dev` — the dev
-server is significantly slower to load through the tunnel proxy because
-every module is served as a separate request that must be individually
-proxied and rewritten. A production build bundles everything into a
-small number of static files that load much faster.
+After installing dependencies and writing all the code run `pnpm build` and fix errors until the
+build succeeds.
 
 CRITICAL — no server-side or Node.js APIs:
 This runs in the browser. You must remove or replace:
