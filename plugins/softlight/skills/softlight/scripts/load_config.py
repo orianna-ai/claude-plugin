@@ -19,7 +19,7 @@ class Config:
 @functools.cache
 def load_config(project_id: str) -> Config:
     return Config(
-        base_url="http://localhost:8080",
+        base_url="https://softlight.orianna.ai",
         project_id=project_id,
         transcripts={},
     )
