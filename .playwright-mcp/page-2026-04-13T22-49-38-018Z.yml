@@ -1,0 +1,131 @@
+- generic [ref=e5]:
+  - banner [ref=e6]:
+    - generic [ref=e9]: Inspiration
+    - generic [ref=e10]:
+      - button "Log in" [ref=e11]:
+        - generic [ref=e12]: Log in
+      - button "Sign up — free" [ref=e13]:
+        - generic [ref=e14]: Sign up — free
+  - generic [ref=e15]:
+    - generic [ref=e16]:
+      - heading "Watch how we find inspiration that actually helps." [level=1] [ref=e17]:
+        - text: Watch how we find
+        - emphasis [ref=e18]: inspiration
+        - text: that actually helps.
+      - paragraph [ref=e19]: No scrolling, no mood-boarding. Describe your design problem, get curated references and AI-generated mocks in seconds. Built for product designers.
+      - list "Demo progress" [ref=e20]:
+        - listitem [ref=e21]:
+          - 'button "Jump to phase 1: Describe" [ref=e22] [cursor=pointer]':
+            - generic [ref=e23]: "1"
+          - generic [ref=e24]: Describe
+        - listitem [ref=e26]:
+          - 'button "Jump to phase 2: We search" [ref=e27] [cursor=pointer]':
+            - generic [ref=e28]: "2"
+          - generic [ref=e29]: We search
+        - listitem [ref=e31]:
+          - 'button "Jump to phase 3: Get references" [ref=e32] [cursor=pointer]':
+            - generic [ref=e33]: "3"
+          - generic [ref=e34]: Get references
+        - listitem [ref=e36]:
+          - 'button "Jump to phase 4: Plus mocks" [ref=e37] [cursor=pointer]':
+            - generic [ref=e38]: "4"
+          - generic [ref=e39]: Plus mocks
+      - generic [ref=e40]:
+        - button "Try it yourself — free" [ref=e41]:
+          - generic [ref=e42]: Try it yourself — free
+          - img [ref=e43]
+        - generic [ref=e45]: Free to try. Work email required.
+    - generic "Interactive Inspiration demo" [ref=e47]:
+      - generic [ref=e48]:
+        - generic [ref=e53]: Inspiration
+        - button "Play demo" [pressed] [ref=e778] [cursor=pointer]:
+          - img [ref=e55]
+      - generic [ref=e762]:
+        - generic [ref=e763]:
+          - generic [ref=e764]: You
+          - generic [ref=e765]: I'm designing a payment reconciliation dashboard. Users keep missing the suggested match in a dense table...
+        - generic [ref=e779]:
+          - generic [ref=e780]: 3 references
+          - generic [ref=e781]: curated for you
+        - generic [ref=e782]:
+          - generic [ref=e783]:
+            - generic [ref=e785]:
+              - generic [ref=e786]:
+                - generic [ref=e787]: Payments
+                - generic [ref=e788]: Filter
+              - generic [ref=e789]:
+                - generic [ref=e792]: 92%
+                - generic [ref=e795]: 74%
+                - generic [ref=e798]: 41%
+            - generic [ref=e799]: Inline confidence saves the dense-table problem.
+          - generic [ref=e800]:
+            - generic [ref=e802]:
+              - generic [ref=e805]: Issues
+              - generic [ref=e813]: Suggest
+            - generic [ref=e820]: Chip doesn't break row rhythm.
+          - generic [ref=e821]:
+            - generic [ref=e824]:
+              - generic [ref=e825]: Match rationale
+              - generic [ref=e829]: Confidence
+            - generic [ref=e836]: Rationale panel unblocks the miss.
+        - generic [ref=e837]:
+          - generic [ref=e838]: GENERATED MOCK
+          - generic [ref=e840]:
+            - generic [ref=e842]:
+              - generic [ref=e843]: Reconciliation
+              - generic [ref=e844]: Open invoices
+              - generic [ref=e845]: Archived
+            - generic [ref=e847]:
+              - generic [ref=e848]:
+                - generic [ref=e849]: Wire
+                - generic [ref=e850]: Invoice
+                - generic [ref=e851]: Amount
+                - generic [ref=e852]: Match
+              - generic [ref=e857]: 48%
+              - generic [ref=e862]: 96%
+              - generic [ref=e868]: 71%
+              - generic [ref=e873]: 33%
+          - generic [ref=e874]:
+            - img [ref=e875]
+            - generic [ref=e877]: 7 more variations
+  - generic [ref=e73]:
+    - heading "Ready to try it?" [level=2] [ref=e74]
+    - paragraph [ref=e75]: Describe your design problem. We'll curate 10 references and generate mocks for you.
+    - generic [ref=e77]:
+      - textbox "Describe your design problem" [ref=e79]
+      - button "Add screenshots of your designs" [ref=e80] [cursor=pointer]:
+        - img [ref=e82]
+        - generic [ref=e86]: Add screenshots of your designs
+      - button "Find inspiration" [ref=e88]:
+        - generic [ref=e89]: Find inspiration
+        - img [ref=e90]
+    - generic [ref=e92]: Free to try. Sign in with your work email.
+  - generic [ref=e93]:
+    - generic [ref=e94]: Used by product designers at
+    - generic [ref=e95]:
+      - generic [ref=e96]: Linear
+      - generic [ref=e97]: Figma
+      - generic [ref=e98]: Notion
+      - generic [ref=e99]: Stripe
+      - generic [ref=e100]: Shopify
+      - generic [ref=e101]: Airbnb
+  - generic [ref=e103]:
+    - heading "Watched enough? Try it yourself." [level=3] [ref=e104]:
+      - text: Watched enough?
+      - emphasis [ref=e105]: Try it yourself.
+    - button "Start free" [ref=e106]:
+      - generic [ref=e107]: Start free
+      - img [ref=e108]
+  - contentinfo [ref=e110]:
+    - generic [ref=e111]:
+      - generic [ref=e112]: Inspiration
+      - navigation [ref=e113]:
+        - link "Try it" [ref=e114] [cursor=pointer]:
+          - /url: "#try-it"
+        - link "Sign in" [ref=e115] [cursor=pointer]:
+          - /url: "#"
+        - link "Privacy" [ref=e116] [cursor=pointer]:
+          - /url: "#"
+        - link "Terms" [ref=e117] [cursor=pointer]:
+          - /url: "#"
+      - generic [ref=e118]: © 2026 Inspiration

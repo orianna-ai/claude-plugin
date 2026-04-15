@@ -1,0 +1,2 @@
+[    2869ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ https://softlight.orianna.ai/api/tunnel/1a57dbc0-0f30-46ca-9782-8fe6cfc6cbe0/node_modules/.vite/deps/react-dom_client.js?v=a425fbf2:14336
+[    3465ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://softlight.orianna.ai/api/tunnel/1a57dbc0-0f30-46ca-9782-8fe6cfc6cbe0/favicon.ico:0

@@ -1,0 +1,229 @@
+- generic [ref=e5]:
+  - banner [ref=e6]:
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - generic [ref=e9]: I
+        - generic [ref=e10]: inspiration
+      - navigation [ref=e11]:
+        - link "Browse" [ref=e12] [cursor=pointer]:
+          - /url: "#"
+        - link "Categories" [ref=e13] [cursor=pointer]:
+          - /url: "#"
+        - link "For teams" [ref=e14] [cursor=pointer]:
+          - /url: "#"
+      - generic [ref=e15]:
+        - button "Sign in" [ref=e16] [cursor=pointer]
+        - button "Sign up — free" [ref=e17]:
+          - generic [ref=e18]: Sign up — free
+  - generic [ref=e19]:
+    - generic [ref=e21]:
+      - heading "Inspiration from unexpected places" [level=1] [ref=e22]:
+        - text: Inspiration from
+        - emphasis [ref=e23]: unexpected
+        - text: places
+      - paragraph [ref=e24]: A browsable archive of real app screens. Curated for the hardest parts of product design.
+      - generic [ref=e854]:
+        - textbox "Describe your design problem — e.g. 'I need a settings page for a multi-workspace team with billing + SSO tabs'" [active] [ref=e855]
+        - button "Drop screenshots, or click to upload" [ref=e856] [cursor=pointer]:
+          - generic [ref=e857]:
+            - img [ref=e858]
+            - generic [ref=e862]: Drop screenshots, or click to upload
+        - generic [ref=e863]:
+          - button "Cancel" [ref=e864] [cursor=pointer]
+          - button "Find inspiration" [disabled] [ref=e865]:
+            - generic [ref=e866]: Find inspiration
+            - img [ref=e867]
+      - generic [ref=e30]:
+        - button "All" [ref=e31] [cursor=pointer]
+        - button "Dashboards" [ref=e32] [cursor=pointer]
+        - button "Onboarding" [ref=e33] [cursor=pointer]
+        - button "Empty states" [ref=e34] [cursor=pointer]
+        - button "Settings" [ref=e35] [cursor=pointer]
+        - button "Pricing pages" [ref=e36] [cursor=pointer]
+        - button "Auth flows" [ref=e37] [cursor=pointer]
+        - button "Modals" [ref=e38] [cursor=pointer]
+        - button "Tables" [ref=e39] [cursor=pointer]
+        - button "Mobile apps" [ref=e40] [cursor=pointer]
+        - button "AI chat UIs" [ref=e41] [cursor=pointer]
+    - main [ref=e42]:
+      - generic [ref=e43]:
+        - generic [ref=e44]:
+          - generic [ref=e45]:
+            - heading "Pricing-tier components" [level=2] [ref=e46]
+            - paragraph [ref=e47]: 24 examples curated for billing dashboards
+          - button "See all 24" [ref=e48] [cursor=pointer]:
+            - text: See all 24
+            - img [ref=e49]
+        - generic [ref=e51]:
+          - generic [ref=e52] [cursor=pointer]:
+            - button "Save" [ref=e82]:
+              - img [ref=e83]
+            - generic [ref=e88]: Figma · Stripe Atlas
+          - generic [ref=e89] [cursor=pointer]:
+            - button "Save" [ref=e119]:
+              - img [ref=e120]
+            - generic [ref=e125]: Mobbin · Linear
+          - generic [ref=e126] [cursor=pointer]:
+            - button "Save" [ref=e156]:
+              - img [ref=e157]
+            - generic [ref=e162]: Mobbin · Ghost
+          - generic [ref=e163] [cursor=pointer]:
+            - button "Save" [ref=e193]:
+              - img [ref=e194]
+            - generic [ref=e199]: Figma · Superhuman
+      - generic [ref=e200]:
+        - generic [ref=e201]:
+          - generic [ref=e202]:
+            - heading "Onboarding flows" [level=2] [ref=e203]
+            - paragraph [ref=e204]: 37 first-run experiences we love
+          - button "See all 37" [ref=e205] [cursor=pointer]:
+            - text: See all 37
+            - img [ref=e206]
+        - generic [ref=e208]:
+          - generic [ref=e209] [cursor=pointer]:
+            - button "Save" [ref=e226]:
+              - img [ref=e227]
+            - generic [ref=e232]: Mobbin · Duolingo
+          - generic [ref=e233] [cursor=pointer]:
+            - button "Save" [ref=e243]:
+              - img [ref=e244]
+            - generic [ref=e249]: Mobbin · Airbnb
+          - generic [ref=e250] [cursor=pointer]:
+            - button "Save" [ref=e260]:
+              - img [ref=e261]
+            - generic [ref=e266]: Figma · Notion
+          - generic [ref=e267] [cursor=pointer]:
+            - button "Save" [ref=e284]:
+              - img [ref=e285]
+            - generic [ref=e290]: Mobbin · Arc
+      - generic [ref=e291]:
+        - generic [ref=e292]:
+          - heading "Don't see what you're looking for?" [level=3] [ref=e293]
+          - paragraph [ref=e294]: Describe your specific design problem and we'll curate the best 6–8 results from 200K+ apps in 3 minutes.
+        - button "Try it free" [ref=e295]:
+          - generic [ref=e296]: Try it free
+          - img [ref=e297]
+      - generic [ref=e299]:
+        - generic [ref=e300]:
+          - generic [ref=e301]:
+            - heading "Dashboard empty states" [level=2] [ref=e302]
+            - paragraph [ref=e303]: 18 layouts for blank first impressions
+          - button "See all 18" [ref=e304] [cursor=pointer]:
+            - text: See all 18
+            - img [ref=e305]
+        - generic [ref=e307]:
+          - generic [ref=e308] [cursor=pointer]:
+            - button "Save" [ref=e317]:
+              - img [ref=e318]
+            - generic [ref=e323]: Figma · Stripe
+          - generic [ref=e324] [cursor=pointer]:
+            - button "Save" [ref=e333]:
+              - img [ref=e334]
+            - generic [ref=e339]: Mobbin · Retool
+          - generic [ref=e340] [cursor=pointer]:
+            - button "Save" [ref=e349]:
+              - img [ref=e350]
+            - generic [ref=e355]: Mobbin · Height
+          - generic [ref=e356] [cursor=pointer]:
+            - button "Save" [ref=e365]:
+              - img [ref=e366]
+            - generic [ref=e371]: Mobbin · Linear
+      - generic [ref=e372]:
+        - generic [ref=e373]:
+          - generic [ref=e374]:
+            - heading "Account settings layouts" [level=2] [ref=e375]
+            - paragraph [ref=e376]: 29 examples of settings IA
+          - button "See all 29" [ref=e377] [cursor=pointer]:
+            - text: See all 29
+            - img [ref=e378]
+        - generic [ref=e380]:
+          - generic [ref=e381] [cursor=pointer]:
+            - button "Save" [ref=e400]:
+              - img [ref=e401]
+            - generic [ref=e406]: Figma · GitHub
+          - generic [ref=e407] [cursor=pointer]:
+            - button "Save" [ref=e426]:
+              - img [ref=e427]
+            - generic [ref=e432]: Figma · Notion
+          - generic [ref=e433] [cursor=pointer]:
+            - button "Save" [ref=e452]:
+              - img [ref=e453]
+            - generic [ref=e458]: Mobbin · Vercel
+          - generic [ref=e459] [cursor=pointer]:
+            - button "Save" [ref=e478]:
+              - img [ref=e479]
+            - generic [ref=e484]: Mobbin · Stripe
+      - generic [ref=e485]:
+        - generic [ref=e486]:
+          - generic [ref=e487]:
+            - heading "AI chat input patterns" [level=2] [ref=e488]
+            - paragraph [ref=e489]: 22 input affordances from modern chat UIs
+          - button "See all 22" [ref=e490] [cursor=pointer]:
+            - text: See all 22
+            - img [ref=e491]
+        - generic [ref=e493]:
+          - generic [ref=e494] [cursor=pointer]:
+            - button "Save" [ref=e515]:
+              - img [ref=e516]
+            - generic [ref=e521]: Figma · Linear AI
+          - generic [ref=e522] [cursor=pointer]:
+            - button "Save" [ref=e543]:
+              - img [ref=e544]
+            - generic [ref=e549]: Figma · Notion AI
+          - generic [ref=e550] [cursor=pointer]:
+            - button "Save" [ref=e571]:
+              - img [ref=e572]
+            - generic [ref=e577]: Mobbin · ChatGPT
+          - generic [ref=e578] [cursor=pointer]:
+            - button "Save" [ref=e599]:
+              - img [ref=e600]
+            - generic [ref=e605]: Figma · v0
+      - generic [ref=e606]:
+        - generic [ref=e607]:
+          - generic [ref=e608]:
+            - heading "Dense data tables" [level=2] [ref=e609]
+            - paragraph [ref=e610]: 31 examples of readable dense tables
+          - button "See all 31" [ref=e611] [cursor=pointer]:
+            - text: See all 31
+            - img [ref=e612]
+        - generic [ref=e614]:
+          - generic [ref=e615] [cursor=pointer]:
+            - button "Save" [ref=e647]:
+              - img [ref=e648]
+            - generic [ref=e653]: Figma · Linear
+          - generic [ref=e654] [cursor=pointer]:
+            - button "Save" [ref=e686]:
+              - img [ref=e687]
+            - generic [ref=e692]: Figma · Stripe
+          - generic [ref=e693] [cursor=pointer]:
+            - button "Save" [ref=e725]:
+              - img [ref=e726]
+            - generic [ref=e731]: Mobbin · Retool
+          - generic [ref=e732] [cursor=pointer]:
+            - button "Save" [ref=e764]:
+              - img [ref=e765]
+            - generic [ref=e770]: Figma · Supabase
+    - contentinfo [ref=e771]:
+      - generic [ref=e772]:
+        - generic [ref=e773]:
+          - generic [ref=e774]: I
+          - generic [ref=e775]: inspiration
+        - generic [ref=e776]:
+          - link "Categories" [ref=e777] [cursor=pointer]:
+            - /url: "#"
+          - link "For teams" [ref=e778] [cursor=pointer]:
+            - /url: "#"
+          - link "Changelog" [ref=e779] [cursor=pointer]:
+            - /url: "#"
+          - link "Privacy" [ref=e780] [cursor=pointer]:
+            - /url: "#"
+        - generic [ref=e781]: 200K+ screens · curated weekly · Mobbin & Figma sourced
+  - generic:
+    - generic:
+      - generic:
+        - text: Get curated inspiration for
+        - strong: your
+        - text: specific design problem — sign up free.
+      - button "Get started":
+        - generic: Get started
+        - img

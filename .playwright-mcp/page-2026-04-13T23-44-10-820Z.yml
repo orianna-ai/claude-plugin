@@ -1,0 +1,75 @@
+- generic [ref=e5]:
+  - generic [ref=e6]:
+    - button "Log in" [ref=e7]:
+      - generic [ref=e8]: Log in
+    - button "Sign up free" [ref=e9]:
+      - generic [ref=e10]: Sign up free
+  - generic [ref=e48]:
+    - generic [ref=e49]:
+      - generic [ref=e50]: Your query
+      - generic [ref=e51]:
+        - generic [ref=e52]: “I'm designing the 'Send Coach' tab in our email platform. 'Subject Line Suggestions' and 'Best Send Time' stay hidden until the account has 5 sent campaigns, but 'Spam-Risk Check' runs from day one.”
+        - button "Edit query" [ref=e53] [cursor=pointer]
+    - generic [ref=e54]:
+      - generic [ref=e55]:
+        - generic [ref=e83]: Results
+        - generic [ref=e57]: 6 screens ranked for your problem
+      - generic [ref=e58]:
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - generic [ref=e111]: F
+            - generic [ref=e112]: Figma community · Mailchimp Redesign
+          - generic [ref=e113]: Progressive feature reveal — first 5 sends
+          - generic [ref=e114]: "Uses dimmed tabs with small 'unlocks at send #5' badge; keeps navigation stable."
+        - generic [ref=e140]:
+          - generic [ref=e143]: Mobbin · Klaviyo iOS
+          - generic [ref=e144]: Send coach — grouped assistance tray
+          - generic [ref=e145]: Collapses 'not yet available' helpers into a single tray row so the send form stays clean.
+        - generic [ref=e146]:
+          - generic [ref=e147]:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: F
+                    - generic: Figma community · Postmark dashboard
+                  - generic: Inline feature gating
+                  - generic: Per-row gate states with tooltip rationale.
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: Mobbin · HubSpot
+                  - generic: Send wizard — locked steps
+                  - generic: Stepper UI with locked future steps.
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: F
+                    - generic: Figma community · Intercom
+                  - generic: Maturity-gated assistant
+                  - generic: Assistant shows 'warming up' state.
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: Mobbin · Campaign Monitor
+                  - generic: Feature unlock ribbon
+                  - generic: Ribbon-style progress indicator.
+          - generic [ref=e149]:
+            - img [ref=e151]
+            - heading "See the rest of your inspiration" [level=3] [ref=e154]
+            - generic [ref=e155]: Sign up with your work email — free, takes 10 seconds. Your query is saved.
+            - generic [ref=e156]:
+              - button "Continue with Google →" [ref=e157]:
+                - img [ref=e158]
+                - generic [ref=e163]: Continue with Google
+                - generic [ref=e164]: →
+              - button "Continue with Microsoft" [ref=e165]:
+                - img [ref=e166]
+                - generic [ref=e171]: Continue with Microsoft
+            - generic [ref=e172]:
+              - generic [ref=e173]: 4 more results ready
+              - generic [ref=e174]: ·
+              - button "Already have an account? Log in" [ref=e175] [cursor=pointer]

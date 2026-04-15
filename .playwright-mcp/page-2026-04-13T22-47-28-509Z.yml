@@ -1,0 +1,96 @@
+- generic [ref=e5]:
+  - banner [ref=e6]:
+    - generic [ref=e9]: Inspiration
+    - generic [ref=e10]:
+      - button "Log in" [ref=e11]:
+        - generic [ref=e12]: Log in
+      - button "Sign up — free" [ref=e13]:
+        - generic [ref=e14]: Sign up — free
+  - generic [ref=e15]:
+    - generic [ref=e16]:
+      - heading "Watch how we find inspiration that actually helps." [level=1] [ref=e17]:
+        - text: Watch how we find
+        - emphasis [ref=e18]: inspiration
+        - text: that actually helps.
+      - paragraph [ref=e19]: No scrolling, no mood-boarding. Describe your design problem, get curated references and AI-generated mocks in seconds. Built for product designers.
+      - list "Demo progress" [ref=e20]:
+        - listitem [ref=e21]:
+          - 'button "Jump to phase 1: Describe" [ref=e22] [cursor=pointer]':
+            - generic [ref=e23]: "1"
+          - generic [ref=e24]: Describe
+        - listitem [ref=e26]:
+          - 'button "Jump to phase 2: We search" [ref=e27] [cursor=pointer]':
+            - generic [ref=e28]: "2"
+          - generic [ref=e29]: We search
+        - listitem [ref=e31]:
+          - 'button "Jump to phase 3: Get references" [ref=e32] [cursor=pointer]':
+            - generic [ref=e33]: "3"
+          - generic [ref=e34]: Get references
+        - listitem [ref=e36]:
+          - 'button "Jump to phase 4: Plus mocks" [ref=e37] [cursor=pointer]':
+            - generic [ref=e38]: "4"
+          - generic [ref=e39]: Plus mocks
+      - generic [ref=e40]:
+        - button "Try it yourself — free" [ref=e41]:
+          - generic [ref=e42]: Try it yourself — free
+          - img [ref=e43]
+        - generic [ref=e45]: Free to try. Work email required.
+    - generic "Interactive Inspiration demo" [ref=e47]:
+      - generic [ref=e48]:
+        - generic [ref=e53]: Inspiration
+        - button "Pause demo" [ref=e380] [cursor=pointer]:
+          - img [ref=e55]
+      - generic [ref=e381]:
+        - generic [ref=e382]:
+          - generic [ref=e383]: You
+          - generic [ref=e384]: I'm designing a payment reconciliation dashboard. Users keep missing the suggested match in a dense table...
+        - generic [ref=e385]:
+          - generic [ref=e386]: Thinking...
+          - list [ref=e387]:
+            - listitem [ref=e388]:
+              - generic [ref=e390]: Searching Mobbin...
+            - listitem [ref=e391]:
+              - generic [ref=e393]: Checking Stripe patterns...
+            - listitem [ref=e394]:
+              - generic [ref=e396]: Analyzing dashboard references...
+  - generic [ref=e73]:
+    - heading "Ready to try it?" [level=2] [ref=e74]
+    - paragraph [ref=e75]: Describe your design problem. We'll curate 10 references and generate mocks for you.
+    - generic [ref=e77]:
+      - textbox "Describe your design problem" [ref=e79]
+      - button "Add screenshots of your designs" [ref=e80] [cursor=pointer]:
+        - img [ref=e82]
+        - generic [ref=e86]: Add screenshots of your designs
+      - button "Find inspiration" [ref=e88]:
+        - generic [ref=e89]: Find inspiration
+        - img [ref=e90]
+    - generic [ref=e92]: Free to try. Sign in with your work email.
+  - generic [ref=e93]:
+    - generic [ref=e94]: Used by product designers at
+    - generic [ref=e95]:
+      - generic [ref=e96]: Linear
+      - generic [ref=e97]: Figma
+      - generic [ref=e98]: Notion
+      - generic [ref=e99]: Stripe
+      - generic [ref=e100]: Shopify
+      - generic [ref=e101]: Airbnb
+  - generic [ref=e103]:
+    - heading "Watched enough? Try it yourself." [level=3] [ref=e104]:
+      - text: Watched enough?
+      - emphasis [ref=e105]: Try it yourself.
+    - button "Start free" [ref=e106]:
+      - generic [ref=e107]: Start free
+      - img [ref=e108]
+  - contentinfo [ref=e110]:
+    - generic [ref=e111]:
+      - generic [ref=e112]: Inspiration
+      - navigation [ref=e113]:
+        - link "Try it" [ref=e114] [cursor=pointer]:
+          - /url: "#try-it"
+        - link "Sign in" [ref=e115] [cursor=pointer]:
+          - /url: "#"
+        - link "Privacy" [ref=e116] [cursor=pointer]:
+          - /url: "#"
+        - link "Terms" [ref=e117] [cursor=pointer]:
+          - /url: "#"
+      - generic [ref=e118]: © 2026 Inspiration

@@ -1,0 +1,49 @@
+- generic:
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - generic:
+            - button:
+              - generic: Log in
+            - button:
+              - generic: Sign up
+          - generic:
+            - generic:
+              - heading [level=1]:
+                - text: Inspiration from
+                - emphasis: unexpected
+                - text: places
+              - generic:
+                - generic:
+                  - generic:
+                    - textbox:
+                      - /placeholder: Describe your design problem
+                  - button:
+                    - generic:
+                      - img
+                    - generic: Add screenshots of your designs
+                  - generic:
+                    - button [disabled]:
+                      - generic: Find inspiration
+                      - img
+            - generic:
+              - generic: Examples
+              - generic:
+                - generic:
+                  - generic: Pre-5 Campaigns
+                  - generic: “I'm designing the 'Send Coach' tab in our email platform. 'Subject Line Suggestions' and 'Best Send Time' stay hidden until the account has 5 sent campaigns, but 'Spam-Risk Check' runs from day one.”
+                - generic:
+                  - generic: Threshold Nudge
+                  - generic: “I'm stuck on a payment reconciliation dashboard. We match incoming wires to open invoices and show a 'Suggested Match' with confidence + rationale, but users often miss it in a dense table.”
+                - generic:
+                  - generic: Coach Onboarding
+                  - generic: “On a fitness coach home page, I need to visualize the next 7 days of client workouts in a compact summary card. How can I encode both per-day volume and type mix without overwhelming the layout?”
+  - dialog [ref=e46]:
+    - generic [ref=e47]:
+      - heading "Sign in with your work email" [level=1] [ref=e48]:
+        - text: Sign in with your
+        - text: work email
+      - button "Continue with Google" [active] [ref=e50]:
+        - img [ref=e51]
+        - generic [ref=e56]: Continue with Google

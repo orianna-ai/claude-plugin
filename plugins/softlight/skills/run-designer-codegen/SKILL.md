@@ -227,10 +227,7 @@ information in their prompt, confirm it back to them and proceed.
    user has logged in, write a short problem statement — a natural paragraph covering what the
    product is, who uses it, and the people problem that needs solving. Then call `create_project`
    with the `problem_statement`, `tunnel_id`, and current git commit (`git rev-parse HEAD`).
-   CRITICAL: Share the `project_url` with the user and open it in their browser automatically:
-   ```bash
-   ${BROWSER:-open} "$PROJECT_URL" 2>/dev/null || xdg-open "$PROJECT_URL" 2>/dev/null || true
-   ```
+   Share the `project_url` with the user.
 
 5. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
    resize to 1512x982) and screenshot the key screen(s) relevant to the design problem.
@@ -256,8 +253,14 @@ information in their prompt, confirm it back to them and proceed.
    canvas and arranges the layout while prototypes generate — the human sees real work
    appearing from the start.
 
-Then wait for all prototypes and the presenter to finish. The canvas should tell the
-complete story — problem analysis, explorations, and where you landed.
+Then wait for all prototypes and the presenter to finish. The canvas should tell the complete story — problem analysis, explorations, and where you landed. 
+
+CRITICAL: Once the prototypes and the presenter have finished, open the project in the user's browser:
+```bash
+${BROWSER:-open} "$PROJECT_URL" 2>/dev/null || xdg-open "$PROJECT_URL" 2>/dev/null || true
+```
+
+This is extremely important because if you don't open it, they won't know it's done and won't get the opportunity to review the work.
 
 ## After the initial exploration
 

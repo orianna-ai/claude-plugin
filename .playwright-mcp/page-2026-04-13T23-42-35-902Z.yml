@@ -1,0 +1,62 @@
+- generic [ref=e5]:
+  - generic [ref=e6]:
+    - button "Log in" [ref=e7]:
+      - generic [ref=e8]: Log in
+    - button "Sign up free" [ref=e9]:
+      - generic [ref=e10]: Sign up free
+  - generic [ref=e11]:
+    - generic [ref=e12]:
+      - generic [ref=e13]:
+        - heading "See your design problem, answered." [level=1] [ref=e14]:
+          - text: See
+          - emphasis [ref=e15]: your
+          - text: design problem,
+          - emphasis [ref=e16]: answered
+          - text: .
+        - paragraph [ref=e17]: AI-curated UI inspiration from real apps — Figma community + Mobbin — ranked for your problem in 1–3 minutes.
+      - generic "Demo of Inspiration" [ref=e18]:
+        - generic [ref=e19]:
+          - generic [ref=e21]: Empty state for an analytics dashboard — what does a warm, helpful 'noth
+          - generic [ref=e23]: Finding inspiration in 200K+ apps…
+          - generic [ref=e24]:
+            - generic:
+              - generic:
+                - generic:
+                  - generic: Amplitude — empty chart
+              - generic:
+                - generic:
+                  - generic: Mixpanel — zero state
+              - generic:
+                - generic:
+                  - generic: Linear — empty inbox
+              - generic:
+                - generic:
+                  - generic: Stripe — no activity yet
+              - generic:
+                - generic:
+                  - generic: PostHog — dashboard setup
+              - generic:
+                - generic:
+                  - generic: Segment — new workspace
+      - generic [ref=e50]:
+        - generic [ref=e51]: Try it with your design problem
+        - generic [ref=e53]:
+          - textbox "Describe your design problem" [ref=e55]
+          - button "Add screenshots" [ref=e56] [cursor=pointer]:
+            - img [ref=e57]
+            - generic [ref=e61]: Add screenshots
+          - button "Find inspiration" [disabled] [ref=e63]:
+            - generic [ref=e64]: Find inspiration
+            - img [ref=e65]
+    - generic [ref=e67]:
+      - generic [ref=e68]: Examples
+      - generic [ref=e69]:
+        - generic [ref=e70] [cursor=pointer]:
+          - generic [ref=e71]: Pre-5 Campaigns
+          - generic [ref=e72]: “I'm designing the 'Send Coach' tab in our email platform. 'Subject Line Suggestions' and 'Best Send Time' stay hidden until the account has 5 sent campaigns…”
+        - generic [ref=e73] [cursor=pointer]:
+          - generic [ref=e74]: Threshold Nudge
+          - generic [ref=e75]: “I'm stuck on a payment reconciliation dashboard. We match incoming wires to open invoices and show a 'Suggested Match' with confidence…”
+        - generic [ref=e76] [cursor=pointer]:
+          - generic [ref=e77]: Coach Onboarding
+          - generic [ref=e78]: “On a fitness coach home page, I need to visualize the next 7 days of client workouts in a compact summary card…”

@@ -1,0 +1,75 @@
+- generic [ref=e5]:
+  - button "back to form" [ref=e6] [cursor=pointer]:
+    - generic [ref=e7]: ←
+    - generic [ref=e8]: back to form
+  - generic [ref=e9]:
+    - button "Log in" [ref=e10]:
+      - generic [ref=e11]: Log in
+    - button "Sign up" [ref=e12]:
+      - generic [ref=e13]: Sign up
+  - generic [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]: Inspiration for
+      - emphasis [ref=e19]: I'm stuck on a payment reconciliation dashboard. We match incoming wires to open invoices and show a 'Suggested Match' with confidence + rationale, but users often miss it in a dense table.
+    - generic [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e31]: 92%
+        - generic [ref=e42]:
+          - emphasis [ref=e43]: Stripe Dashboard
+          - generic [ref=e44]: — confidence badge pattern
+        - generic [ref=e45]: Shows the confidence rationale inline without a modal.
+      - generic [ref=e46]:
+        - generic [ref=e48]:
+          - generic [ref=e49]:
+            - generic [ref=e50]: INS-214
+            - generic [ref=e51]: In review
+          - generic [ref=e60]: Add recurrence
+        - generic [ref=e65]:
+          - emphasis [ref=e66]: Linear Issue
+          - generic [ref=e67]: — inline suggestion chip
+        - generic [ref=e68]: Chip sits beside the field so the user never loses context.
+      - generic [ref=e69]:
+        - generic [ref=e86]: Why this match
+        - generic [ref=e90]:
+          - emphasis [ref=e91]: QuickBooks Match
+          - generic [ref=e92]: — side-panel rationale
+        - generic [ref=e93]: Rationale panel slides in; the table stays the anchor.
+    - generic [ref=e94]:
+      - generic [ref=e95]:
+        - img [ref=e97]
+        - generic [ref=e99]: 8 more curated references
+      - generic [ref=e100]:
+        - img [ref=e102]
+        - generic [ref=e104]: Rationale for each
+      - generic [ref=e105]:
+        - img [ref=e107]
+        - generic [ref=e109]: 3 AI-generated mock variations
+    - generic [ref=e110]:
+      - generic [ref=e111]:
+        - button "92%" [ref=e112] [cursor=pointer]:
+          - generic [ref=e122]: 92%
+        - button "INS-214 In review Add recurrence" [ref=e133] [cursor=pointer]:
+          - generic [ref=e135]:
+            - generic [ref=e136]:
+              - generic [ref=e137]: INS-214
+              - generic [ref=e138]: In review
+            - generic [ref=e147]: Add recurrence
+        - button "Why this match" [ref=e152] [cursor=pointer]:
+          - generic [ref=e169]: Why this match
+        - button "92%" [ref=e173] [cursor=pointer]:
+          - generic [ref=e183]: 92%
+        - button "INS-214 In review Add recurrence" [ref=e194] [cursor=pointer]:
+          - generic [ref=e196]:
+            - generic [ref=e197]:
+              - generic [ref=e198]: INS-214
+              - generic [ref=e199]: In review
+            - generic [ref=e208]: Add recurrence
+      - generic [ref=e213]:
+        - heading "8 more inspirations waiting" [level=2] [ref=e214]:
+          - emphasis [ref=e215]: 8 more inspirations waiting
+        - paragraph [ref=e216]: Sign up free to unlock the full set, plus generated mocks and rationale for each.
+        - button "Continue with Google" [ref=e217] [cursor=pointer]:
+          - img [ref=e218]
+          - generic [ref=e223]: Continue with Google
+        - button "Already have an account? Log in." [ref=e224] [cursor=pointer]
+        - generic [ref=e225]: Work email required. No credit card. Your query is saved.

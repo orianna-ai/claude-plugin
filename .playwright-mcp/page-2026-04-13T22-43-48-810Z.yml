@@ -1,0 +1,34 @@
+- generic [ref=e5]:
+  - generic [ref=e9]:
+    - button "Log in" [ref=e10]:
+      - generic [ref=e11]: Log in
+    - button "Sign up" [ref=e12]:
+      - generic [ref=e13]: Sign up
+  - generic [ref=e226]:
+    - generic [ref=e227]:
+      - heading "Inspiration from unexpected places" [level=1] [ref=e228]:
+        - text: Inspiration from
+        - emphasis [ref=e229]: unexpected
+        - text: places
+      - generic [ref=e231]:
+        - textbox "Describe your design problem" [ref=e233]
+        - button "Add screenshots of your designs" [ref=e234] [cursor=pointer]:
+          - img [ref=e236]
+          - generic [ref=e240]: Add screenshots of your designs
+        - generic [ref=e241]:
+          - generic [ref=e242]: See a preview → sign up free to continue.
+          - button "Find inspiration" [disabled] [ref=e243]:
+            - generic [ref=e244]: Find inspiration
+            - img [ref=e245]
+    - generic [ref=e247]:
+      - generic [ref=e248]: Examples
+      - generic [ref=e249]:
+        - generic [ref=e250] [cursor=pointer]:
+          - generic [ref=e251]: Pre-5 Campaigns
+          - generic [ref=e252]: “I'm designing the 'Send Coach' tab in our email platform. 'Subject Line Suggestions' and 'Best Send Time' stay hidden until the account has 5 sent campaigns, but 'Spam-Risk Check' runs from day one.”
+        - generic [ref=e253] [cursor=pointer]:
+          - generic [ref=e254]: Threshold Nudge
+          - generic [ref=e255]: “I'm stuck on a payment reconciliation dashboard. We match incoming wires to open invoices and show a 'Suggested Match' with confidence + rationale, but users often miss it in a dense table.”
+        - generic [ref=e256] [cursor=pointer]:
+          - generic [ref=e257]: Coach Onboarding
+          - generic [ref=e258]: “On a fitness coach home page, I need to visualize the next 7 days of client workouts in a compact summary card. How can I encode both per-day volume and type mix without overwhelming the layout?”

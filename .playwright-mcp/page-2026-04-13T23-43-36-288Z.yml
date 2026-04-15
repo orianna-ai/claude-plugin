@@ -1,0 +1,312 @@
+- generic:
+  - generic:
+    - generic:
+      - generic:
+        - generic:
+          - banner:
+            - generic:
+              - generic:
+                - generic: I
+                - generic: inspiration
+              - navigation:
+                - link:
+                  - /url: "#"
+                  - text: Browse
+                - link:
+                  - /url: "#"
+                  - text: Categories
+                - link:
+                  - /url: "#"
+                  - text: For teams
+              - generic:
+                - button: Sign in
+                - button:
+                  - generic: Sign up — free
+          - generic:
+            - generic:
+              - generic:
+                - heading [level=1]:
+                  - text: Inspiration from
+                  - emphasis: unexpected
+                  - text: places
+                - paragraph: A browsable archive of real app screens. Curated for the hardest parts of product design.
+                - button:
+                  - textbox:
+                    - /placeholder: Search 200K+ real app screens — or describe your design problem
+                  - generic:
+                    - text: Find
+                    - img
+                - generic:
+                  - button: All
+                  - button: Dashboards
+                  - button: Onboarding
+                  - button: Empty states
+                  - button: Settings
+                  - button: Pricing pages
+                  - button: Auth flows
+                  - button: Modals
+                  - button: Tables
+                  - button: Mobile apps
+                  - button: AI chat UIs
+            - main:
+              - generic:
+                - generic:
+                  - generic:
+                    - heading [level=2]: Pricing-tier components
+                    - paragraph: 24 examples curated for billing dashboards
+                  - button:
+                    - text: See all 24
+                    - img
+                - generic:
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Figma · Stripe Atlas
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Mobbin · Linear
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Mobbin · Ghost
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Figma · Superhuman
+              - generic:
+                - generic:
+                  - generic:
+                    - heading [level=2]: Onboarding flows
+                    - paragraph: 37 first-run experiences we love
+                  - button:
+                    - text: See all 37
+                    - img
+                - generic:
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Mobbin · Duolingo
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Mobbin · Airbnb
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Figma · Notion
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Mobbin · Arc
+              - generic:
+                - generic:
+                  - heading [level=3]: Don't see what you're looking for?
+                  - paragraph: Describe your specific design problem and we'll curate the best 6–8 results from 200K+ apps in 3 minutes.
+                - button:
+                  - generic: Try it free
+                  - img
+              - generic:
+                - generic:
+                  - generic:
+                    - heading [level=2]: Dashboard empty states
+                    - paragraph: 18 layouts for blank first impressions
+                  - button:
+                    - text: See all 18
+                    - img
+                - generic:
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Figma · Stripe
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Mobbin · Retool
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Mobbin · Height
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Mobbin · Linear
+              - generic:
+                - generic:
+                  - generic:
+                    - heading [level=2]: Account settings layouts
+                    - paragraph: 29 examples of settings IA
+                  - button:
+                    - text: See all 29
+                    - img
+                - generic:
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Figma · GitHub
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Figma · Notion
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Mobbin · Vercel
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Mobbin · Stripe
+              - generic:
+                - generic:
+                  - generic:
+                    - heading [level=2]: AI chat input patterns
+                    - paragraph: 22 input affordances from modern chat UIs
+                  - button:
+                    - text: See all 22
+                    - img
+                - generic:
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Figma · Linear AI
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Figma · Notion AI
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Mobbin · ChatGPT
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Figma · v0
+              - generic:
+                - generic:
+                  - generic:
+                    - heading [level=2]: Dense data tables
+                    - paragraph: 31 examples of readable dense tables
+                  - button:
+                    - text: See all 31
+                    - img
+                - generic:
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Figma · Linear
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Figma · Stripe
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Mobbin · Retool
+                  - generic:
+                    - button:
+                      - img
+                    - generic:
+                      - generic:
+                        - generic: Figma · Supabase
+            - contentinfo:
+              - generic:
+                - generic:
+                  - generic: I
+                  - generic: inspiration
+                - generic:
+                  - link:
+                    - /url: "#"
+                    - text: Categories
+                  - link:
+                    - /url: "#"
+                    - text: For teams
+                  - link:
+                    - /url: "#"
+                    - text: Changelog
+                  - link:
+                    - /url: "#"
+                    - text: Privacy
+                - generic: 200K+ screens · curated weekly · Mobbin & Figma sourced
+          - generic:
+            - generic:
+              - generic:
+                - text: Get curated inspiration for
+                - strong: your
+                - text: specific design problem — sign up free.
+              - button:
+                - generic: Get started
+                - img
+  - dialog [ref=e793]:
+    - generic [ref=e794]:
+      - generic [ref=e796] [cursor=pointer]:
+        - button "Save" [active] [ref=e826]:
+          - img [ref=e827]
+        - generic [ref=e832]: Figma · Stripe Atlas
+      - generic [ref=e833]:
+        - generic [ref=e836]: Figma · Stripe Atlas
+        - heading "Stripe — 3-tier pricing" [level=3] [ref=e837]
+        - paragraph [ref=e838]:
+          - text: From
+          - strong [ref=e839]: Pricing-tier components
+          - text: · 24 screens
+        - generic [ref=e840]:
+          - button "Save to collection sign up" [ref=e841] [cursor=pointer]:
+            - img [ref=e842]
+            - generic [ref=e844]: Save to collection
+            - generic [ref=e845]: sign up
+          - link "Open original" [ref=e846] [cursor=pointer]:
+            - /url: "#"
+        - generic [ref=e847]:
+          - generic [ref=e848]:
+            - text: See
+            - strong [ref=e849]: 23 more
+            - text: in this collection
+          - button "Sign up free" [ref=e850]:
+            - generic [ref=e851]: Sign up free
+            - img [ref=e852]
