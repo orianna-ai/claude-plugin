@@ -216,18 +216,16 @@ information in their prompt, confirm it back to them and proceed.
    directory path of the baseline clone. Save the directory path as `baseline_dir` — every
    prototype subagent needs it.
 
-2. **Start the tunnel.** Run the `start-tunnel` skill with the port number. The moment the tunnel is
-   up, print the tunnel URL as a clickable link in a regular message first.
+2. **Start the tunnel.** Run the `start-tunnel` skill with the port number.
 
 3. **Explore the codebase.** Read, Glob, Grep. Understand the product, tensions, design
    system, components, routing, data models, user flows, and business logic relevant to the
    design problem. This is your foundation for everything that follows.
 
-4. **Write the problem statement and create the project.** Once you understand the app and the
-   user has logged in, write a short problem statement — a natural paragraph covering what the
+4. **Write the problem statement and create the project.** Once you understand the app
+   write a short problem statement — a natural paragraph covering what the
    product is, who uses it, and the people problem that needs solving. Then call `create_project`
-   with the `problem_statement`, `tunnel_id`, and current git commit (`git rev-parse HEAD`).
-   Share the `project_url` with the user.
+   with the `problem_statement`, and `tunnel_id`. Share the `project_url` with the user.
 
 5. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
    resize to 1512x982) and screenshot the key screen(s) relevant to the design problem.
@@ -253,7 +251,7 @@ information in their prompt, confirm it back to them and proceed.
    canvas and arranges the layout while prototypes generate — the human sees real work
    appearing from the start.
 
-Then wait for all prototypes and the presenter to finish. The canvas should tell the complete story — problem analysis, explorations, and where you landed. 
+Then wait for all prototypes and the presenter to finish. The canvas should tell the complete story — problem analysis, explorations, and where you landed.
 
 CRITICAL: Once the prototypes and the presenter have finished, open the project in the user's browser:
 ```bash
