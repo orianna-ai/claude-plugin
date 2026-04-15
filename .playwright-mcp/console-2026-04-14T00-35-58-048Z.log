@@ -1,7 +1,0 @@
-[    5080ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://softlight.orianna.ai/api/tunnel/505f6b38-23ea-46fc-aa5c-bcced0b06931/node_modules/.vite/deps/chunk-EMBGZOEE.js?v=dd51963b:21550
-[   21235ms] [ERROR] `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
-
-If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
-
-For more information, see https://radix-ui.com/primitives/docs/components/dialog @ https://softlight.orianna.ai/api/tunnel/505f6b38-23ea-46fc-aa5c-bcced0b06931/node_modules/.vite/deps/@radix-ui_themes.js?v=2d5678e0:3400
-[   21235ms] [WARNING] Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}. @ https://softlight.orianna.ai/api/tunnel/505f6b38-23ea-46fc-aa5c-bcced0b06931/node_modules/.vite/deps/@radix-ui_themes.js?v=2d5678e0:3414
