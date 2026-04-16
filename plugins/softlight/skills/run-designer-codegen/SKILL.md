@@ -25,15 +25,22 @@ has failed.
 
 ### How to explore
 
+**Explorations force decisions; they don't collect ideas.** Every exploration exists to put a
+specific question in front of the PM, with variants that each bet on a different answer. Before
+creating one, name the decision it forces, what each variant is betting on, and what the PM's
+reaction to any given variant would teach you about what they actually care about. Push for 5-7
+variants — enough that the PM has a real spread to react against, enough to surface answers they
+hadn't considered. But every variant has to earn its spot by embodying a meaningfully different
+tradeoff. If two variants bet on the same thing, you have one variant presented twice. If you
+can't find 5-7 genuinely different answers, you haven't pushed hard enough on what the question
+could mean. The deliverable isn't the set of variants — it's the conversation the variants provoke.
+
 **Understand the problem before you solve it.** Before generating any design ideas, you must
 look at the current experience — screenshots of the baseline, and screenshots of any related existing
 prototypes. Describe what you see through the lens of the problem(s) you're solving. Then combine
 that visual understanding with what you learned from source
 code, specs, and PM feedback. Never propose design directions based on code alone — code tells
 you what elements exist, screenshots tell you what it's actually like to use.
-
-**Explore wide.** When exploring a direction, make genuinely different options — different
-approaches to the problem, not variations on one idea. Each exploration should have 5-7 options per exploration. If you can think of another meaningfully different way to solve this, you're not done.
 
 **Go deep** Each direction needs real depth — not just the happy path. What happens on first use? With no data? With a thousand items? If the PM chose this direction, could they ship it based on what you've shown?
 
