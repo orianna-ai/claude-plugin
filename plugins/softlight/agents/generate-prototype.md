@@ -95,12 +95,17 @@ whatever you need about the app. Read local source files, not the tunnel URL.
    **Do not modify existing CSS class definitions.** If you need different behavior, create a
    new element with inline styles rather than changing a class that other elements depend on.
 
-5. **Start the app.** Run the prototype's dev server on a free port. **Do NOT use the
-   default port (5173)** — multiple prototypes run in parallel and will collide. Find a
-   free port and bind to `127.0.0.1` explicitly (avoid IPv6 `[::1]` ambiguity):
+5. **Build and serve the app.** Run a production build, then serve it on a free port.
+   **Do NOT use the default port (5173)** — multiple prototypes run in parallel and will
+   collide. Find a free port and bind to `127.0.0.1` explicitly (avoid IPv6 `[::1]`
+   ambiguity):
+   ```bash
+   cd /tmp/prototype_<slot_id> && pnpm build
+   ```
+   Fix any build errors until the build succeeds, then serve the production build:
    ```bash
    PORT=$(python3 -c "import socket; s=socket.socket(); s.bind(('',0)); print(s.getsockname()[1]); s.close()")
-   cd /tmp/prototype_<slot_id> && npx vite --port $PORT --host 127.0.0.1 --strictPort &
+   cd /tmp/prototype_<slot_id> && pnpm preview --host 127.0.0.1 --port $PORT --strictPort &
    ```
    Wait for the server to print the port it's listening on. Capture that port number.
 
