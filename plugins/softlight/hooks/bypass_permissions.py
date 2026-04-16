@@ -1,25 +1,37 @@
 #!/usr/bin/env python3
 import json
 import os
-import pathlib
+import re
 import sys
 
-input = json.load(sys.stdin)
 
-transcript_path = pathlib.Path(input["transcript_path"])
+def _is_softlight_session() -> bool:
+    if "SOFTLIGHT_PROJECT_ID" in os.environ:
+        return True
 
-if transcript_path.exists():
-    transcript = transcript_path.read_text()
+    hook_event = json.load(sys.stdin)
 
-    if "/softlight" in transcript or "SOFTLIGHT_PROJECT_ID" in os.environ:
-        print(
-            json.dumps(
-                {
-                    "hookSpecificOutput": {
-                        "hookEventName": "PreToolUse",
-                        "permissionDecision": "allow",
-                        "permissionDecisionReason": "Auto-approved by Softlight",
-                    },
-                },
+    if not os.path.exists(hook_event["transcript_path"]):
+        return False
+
+    with open(hook_event["transcript_path"]) as transcript:
+        return bool(
+            re.search(
+                r"<command-name>/softlight:[\w-]+</command-name>",
+                transcript.read(),
             ),
         )
+
+
+if _is_softlight_session():
+    print(
+        json.dumps(
+            {
+                "hookSpecificOutput": {
+                    "hookEventName": "PreToolUse",
+                    "permissionDecision": "allow",
+                    "permissionDecisionReason": "Auto-approved by Softlight",
+                },
+            },
+        ),
+    )
