@@ -35,7 +35,7 @@ Optional. Image URLs or local file paths, one per line. If these are passed, vie
 ### `<caption_slot_id>`
 
 Optional. Canvas slot UUID for the caption below this prototype. If provided, fill it in after
-registering the prototype (see Phase 5).
+registering the prototype (see Phase 6).
 
 ### `<baseline_dir>`
 
@@ -112,7 +112,7 @@ whatever you need about the app. Read local source files, not the tunnel URL.
 ## Phase 2: Start a tunnel
 
 Run the `start-tunnel` skill with the port number from Phase 1. It returns a `tunnel_id` and
-`PID`. Capture the `tunnel_id` — you'll need it for Phase 3, Phase 4, and Phase 6.
+`PID`. Capture the `tunnel_id` — you'll need it for Phase 3, Phase 4, and Phase 5.
 
 ## Phase 3: Validate in the browser
 
@@ -143,25 +143,13 @@ If the page is broken (blank, error overlay, nothing rendered):
 
 When validation passes, call `close_session` to clean up the browser.
 
-## Phase 4: Register on the canvas
-
-Call the `update_iframe_element` MCP tool with `project_id`, `slot_id`, `tunnel_id` (the new
-tunnel from Phase 2), and `spec_url` (the `<spec_url>` from your input — pass it through
-unchanged).
-
-## Phase 5: Fill in the caption
-
-If `<caption_slot_id>` was provided, call `update_text_element` with `project_id`,
-`slot_id` set to the `<caption_slot_id>`, and a short `text` (1-2 sentences) describing what
-this prototype does, how it solves the problem, and what its tradeoffs are.
-
-## Phase 6: Screenshot the prototype
+## Phase 4: Screenshot the prototype
 
 You MUST use the `plugin:softlight:playwright` MCP for all browser interactions. All standard Playwright browser tools are available through this MCP. It is a thin wrapper around Playwright MCP that gives each session its own isolated browser, so multiple prototype agents can browse in parallel without conflicts.
 
 Open the prototype in a browser and screenshot it so reviewers can see the design changes. The task is to take screenshot(s) of the prototype in states where the design change(s) are visible.
 
-If the page isn't loading or the browser becomes unresponsive, check the preview server output for build errors, fix them, and retry. Try up to 3 times before giving up. If the prototype still won't load, return whatever screenshots you managed to capture (even none) and move on. The prototype is already on the canvas from Phase 4.
+If the page isn't loading or the browser becomes unresponsive, check the preview server output for build errors, fix them, and retry. Try up to 3 times before giving up. If the prototype still won't load, return whatever screenshots you managed to capture (even none) and move on.
 
 Call `create_session` to get an isolated browser instance. Resize the viewport to 1512x982
 (MacBook Pro 14"). Ensure you find the design change(s) so you can screenshot the design
@@ -175,6 +163,17 @@ changes to screenshot them (the codebase, spec_url, and source code can help you
    ```bash
    curl -sF 'file=@<local_screenshot_path>' https://drive.orianna.ai/api/v2/upload
    ```
-4. Call `set_iframe_screenshots` with `project_id`, `slot_id`, and the **drive URLs** from
-   step 3 as `screenshot_urls`.
-5. Call `close_session` to clean up the browser
+4. Call `close_session` to clean up the browser
+
+## Phase 5: Register on the canvas
+
+Call the `update_iframe_element` MCP tool with `project_id`, `slot_id`, `tunnel_id` (the new
+tunnel from Phase 2), `spec_url` (the `<spec_url>` from your input — pass it through
+unchanged), `screenshot_urls` (the **drive URLs** from Phase 4), and `preview_url` set to the
+screenshot that best represents the core of the design change.
+
+## Phase 6: Fill in the caption
+
+If `<caption_slot_id>` was provided, call `update_text_element` with `project_id`,
+`slot_id` set to the `<caption_slot_id>`, and a short `text` (1-2 sentences) describing what
+this prototype does, how it solves the problem, and what its tradeoffs are.
