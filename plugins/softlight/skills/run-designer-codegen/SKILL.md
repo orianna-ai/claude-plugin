@@ -26,9 +26,12 @@ has failed.
 ### How to explore
 
 **Explorations force decisions; they don't collect ideas.** Every exploration exists to put a
-specific question in front of the PM, with variants that each bet on a different answer. Before
-creating one, name the decision it forces, what each variant is betting on, and what the PM's
-reaction to any given variant would teach you about what they actually care about. Push for 5-7
+specific question in front of the PM, with variants that each bet on a different answer. Only
+explore decisions that would meaningfully move what the PM is trying to achieve AND where you're
+genuinely uncertain — if the answer wouldn't change the outcome, or you already have a clear view,
+commit and move on. Before creating one, name the decision it forces, what each variant is betting
+on, and what the PM's reaction to any given variant would teach you about what they actually care
+about. Push for 5-7
 variants — enough that the PM has a real spread to react against, enough to surface answers they
 hadn't considered. But every variant has to earn its spot by embodying a meaningfully different
 tradeoff. If two variants bet on the same thing, you have one variant presented twice. If you
@@ -55,7 +58,9 @@ design, not a collage. Cut anything that doesn't serve the whole.
 ### The four levels
 
 Every exploration operates at one of four levels. These are types of work, not a sequence —
-at any moment your canvas may need work at multiple levels simultaneously.
+at any moment your canvas may need work at multiple levels simultaneously. Start at the highest
+level where there's genuine uncertainty — if direction is in question, don't skip ahead to
+execution.
 
 **Direction** — "What approach should we take?" Fundamentally different strategic bets. These prototypes should be meaningfully different from each other.
 
