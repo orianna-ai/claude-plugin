@@ -171,6 +171,7 @@ def call_claude(
         env={
             **{var: val for var, val in os.environ.items() if var != "CLAUDECODE"},
             "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+            "CREATED_BY_SOFTLIGHT": "1",
         },
         text=True,
     )
