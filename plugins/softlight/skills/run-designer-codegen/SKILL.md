@@ -265,11 +265,6 @@ spec_url, baseline_dir, context, and images as the original. After those subagen
 check your slot_ids again and repeat until every one has `element.type: "iframe"`. Only then
 does the canvas tell the complete story.
 
-CRITICAL: Once the prototypes and the presenter have finished, open the project in the user's browser:
-```bash
-${BROWSER:-open} "$PROJECT_URL" 2>/dev/null || xdg-open "$PROJECT_URL" 2>/dev/null || true
-```
-
 This is extremely important because if you don't open it, they won't know it's done and won't get the opportunity to review the work.
 
 ## After the initial exploration
