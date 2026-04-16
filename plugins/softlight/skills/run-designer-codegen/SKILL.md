@@ -254,7 +254,16 @@ information in their prompt, confirm it back to them and proceed.
    canvas and arranges the layout while prototypes generate — the human sees real work
    appearing from the start.
 
-Then wait for all prototypes and the presenter to finish. The canvas should tell the complete story — problem analysis, explorations, and where you landed.
+Then wait for all prototypes and the presenter to finish.
+
+**Validate your prototypes before finishing.** You know every `slot_id` you received from
+`create_exploration`, and the `spec_url` you uploaded for each one — track them. After all
+subagents return, call `get_project` and check each of YOUR slot_ids. Any whose element still
+has `type: "placeholder"` with `content_type: "prototype"` is a prototype that was never
+generated. For each one, dispatch a new `generate-prototype` subagent using the same
+spec_url, baseline_dir, context, and images as the original. After those subagents finish,
+check your slot_ids again and repeat until every one has `element.type: "iframe"`. Only then
+does the canvas tell the complete story.
 
 CRITICAL: Once the prototypes and the presenter have finished, open the project in the user's browser:
 ```bash
@@ -306,8 +315,9 @@ the PM asked for.
    (each needs a full spec, codebase context, and builds a standalone app). If you try to
    batch them all together, the presenter gets stuck behind 10 prototypes and the canvas
    stays bare for minutes. Always dispatch the presenter as its own separate step, then
-   dispatch prototypes after. When you finish, the canvas should show clear progress on what
-   the PM asked for.
+   dispatch prototypes after. After all subagents finish, validate the same way — check YOUR
+   slot_ids from `create_exploration` for remaining prototype placeholders, and retry any that
+   failed. When you finish, the canvas should show clear progress on what the PM asked for.
 
    Dispatch `present-canvas` in the background with revision mode:
 
