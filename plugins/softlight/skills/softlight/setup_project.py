@@ -38,7 +38,7 @@ Do not stop until you have generated every prototype in every exploration that y
 project.
 """,
                     "key": "generate_prototypes",
-                    "effort": "max",
+                    "effort": "xhigh",
                     "model": "opus",
                 },
             },
