@@ -160,22 +160,20 @@ Use the `plugin:softlight:playwright` MCP tools:
 
 1. Call `create_session` to get an isolated browser instance.
 2. Call `browser_resize` to set the viewport to 1512x982.
-3. Call `browser_navigate` to `https://softlight.orianna.ai/api/tunnel/{TUNNEL_ID}/`.
-4. Call `browser_console_messages` and check for errors. Look for:
-   - Messages with `level: "error"`
-   - React error boundaries, uncaught exceptions, failed module loads
-5. Call `browser_snapshot` and verify the page has real rendered content —
+3. Call `browser_navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`.
+4. Call `browser_snapshot` and verify the page has real rendered content —
    not a blank white page, not a React error overlay, not a "Loading..."
-   spinner stuck forever.
+   spinner stuck forever. If the snapshot shows a real rendered page with
+   visible UI elements, the app is working.
 
-If the page is blank, shows an error overlay, or the console has runtime
-errors:
-1. Read the error messages to understand what broke.
+If the page is broken (blank, error overlay, nothing rendered):
+1. Call `browser_console_messages` to diagnose. Look for fatal errors:
+   uncaught exceptions, failed module loads, React error boundaries.
+   Ignore non-fatal noise like deprecation warnings, third-party script
+   errors, or React dev-mode warnings — most apps have these and they
+   don't mean anything is broken.
 2. Fix the source code in the clone directory.
 3. Rebuild with `pnpm build` and restart `pnpm preview --host`.
 4. Re-check in the browser.
-5. Repeat up to 3 times. If the app still won't render after 3 attempts,
-   report what's broken in your final message — do not silently return a
-   broken clone.
 
 When validation passes, call `close_session` to clean up the browser.
