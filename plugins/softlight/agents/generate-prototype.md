@@ -35,7 +35,7 @@ Optional. Image URLs or local file paths, one per line. If these are passed, vie
 ### `<caption_slot_id>`
 
 Optional. Canvas slot UUID for the caption below this prototype. If provided, fill it in after
-registering the prototype (see Phase 4).
+registering the prototype (see Phase 5).
 
 ### `<baseline_dir>`
 
@@ -112,27 +112,56 @@ whatever you need about the app. Read local source files, not the tunnel URL.
 ## Phase 2: Start a tunnel
 
 Run the `start-tunnel` skill with the port number from Phase 1. It returns a `tunnel_id` and
-`PID`. Capture the `tunnel_id` — you'll need it for Phase 3 and Phase 5.
+`PID`. Capture the `tunnel_id` — you'll need it for Phase 3, Phase 4, and Phase 6.
 
-## Phase 3: Register on the canvas
+## Phase 3: Validate in the browser
+
+After the build succeeds and `pnpm preview` is running, you MUST validate that the app renders
+correctly with no runtime errors. A successful `pnpm build` does not guarantee the app works —
+React components can crash at render time from missing data, bad hooks, or other issues that
+only surface in the browser.
+
+Use the `plugin:softlight:playwright` MCP tools:
+
+1. Call `create_session` to get an isolated browser instance.
+2. Call `browser_resize` to set the viewport to 1512x982.
+3. Call `browser_navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`.
+4. Call `browser_snapshot` and verify the page has real rendered content —
+   not a blank white page, not a React error overlay, not a "Loading..."
+   spinner stuck forever. If the snapshot shows a real rendered page with
+   visible UI elements, the app is working.
+
+If the page is broken (blank, error overlay, nothing rendered):
+1. Call `browser_console_messages` to diagnose. Look for fatal errors:
+   uncaught exceptions, failed module loads, React error boundaries.
+   Ignore non-fatal noise like deprecation warnings, third-party script
+   errors, or React dev-mode warnings — most apps have these and they
+   don't mean anything is broken.
+2. Fix the source code in the prototype directory.
+3. Rebuild with `pnpm build` and restart `pnpm preview --host`.
+4. Re-check in the browser.
+
+When validation passes, call `close_session` to clean up the browser.
+
+## Phase 4: Register on the canvas
 
 Call the `update_iframe_element` MCP tool with `project_id`, `slot_id`, `tunnel_id` (the new
 tunnel from Phase 2), and `spec_url` (the `<spec_url>` from your input — pass it through
 unchanged).
 
-## Phase 4: Fill in the caption
+## Phase 5: Fill in the caption
 
 If `<caption_slot_id>` was provided, call `update_text_element` with `project_id`,
 `slot_id` set to the `<caption_slot_id>`, and a short `text` (1-2 sentences) describing what
 this prototype does, how it solves the problem, and what its tradeoffs are.
 
-## Phase 5: Screenshot the prototype
+## Phase 6: Screenshot the prototype
 
 You MUST use the `plugin:softlight:playwright` MCP for all browser interactions. All standard Playwright browser tools are available through this MCP. It is a thin wrapper around Playwright MCP that gives each session its own isolated browser, so multiple prototype agents can browse in parallel without conflicts.
 
 Open the prototype in a browser and screenshot it so reviewers can see the design changes. The task is to take screenshot(s) of the prototype in states where the design change(s) are visible.
 
-If the page isn't loading or the browser becomes unresponsive, check the dev server output for build errors, fix them, and retry. Try up to 3 times before giving up. If the prototype still won't load, return whatever screenshots you managed to capture (even none) and move on. The prototype is already on the canvas from Phase 3.
+If the page isn't loading or the browser becomes unresponsive, check the preview server output for build errors, fix them, and retry. Try up to 3 times before giving up. If the prototype still won't load, return whatever screenshots you managed to capture (even none) and move on. The prototype is already on the canvas from Phase 4.
 
 Call `create_session` to get an isolated browser instance. Resize the viewport to 1512x982
 (MacBook Pro 14"). Ensure you find the design change(s) so you can screenshot the design
