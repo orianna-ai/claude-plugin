@@ -1,5 +1,39 @@
 # Setup
 
+## Prerequisites
+
+You need **Node.js version 20 or higher** installed before running any of the setup steps below.
+
+```bash
+node --version
+```
+
+If you don't have Node.js or it is older than v20, pick one of the installation methods:
+
+- **nvm (recommended, macOS/Linux)**:
+
+   ```bash
+   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+   source ~/.nvm/nvm.sh
+   nvm install 25
+   nvm use 25
+   ```
+
+- **Homebrew (macOS)**:
+
+   ```bash
+   brew install node
+   ```
+
+- **Linux (apt)**:
+
+   ```bash
+   curl -fsSL https://deb.nodesource.com/setup_25.x | sudo -E bash -
+   sudo apt-get install -y nodejs
+   ```
+
+After installing, re-run `node --version` to confirm it reports `v20` or higher.
+
 ## Claude Code Terminal
 
 ```bash
