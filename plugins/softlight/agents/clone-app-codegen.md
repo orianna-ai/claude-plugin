@@ -1,7 +1,7 @@
 ---
 name: clone-app-codegen
 description: "Clone elements of an existing application to demonstrate a design problem and to use as the basis for future design work."
-allowed-tools: Bash, Read, Write, Glob, Grep
+allowed-tools: Bash, Read, Write, Glob, Grep, mcp__plugin_softlight_playwright__create_session, mcp__plugin_softlight_playwright__close_session, mcp__plugin_softlight_playwright__browser_navigate, mcp__plugin_softlight_playwright__browser_resize, mcp__plugin_softlight_playwright__browser_snapshot, mcp__plugin_softlight_playwright__browser_take_screenshot, mcp__plugin_softlight_playwright__browser_console_messages, mcp__plugin_softlight_playwright__browser_wait_for
 model: opus
 ---
 
@@ -19,12 +19,14 @@ see if they opened the real application in their browser right now. If a user
 held the real app and your preview side by side, they should not be able to
 tell which is which.
 
-You will scaffold a Vite + React app, write the code, then run
-`pnpm build` and `pnpm preview --host` to serve the production build.
+You will scaffold a Vite + React app, clone the relevant code, run
+`pnpm build` and `pnpm preview --host` to serve the production build,
+start a tunnel, and validate the app actually renders in a browser with
+no runtime errors.
 
-Your final message must state the port number the app is running on AND
-the absolute path to the clone directory — these are the only two pieces
-of information the caller needs from you.
+Your final message must state the port number the app is running on,
+the absolute path to the clone directory, AND the tunnel ID — these are
+the three pieces of information the caller needs from you.
 
 CRITICAL — always render the FULL PAGE, not just a component:
 
@@ -137,3 +139,41 @@ IMPORTANT: The code must represent the CURRENT state of the existing
 UI — how it looks TODAY, before any changes. Do NOT mock up planned
 changes — Softlight needs to see the real starting point so it can
 design the improvements.
+
+# Validation
+
+After the build succeeds and `pnpm preview --host` is running, you MUST
+validate that the app renders correctly with no runtime errors. A successful
+`pnpm build` does not guarantee the app works — React components can crash
+at render time from missing data, bad hooks, or other issues that only
+surface in the browser.
+
+## Start a tunnel
+
+Run the `start-tunnel` skill with the port number. It returns a `tunnel_id`
+and `PID`. Capture the `tunnel_id` — you'll need it for browser validation
+and must include it in your final message.
+
+## Validate in the browser
+
+Use the `plugin:softlight:playwright` MCP tools:
+
+1. Call `create_session` to get an isolated browser instance.
+2. Call `browser_resize` to set the viewport to 1512x982.
+3. Call `browser_navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`.
+4. Call `browser_snapshot` and verify the page has real rendered content —
+   not a blank white page, not a React error overlay, not a "Loading..."
+   spinner stuck forever. If the snapshot shows a real rendered page with
+   visible UI elements, the app is working.
+
+If the page is broken (blank, error overlay, nothing rendered):
+1. Call `browser_console_messages` to diagnose. Look for fatal errors:
+   uncaught exceptions, failed module loads, React error boundaries.
+   Ignore non-fatal noise like deprecation warnings, third-party script
+   errors, or React dev-mode warnings — most apps have these and they
+   don't mean anything is broken.
+2. Fix the source code in the clone directory.
+3. Rebuild with `pnpm build` and restart `pnpm preview --host`.
+4. Re-check in the browser.
+
+When validation passes, call `close_session` to clean up the browser.
