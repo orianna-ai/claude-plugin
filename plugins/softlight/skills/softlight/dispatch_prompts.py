@@ -59,25 +59,6 @@ def dispatch_prompts(
 ) -> None:
     config = load_config(project_id)
 
-    post_events(
-        config=config,
-        events=[
-            {
-                "type": "prompt_created",
-                "prompt": {
-                    "text": """\
-Invoke the `run-designer-codegen` skill to create the project and generate the initial explorations.
-Do not stop until you have generated every prototype in every exploration that you create in the
-project.
-""",
-                    "key": "generate_prototypes",
-                    "effort": "max",
-                    "model": "opus",
-                },
-            },
-        ],
-    )
-
     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
         cursor = 0
 
