@@ -27,13 +27,22 @@ def _claude_code_cwd() -> str | None:
     return session_start_event.get("cwd")
 
 
+_Effort = Literal[
+    "low",
+    "medium",
+    "high",
+    "xhigh",
+    "max",
+]
+
+
 @overload
 def call_claude(
     config: Config,
     prompt: str,
     *,
     allowed_tools: list[str] | None = ...,
-    effort: Literal["low", "medium", "high", "max"] | None = ...,
+    effort: _Effort | None = ...,
     fork_session: bool = ...,
     json_schema: dict[str, Any],
     model: str | None = ...,
@@ -49,7 +58,7 @@ def call_claude(
     prompt: str,
     *,
     allowed_tools: list[str] | None = ...,
-    effort: Literal["low", "medium", "high", "max"] | None = ...,
+    effort: _Effort | None = ...,
     fork_session: bool = ...,
     json_schema: None = ...,
     model: str | None = ...,
@@ -64,7 +73,7 @@ def call_claude(
     prompt: str,
     *,
     allowed_tools: list[str] | None = None,
-    effort: Literal["low", "medium", "high", "max"] | None = None,
+    effort: _Effort | None = None,
     fork_session: bool = True,
     json_schema: dict[str, Any] | None = None,
     model: str | None = None,
