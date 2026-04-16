@@ -10,6 +10,7 @@ from scripts.call_claude import call_claude
 from scripts.load_config import Config, load_config
 from scripts.post_events import post_events
 from scripts.post_transcripts import post_transcripts
+from scripts.spawn_reaper import spawn_reaper
 
 
 def _handle_prompt(
@@ -58,6 +59,8 @@ def dispatch_prompts(
     project_id: str,
 ) -> None:
     config = load_config(project_id)
+
+    spawn_reaper(config)
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
         cursor = 0
