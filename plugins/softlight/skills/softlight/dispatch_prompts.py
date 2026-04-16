@@ -1,7 +1,10 @@
 import argparse
+import atexit
 import concurrent.futures
 import contextlib
 import json
+import os
+import signal
 import time
 import urllib.request
 from typing import Any
@@ -57,6 +60,9 @@ def dispatch_prompts(
     *,
     project_id: str,
 ) -> None:
+    os.setpgrp()
+    atexit.register(lambda: os.killpg(0, signal.SIGTERM))
+
     config = load_config(project_id)
 
     post_events(
