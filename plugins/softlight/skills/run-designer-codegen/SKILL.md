@@ -214,24 +214,23 @@ Do not proceed until the user has provided all three. If the user has already pr
 information in their prompt, confirm it back to them and proceed.
 
 1. **Clone the app.** Dispatch the `clone-app-codegen` agent with the path to the application source
-   code and the design problem. Wait for it to finish — it will return the port number and the
-   directory path of the baseline clone. Save the directory path as `baseline_dir` — every
-   prototype subagent needs it.
+   code and the design problem. Wait for it to finish — it will return the port number, the
+   directory path of the baseline clone, and a `tunnel_id`. Save the directory path as
+   `baseline_dir` — every prototype subagent needs it. Save the `tunnel_id` — you'll use it for the
+   project baseline tunnel.
 
-2. **Start the tunnel.** Run the `start-tunnel` skill with the port number.
-
-3. **Explore the codebase.** Read, Glob, Grep. Understand the product, tensions, design
+2. **Explore the codebase.** Read, Glob, Grep. Understand the product, tensions, design
    system, components, routing, data models, user flows, and business logic relevant to the
    design problem. This is your foundation for everything that follows.
 
-4. **Write the problem statement and update the project.** Once you understand the app
+3. **Write the problem statement and update the project.** Once you understand the app
    write a short problem statement — a natural paragraph covering what the
    product is, who uses it, and the people problem that needs solving. Then call `create_project`
    with the `problem_statement`, and `tunnel_id`. The project already exists (it was created
    by the dispatcher) — this call updates it with your refined problem statement and the
    baseline tunnel.
 
-5. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
+4. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
    resize to 1512x982) and screenshot the key screen(s) relevant to the design problem.
    Upload to drive — you'll pass these URLs in `<images>` for every prototype subagent.
 
@@ -239,10 +238,10 @@ information in their prompt, confirm it back to them and proceed.
    screenshot: the layout and composition, visual hierarchy, use of space, what draws the
    eye first, what feels buried or lost, how the page communicates (or fails to communicate)
    its purpose. Code tells you what elements exist; the screenshot tells you how the
-   experience actually feels. Your design analysis in step 5 must be grounded in these
+   experience actually feels. Your design analysis in step 4 must be grounded in these
    visual observations — not just inferred from source code.
 
-6. **Start design work.** Synthesize everything — what you learned from the code, what you
+5. **Start design work.** Synthesize everything — what you learned from the code, what you
    saw in the screenshots, and the PM's stated problem. The PM came to you
    with a murky problem. Your first round of explorations should help them see the real
    shape of it — the tensions that make it hard, the tradeoffs they'll need to navigate,
@@ -255,7 +254,16 @@ information in their prompt, confirm it back to them and proceed.
    canvas and arranges the layout while prototypes generate — the human sees real work
    appearing from the start.
 
-Then wait for all prototypes and the presenter to finish. The canvas should tell the complete story — problem analysis, explorations, and where you landed.
+Then wait for all prototypes and the presenter to finish.
+
+**Validate your prototypes before finishing.** You know every `slot_id` you received from
+`create_exploration`, and the `spec_url` you uploaded for each one — track them. After all
+subagents return, call `get_project` and check each of YOUR slot_ids. Any whose element still
+has `type: "placeholder"` with `content_type: "prototype"` is a prototype that was never
+generated. For each one, dispatch a new `generate-prototype` subagent using the same
+spec_url, baseline_dir, context, and images as the original. After those subagents finish,
+check your slot_ids again and repeat until every one has `element.type: "iframe"`. Only then
+does the canvas tell the complete story.
 
 CRITICAL: Once the prototypes and the presenter have finished, open the project in the user's browser:
 ```bash
@@ -307,8 +315,9 @@ the PM asked for.
    (each needs a full spec, codebase context, and builds a standalone app). If you try to
    batch them all together, the presenter gets stuck behind 10 prototypes and the canvas
    stays bare for minutes. Always dispatch the presenter as its own separate step, then
-   dispatch prototypes after. When you finish, the canvas should show clear progress on what
-   the PM asked for.
+   dispatch prototypes after. After all subagents finish, validate the same way — check YOUR
+   slot_ids from `create_exploration` for remaining prototype placeholders, and retry any that
+   failed. When you finish, the canvas should show clear progress on what the PM asked for.
 
    Dispatch `present-canvas` in the background with revision mode:
 
