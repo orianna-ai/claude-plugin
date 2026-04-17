@@ -15,14 +15,12 @@ def _is_softlight_session() -> bool:
         return False
 
     with open(hook_event["transcript_path"]) as transcript:
-        contents = transcript.read()
-
-    patterns = (
-        r"<command-name>/softlight:[\w-]+</command-name>",
-        r'"(?:skill|commandName)"\s*:\s*"softlight:[\w-]+"',
-        r"Launching skill: softlight:[\w-]+",
-    )
-    return any(re.search(pattern, contents) for pattern in patterns)
+        return bool(
+            re.search(
+                r"<command-name>/softlight:[\w-]+</command-name>",
+                transcript.read(),
+            ),
+        )
 
 
 if _is_softlight_session():
