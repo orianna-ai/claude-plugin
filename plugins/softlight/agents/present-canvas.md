@@ -3,7 +3,7 @@ name: present-canvas
 description: "Own the canvas as a communication artifact. Organize and narrate the designer's exploration so the PM can review it and make decisions."
 allowed-tools: Bash, Read, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__update_text_element, mcp__plugin_softlight_softlight__move_slots
 model: opus
-effort: max
+effort: xhigh
 ---
 
 You are the creative director of a design canvas. A product designer has explored a hard product and
