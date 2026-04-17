@@ -41,7 +41,7 @@ def _wait_for_exit(
         time.sleep(5)
 
 
-def _kill_subprocesses(
+def _kill_subprocesses_linux(
     project_id: str,
 ) -> None:
     marker = f"SOFTLIGHT_PROJECT_ID={project_id}\x00".encode()
@@ -63,6 +63,25 @@ def _kill_subprocesses(
                 os.kill(pid, signal.SIGKILL)
 
 
+def _kill_subprocesses_macos(
+    project_id: str,
+) -> None:
+    marker = f"SOFTLIGHT_PROJECT_ID={project_id}"
+
+    processes = subprocess.check_output(
+        ["ps", "-E", "-ww", "-ax", "-o", "pid=,command="],
+        text=True,
+        errors="replace",
+    )
+
+    for process in processes.splitlines():
+        pid, command = process.split(None, 1)
+
+        if marker in command.split():
+            with contextlib.suppress(OSError):
+                os.kill(int(pid), signal.SIGKILL)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pid", type=int, required=True)
@@ -71,7 +90,10 @@ def main() -> None:
 
     _wait_for_exit(args.pid)
 
-    _kill_subprocesses(args.project_id)
+    if sys.platform == "linux":
+        _kill_subprocesses_linux(args.project_id)
+    elif sys.platform == "darwin":
+        _kill_subprocesses_macos(args.project_id)
 
 
 if __name__ == "__main__":
