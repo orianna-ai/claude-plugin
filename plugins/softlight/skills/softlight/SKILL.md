@@ -15,9 +15,7 @@ Run the following script to setup the Softlight project. The script will output
 `project_id=<project_id>` and `project_url=<project_url>`.
 
 ```bash
-python3 -m setup_project <<'EOF'
-<problem_statement>
-EOF
+python3 -m setup_project
 ```
 
 Open the `<project_url>` in the user's browser by running the following command.

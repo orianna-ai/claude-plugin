@@ -1,14 +1,10 @@
-import sys
 import uuid
 
 from scripts.load_config import load_config
 from scripts.post_events import post_events
 
 
-def setup_project(
-    *,
-    problem_statement: str,
-) -> None:
+def setup_project() -> None:
     project_id = str(uuid.uuid4())
     print(f"{project_id=}")
 
@@ -17,18 +13,6 @@ def setup_project(
     post_events(
         config=config,
         events=[
-            {
-                "type": "project_updated",
-                "problem": {
-                    "text": problem_statement,
-                    "baseline": {
-                        "type": "iframe",
-                        "content_script": None,
-                        "tunnel_id": "",
-                    },
-                    "attachments": [],
-                },
-            },
             {
                 "type": "prompt_created",
                 "prompt": {
@@ -50,9 +34,7 @@ project.
 
 
 def main() -> None:
-    setup_project(
-        problem_statement=sys.stdin.read(),
-    )
+    setup_project()
 
 
 if __name__ == "__main__":
