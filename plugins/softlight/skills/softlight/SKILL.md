@@ -11,14 +11,15 @@ If the user has already provided the following information in their prompt, conf
 Do not proceed until the user has provided both. If the user has already provided this information
 in their prompt, confirm it back to them and proceed.
 
-Run the following script to setup the Softlight project. The script will output
-`project_id=<project_id>` and `project_url=<project_url>`.
+Run the following script to setup the Softlight project. The `<title>` should be a short (3-5 words)
+summary of the design problem that we will use to quickly identify the purpose of the project.
 
 ```bash
-python3 -m setup_project
+python3 -m setup_project --title <title>
 ```
 
-Open the `<project_url>` in the user's browser by running the following command.
+The script will output `project_id=<project_id>` and `project_url=<project_url>`. Open the
+`<project_url>` in the user's browser by running the following command.
 
 ```bash
 ${BROWSER:-open} "$PROJECT_URL" 2>/dev/null || xdg-open "$PROJECT_URL" 2>/dev/null || true
