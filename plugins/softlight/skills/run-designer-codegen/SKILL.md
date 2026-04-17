@@ -177,6 +177,7 @@ element) has:
 - **`spec_url`** — download with `curl`. Returns JSON with a `spec` field describing the design
   intent, plus any image URLs referenced in the spec. Download and Read images for visual context.
 - **`screenshots`** — drive URLs. Download and Read to see what the prototype looks like.
+- **`source_dir`** — local filesystem path to the prototype's source code on disk.
 - **`tunnel_id`** — each prototype has its own tunnel pointing to its own standalone app.
 
 Canvas tools:
@@ -237,12 +238,12 @@ Then dispatch the `generate-prototype` agent with this prompt:
 <project_id>{project_id}</project_id>
 <slot_id>{slot_id}</slot_id>
 <caption_slot_id>{caption_slot_id, if available}</caption_slot_id>
-<baseline_dir>{baseline_dir}</baseline_dir>
+<baseline_dir>{baseline_dir — or problem.baseline.source_dir via get_project on revisions}</baseline_dir>
 <spec_url>{spec_url}</spec_url>
 <images>
 {image_urls, one per line — screenshots, mocks, references}
 </images>
-<prototype_dir>{existing prototype directory, if revising}</prototype_dir>
+<prototype_dir>{existing prototype's source_dir, if revising}</prototype_dir>
 <context>
 {what you learned about the app: routing, auth, data fetching, response shapes, styling}
 </context>
@@ -264,7 +265,9 @@ read their contents. Upload any file to get a shareable URL:
 curl -sF 'file=@/path/to/file' https://drive.orianna.ai/api/v2/upload
 ```
 
-## Getting started
+## First design round
+
+If you're responding to PM feedback on the canvas or `problem.baseline.source_dir` is already set, skip to [Next design round](#next-design-round). DO NOT re-clone the app.
 
 Before doing anything, confirm with the user:
 
@@ -278,7 +281,8 @@ information in their prompt, confirm it back to them and proceed.
    code and the design problem. Wait for it to finish — it will return the port number, the
    directory path of the baseline clone, and a `tunnel_id`. Save the directory path as
    `baseline_dir` — every prototype subagent needs it. Save the `tunnel_id` — you'll use it for the
-   project baseline tunnel.
+   project baseline tunnel. Then call `update_project` with `tunnel_id` and `source_dir` (pass the
+   `baseline_dir` for this) so downstream agents can find them.
 
 2. **Explore the codebase.** Read, Glob, Grep. Understand the product, tensions, design
    system, components, routing, data models, user flows, and business logic that's relevant and adjacent to the what the PM told you. You need to make sure you have enough product/code context to inform your framings of the problem and design work that follows. When in doubt, over-fetch to make sure you're fully informed. This is your foundation for everything that follows.
@@ -334,7 +338,7 @@ does the canvas tell the complete story.
 
 This is extremely important because if you don't open it, they won't know it's done and won't get the opportunity to review the work.
 
-## After the initial exploration
+## Next design round
 
 The initial exploration is done — but you're not done. The PM will review the canvas, leave
 comments, and click the green button to request the next round. When that happens,

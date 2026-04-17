@@ -1,7 +1,7 @@
 ---
 name: generate-prototype
 description: "Build a standalone prototype app from the baseline clone that implements a design idea, run it on its own port, and register it on the canvas."
-allowed-tools: Bash, Read, Write, Glob, Grep, mcp__plugin_softlight_softlight__create_project, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_exploration, mcp__plugin_softlight_softlight__update_iframe_element, mcp__plugin_softlight_softlight__update_text_element, mcp__plugin_softlight_softlight__create_comment_thread, mcp__plugin_softlight_softlight__create_comment, mcp__plugin_softlight_softlight__complete_prompt, mcp__plugin_softlight_softlight__wait_for_prompt, mcp__plugin_softlight_playwright__create_session, mcp__plugin_softlight_playwright__close_session, mcp__plugin_softlight_playwright__list_sessions, mcp__plugin_softlight_playwright__browser_click, mcp__plugin_softlight_playwright__browser_close, mcp__plugin_softlight_playwright__browser_console_messages, mcp__plugin_softlight_playwright__browser_drag, mcp__plugin_softlight_playwright__browser_evaluate, mcp__plugin_softlight_playwright__browser_file_upload, mcp__plugin_softlight_playwright__browser_fill_form, mcp__plugin_softlight_playwright__browser_handle_dialog, mcp__plugin_softlight_playwright__browser_hover, mcp__plugin_softlight_playwright__browser_navigate, mcp__plugin_softlight_playwright__browser_navigate_back, mcp__plugin_softlight_playwright__browser_network_requests, mcp__plugin_softlight_playwright__browser_press_key, mcp__plugin_softlight_playwright__browser_resize, mcp__plugin_softlight_playwright__browser_run_code, mcp__plugin_softlight_playwright__browser_select_option, mcp__plugin_softlight_playwright__browser_snapshot, mcp__plugin_softlight_playwright__browser_take_screenshot, mcp__plugin_softlight_playwright__browser_type, mcp__plugin_softlight_playwright__browser_wait_for, mcp__plugin_softlight_playwright__browser_tabs
+allowed-tools: Bash, Read, Write, Glob, Grep, mcp__plugin_softlight_softlight__update_project, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__create_exploration, mcp__plugin_softlight_softlight__update_iframe_element, mcp__plugin_softlight_softlight__update_text_element, mcp__plugin_softlight_softlight__create_comment_thread, mcp__plugin_softlight_softlight__create_comment, mcp__plugin_softlight_softlight__complete_prompt, mcp__plugin_softlight_softlight__wait_for_prompt, mcp__plugin_softlight_playwright__create_session, mcp__plugin_softlight_playwright__close_session, mcp__plugin_softlight_playwright__list_sessions, mcp__plugin_softlight_playwright__browser_click, mcp__plugin_softlight_playwright__browser_close, mcp__plugin_softlight_playwright__browser_console_messages, mcp__plugin_softlight_playwright__browser_drag, mcp__plugin_softlight_playwright__browser_evaluate, mcp__plugin_softlight_playwright__browser_file_upload, mcp__plugin_softlight_playwright__browser_fill_form, mcp__plugin_softlight_playwright__browser_handle_dialog, mcp__plugin_softlight_playwright__browser_hover, mcp__plugin_softlight_playwright__browser_navigate, mcp__plugin_softlight_playwright__browser_navigate_back, mcp__plugin_softlight_playwright__browser_network_requests, mcp__plugin_softlight_playwright__browser_press_key, mcp__plugin_softlight_playwright__browser_resize, mcp__plugin_softlight_playwright__browser_run_code, mcp__plugin_softlight_playwright__browser_select_option, mcp__plugin_softlight_playwright__browser_snapshot, mcp__plugin_softlight_playwright__browser_take_screenshot, mcp__plugin_softlight_playwright__browser_type, mcp__plugin_softlight_playwright__browser_wait_for, mcp__plugin_softlight_playwright__browser_tabs
 model: opus
 effort: max
 ---
@@ -168,9 +168,11 @@ changes to screenshot them (the codebase, spec_url, and source code can help you
 ## Phase 5: Register on the canvas
 
 Call the `update_iframe_element` MCP tool with `project_id`, `slot_id`, `tunnel_id` (the new
-tunnel from Phase 2), `spec_url` (the `<spec_url>` from your input — pass it through
-unchanged), `screenshot_urls` (the **drive URLs** from Phase 4), and `preview_url` set to the
-screenshot that best represents the core of the design change.
+tunnel from Phase 2), `source_dir` (the absolute path to `/tmp/prototype_<slot_id>` from
+Phase 1 — stamping this lets later agents find the code you wrote), `spec_url` (the
+`<spec_url>` from your input — pass it through unchanged), `screenshot_urls` (the **drive
+URLs** from Phase 4), and `preview_url` set to the screenshot that best represents the core
+of the design change.
 
 ## Phase 6: Fill in the caption
 
