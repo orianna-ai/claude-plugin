@@ -131,8 +131,8 @@ MCP that gives each session its own isolated browser instance, so multiple agent
 different prototypes in parallel without conflicts. Use it to view the running app and rendered
 prototypes.
 
-Call `create_session` to get an isolated browser. Resize the viewport to 1512x982 (MacBook Pro
-14"). Ensure you find the design change(s) so you can screenshot the design changes and look
+Call `create_session` to get an isolated browser. Resize the viewport to 1716x1065.
+Ensure you find the design change(s) so you can screenshot the design changes and look
 at it. You may need to interact with the prototype to find all the design changes (the codebase
 and spec_url can help you figure out what screenshots you need to take).
 
@@ -231,7 +231,7 @@ information in their prompt, confirm it back to them and proceed.
    baseline tunnel.
 
 4. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
-   resize to 1512x982) and screenshot the key screen(s) relevant to the design problem.
+   resize to 1716x1065) and screenshot the key screen(s) relevant to the design problem.
    Upload to drive — you'll pass these URLs in `<images>` for every prototype subagent.
 
    **Now study what you captured.** Before any design work, describe what you see in the
