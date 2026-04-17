@@ -284,20 +284,8 @@ information in their prompt, confirm it back to them and proceed.
 2. **Explore the codebase.** Read, Glob, Grep. Understand the product, tensions, design
    system, components, routing, data models, user flows, and business logic that's relevant and adjacent to the what the PM told you. You need to make sure you have enough product/code context to inform your framings of the problem and design work that follows. When in doubt, over-fetch to make sure you're fully informed. This is your foundation for everything that follows.
 
-<<<<<<< HEAD
-3. **Write the problem statement and update the project.** Once you understand the app
-   write a short problem statement — a natural paragraph covering what the
-   product is, who uses it, and the people problem that needs solving. Then call `create_project`
-   with the `problem_statement`, and `tunnel_id`. The project already exists (it was created
-   by the dispatcher) — this call updates it with your refined problem statement and the
-   baseline tunnel.
-
-4. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
-   resize to 1716x1065) and screenshot the key screen(s) relevant to the design problem.
-=======
 3. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
-   resize to 1512x982) and screenshot the key screen(s) relevant to the design problem.
->>>>>>> 4331bf74 (feat: frame-before-solve in designer skill; unblock canvas narrative)
+   resize to 1716x1065) and screenshot the key screen(s) relevant to the design problem.
    Upload to drive — you'll pass these URLs in `<images>` for every prototype subagent.
 
    **Now study what you captured.** Before any design work, describe what you see in the
