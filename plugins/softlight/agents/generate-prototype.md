@@ -124,7 +124,7 @@ only surface in the browser.
 Use the `plugin:softlight:playwright` MCP tools:
 
 1. Call `create_session` to get an isolated browser instance.
-2. Call `browser_resize` to set the viewport to 1512x982.
+2. Call `browser_resize` to set the viewport to 1716x1065.
 3. Call `browser_navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`.
 4. Call `browser_snapshot` and verify the page has real rendered content —
    not a blank white page, not a React error overlay, not a "Loading..."
@@ -151,8 +151,8 @@ Open the prototype in a browser and screenshot it so reviewers can see the desig
 
 If the page isn't loading or the browser becomes unresponsive, check the preview server output for build errors, fix them, and retry. Try up to 3 times before giving up. If the prototype still won't load, return whatever screenshots you managed to capture (even none) and move on.
 
-Call `create_session` to get an isolated browser instance. Resize the viewport to 1512x982
-(MacBook Pro 14"). Ensure you find the design change(s) so you can screenshot the design
+Call `create_session` to get an isolated browser instance. Resize the viewport to 1716x1065.
+Ensure you find the design change(s) so you can screenshot the design
 changes and look at it. You may need to interact with the prototype to find all the design
 changes to screenshot them (the codebase, spec_url, and source code can help you figure out what screenshots you need to take).
 

@@ -159,7 +159,7 @@ and must include it in your final message.
 Use the `plugin:softlight:playwright` MCP tools:
 
 1. Call `create_session` to get an isolated browser instance.
-2. Call `browser_resize` to set the viewport to 1512x982.
+2. Call `browser_resize` to set the viewport to 1716x1065.
 3. Call `browser_navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`.
 4. Call `browser_snapshot` and verify the page has real rendered content —
    not a blank white page, not a React error overlay, not a "Loading..."
