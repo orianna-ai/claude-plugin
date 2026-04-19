@@ -89,6 +89,7 @@ def call_claude(
         "--mcp-config",
         str(config.mcp_config_path),
         "--strict-mcp-config",
+        "--no-chrome",
         "--input-format",
         "stream-json",
         "--output-format",
@@ -183,6 +184,7 @@ def call_claude(
         env={
             **{var: val for var, val in os.environ.items() if var != "CLAUDECODE"},
             "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+            "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
             "SOFTLIGHT_PROJECT_ID": config.project_id,
         },
         text=True,
