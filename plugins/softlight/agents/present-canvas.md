@@ -1,7 +1,13 @@
 ---
 name: present-canvas
 description: "Own the canvas as a communication artifact. Organize and narrate the designer's exploration so the PM can review it and make decisions."
-allowed-tools: Bash, Read, mcp__plugin_softlight_softlight__get_project, mcp__plugin_softlight_softlight__update_text_element, mcp__plugin_softlight_softlight__move_slots
+tools: >-
+  Bash,
+  mcp__plugin_softlight_softlight__get_project,
+  mcp__plugin_softlight_softlight__move_slots,
+  mcp__plugin_softlight_softlight__create_text_element,
+  mcp__plugin_softlight_softlight__update_text_element,
+  Read
 model: opus
 effort: max
 ---
@@ -99,8 +105,8 @@ arranged relative to each other, where narrative text goes, how sections are str
    explorations are in their final positions before narrative appears, so the canvas never
    looks broken mid-update. You have `move_slots` for moving multiple slots in one batch.
 
-4. **Then write narrative text with `create_text`.** Place each element at specific x,y coordinates
-   that don't overlap with anything. Choose the right typographic variant:
+4. **Then write narrative text with `create_text_element`.** Place each element at specific x,y
+   coordinates that don't overlap with anything. Choose the right typographic variant:
    - `h1` — the problem being solved, major section headers
    - `h2` — key questions, section headers for sub-problems
    - `h3` — aspects of a problem, sub-questions
