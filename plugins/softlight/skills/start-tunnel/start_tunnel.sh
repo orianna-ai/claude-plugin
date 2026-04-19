@@ -3,7 +3,7 @@ set -euo pipefail
 
 # configure the script
 PORT="${1:?Usage: start_tunnel.sh <port>}"
-TUNNEL_ID="${2:-$(python3 -c "import uuid; print(uuid.uuid4())")}"
+TUNNEL_ID="$(python3 -c "import uuid; print(uuid.uuid4())")"
 FRPC_VERSION="0.67.0"
 PLATFORM="$(uname -sm)"
 
