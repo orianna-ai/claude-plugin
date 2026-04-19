@@ -86,6 +86,7 @@ def call_claude(
         "claude",
         "-p",
         "--no-session-persistence",
+        "--exclude-dynamic-system-prompt-sections",
         "--input-format",
         "stream-json",
         "--output-format",
