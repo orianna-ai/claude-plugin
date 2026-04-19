@@ -273,11 +273,13 @@ Before doing anything, confirm with the user:
 Do not proceed until the user has provided all three. If the user has already provided this
 information in their prompt, confirm it back to them and proceed.
 
-1. **Clone the app.** Dispatch the `clone-app-codegen` agent with the path to the application source
-   code and the design problem. Wait for it to finish — it will return the port number, the
-   directory path of the baseline clone, and a `tunnel_id`. Save the directory path as
-   `baseline_dir` — every prototype subagent needs it. Save the `tunnel_id` — you'll use it for the
-   project baseline tunnel.
+1. **Clone the app.** Dispatch the `clone-app-codegen` agent. Your next tool call
+   must be reading its result — no `Bash`, `Read`, `Write`, `Glob`/`Grep`, or anything
+   else in between. The `Agent` tool is async; if you do other work first, you'll see
+   the subagent's half-built clone on disk and incorrectly conclude it failed.
+
+   On success, save `baseline_dir` and `tunnel_id` from the result. On error,
+   re-dispatch `clone-app-codegen`.
 
 2. **Explore the codebase.** Read, Glob, Grep. Understand the product, tensions, design
    system, components, routing, data models, user flows, and business logic that's relevant and adjacent to the what the PM told you. You need to make sure you have enough product/code context to inform your framings of the problem and design work that follows. When in doubt, over-fetch to make sure you're fully informed. This is your foundation for everything that follows.
