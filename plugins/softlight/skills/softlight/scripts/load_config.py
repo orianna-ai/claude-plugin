@@ -15,17 +15,13 @@ class Config:
     transcripts: dict[str, list[dict[str, Any]]]
 
 
-def _base_url(mcp_config_path: pathlib.Path) -> str:
-    mcp_json = json.loads(mcp_config_path.read_text())
-    mcp_server = mcp_json["mcpServers"]["softlight"]["args"][-1]
-    return mcp_server.removesuffix("/mcp/")
-
-
 @functools.cache
 def load_config(project_id: str) -> Config:
     mcp_config_path = pathlib.Path(__file__).resolve().parents[3] / ".mcp.json"
+    mcp_json = json.loads(mcp_config_path.read_text())
+    base_url = mcp_json["mcpServers"]["softlight"]["args"][-1].removesuffix("/mcp/")
     return Config(
-        base_url=_base_url(mcp_config_path),
+        base_url=base_url,
         mcp_config_path=mcp_config_path,
         project_id=project_id,
         transcripts={},
