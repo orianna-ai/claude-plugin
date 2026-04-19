@@ -21,6 +21,7 @@ def load_config(project_id: str) -> Config:
     mcp_config_path = pathlib.Path(__file__).resolve().parents[3] / ".mcp.json"
     mcp_config = json.loads(mcp_config_path.read_text())
     base_url = mcp_config["mcpServers"]["softlight"]["args"][-1].removesuffix("/mcp/")
+
     return Config(
         base_url=base_url,
         mcp_config=mcp_config,
