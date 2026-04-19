@@ -85,10 +85,14 @@ def call_claude(
     cmd = [
         "claude",
         "-p",
-        "--no-session-persistence",
         "--exclude-dynamic-system-prompt-sections",
         "--input-format",
         "stream-json",
+        "--mcp-config",
+        str(config.mcp_config_path),
+        "--strict-mcp-config",
+        "--no-chrome",
+        "--no-session-persistence",
         "--output-format",
         "stream-json",
         "--verbose",
@@ -181,6 +185,7 @@ def call_claude(
         env={
             **{var: val for var, val in os.environ.items() if var != "CLAUDECODE"},
             "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+            "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
             "SOFTLIGHT_PROJECT_ID": config.project_id,
         },
         text=True,
