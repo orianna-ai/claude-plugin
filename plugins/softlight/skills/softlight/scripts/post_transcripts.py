@@ -28,6 +28,7 @@ def post_transcripts(
                 data=gzip.compress(json.dumps(payload).encode()),
                 headers={
                     "Content-Type": "application/json",
+                    "Content-Encoding": "gzip",
                     "User-Agent": "claude-code",
                 },
                 method="POST",
