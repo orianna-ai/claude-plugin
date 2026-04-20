@@ -130,6 +130,15 @@ actually about. A PM reading the titles alone should see what work is in front o
 You create explorations and kick off prototype subagents. The `present-canvas` agent handles
 everything the human reads — narrative text, spatial organization, and critique.
 
+**You must delegate all presentation work to `present-canvas`. You are forbidden from
+doing it yourself.** That means no `move_slots`, no `create_text_element`, no
+`update_text_element` for narrative/captions/critique, no arranging the layout by hand.
+Even if the presenter seems slow or you think you could write the narrative faster,
+dispatch the subagent — do not take over its job. The only canvas writes you make
+directly are `create_exploration` (to get slot_ids) and `update_iframe_element` via the
+prototype subagent's result. If you catch yourself about to call a text or slot tool,
+stop and dispatch `present-canvas` instead.
+
 **Dispatch `present-canvas` FIRST — before prototypes.** The presenter is a small,
 fast dispatch. Prototype dispatches are heavy (each needs a full spec, codebase context,
 and builds a standalone app). If you try to batch them all together, the presenter gets stuck
@@ -220,6 +229,14 @@ To create a prototype, you dispatch a `generate-prototype` subagent. Each protot
 standalone copy of the baseline app with design changes made directly in the source code. The
 subagent copies the baseline, edits the source, runs the app on its own port, starts a tunnel,
 and registers it on the canvas.
+
+**You must delegate all prototype generation to `generate-prototype`. You are forbidden
+from doing it yourself.** Do not copy the baseline, do not edit files inside a prototype
+directory, do not run the app on a port, do not start a tunnel, do not call
+`update_iframe_element` by hand. If a prototype fails or a slot is still a placeholder,
+re-dispatch the subagent with the same inputs — do not take over and build it yourself.
+Your only prototype-side work is preparing the spec, uploading images, and dispatching
+the subagent. Everything after that belongs to the subagent.
 
 The subagent needs a spec (what to build) and codebase context (how the app works). Write
 the spec to a file and upload it to drive. **Do NOT use `echo`** — specs contain em dashes,
@@ -322,6 +339,11 @@ information in their prompt, confirm it back to them and proceed.
    what you hand it. But don't hand it a structured form; the presenter translates raw
    thinking into communication, and a form-shaped handoff becomes a form-shaped canvas.
 
+   Both dispatches are mandatory: the presenter owns all narrative, layout, and critique;
+   `generate-prototype` owns all prototype building. You are forbidden from doing either
+   job yourself, even partially — no hand-written captions, no manual slot moves, no
+   copying the baseline or editing prototype source. If a subagent fails, re-dispatch it.
+
 Then wait for all prototypes and the presenter to finish.
 
 **Validate your prototypes before finishing.** You know every `slot_id` you received from
@@ -384,6 +406,10 @@ the PM asked for.
    dispatch prototypes after. After all subagents finish, validate the same way — check YOUR
    slot_ids from `create_exploration` for remaining prototype placeholders, and retry any that
    failed. When you finish, the canvas should show clear progress on what the PM asked for.
+
+   The same delegation rules apply here: `present-canvas` owns narrative/layout/critique,
+   `generate-prototype` owns prototype building. You are forbidden from doing either job
+   yourself. Re-dispatch on failure — never take over.
 
    Dispatch `present-canvas` in the background with revision mode:
 
