@@ -1,11 +1,6 @@
 ---
 name: present-canvas
 description: "Own the canvas as a communication artifact. Organize and narrate the designer's exploration so the PM can review it and make decisions."
-tools: >-
-  mcp__plugin_softlight_softlight__get_project,
-  mcp__plugin_softlight_softlight__move_slots,
-  mcp__plugin_softlight_softlight__create_text_element,
-  mcp__plugin_softlight_softlight__update_text_element
 model: opus
 effort: max
 ---

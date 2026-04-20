@@ -1,8 +1,8 @@
 import argparse
 import concurrent.futures
-import contextlib
 import json
 import time
+import traceback
 import urllib.request
 from typing import Any
 
@@ -11,6 +11,27 @@ from scripts.load_config import Config, load_config
 from scripts.post_events import post_events
 from scripts.post_transcripts import post_transcripts
 from scripts.spawn_reaper import spawn_reaper
+
+
+def _fetch_events(
+    config: Config,
+) -> list[dict[str, Any]]:
+    try:
+        with urllib.request.urlopen(
+            urllib.request.Request(
+                f"{config.base_url}/api/projects/{config.project_id}/events",
+                headers={
+                    "Content-Type": "application/json",
+                    "User-Agent": "claude-code",
+                },
+            ),
+            timeout=10,
+        ) as response:
+            return json.loads(response.read())
+    except Exception:
+        traceback.print_exc()
+
+        return []
 
 
 def _handle_prompt(
@@ -66,16 +87,7 @@ def dispatch_prompts(
         cursor = 0
 
         while True:
-            with urllib.request.urlopen(
-                urllib.request.Request(
-                    f"{config.base_url}/api/projects/{config.project_id}/events",
-                    headers={
-                        "Content-Type": "application/json",
-                        "User-Agent": "claude-code",
-                    },
-                ),
-            ) as response:
-                events = json.loads(response.read())
+            events = _fetch_events(config)
 
             for event in events[cursor:]:
                 if event.get("type") == "prompt_created":
@@ -89,8 +101,7 @@ def dispatch_prompts(
 
             time.sleep(10)
 
-            with contextlib.suppress(Exception):
-                post_transcripts(config)
+            post_transcripts(config)
 
 
 def main() -> None:

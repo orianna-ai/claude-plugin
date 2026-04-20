@@ -1,16 +1,6 @@
 ---
 name: clone-app-codegen
 description: "Clone elements of an existing application to demonstrate a design problem and to use as the basis for future design work."
-tools: >-
-  Bash,
-  Edit,
-  Glob,
-  Grep,
-  mcp__plugin_softlight_playwright__execute,
-  mcp__plugin_softlight_playwright__get_schema,
-  mcp__plugin_softlight_playwright__search,
-  Read,
-  Write
 skills:
   - softlight:start-tunnel
 model: sonnet
