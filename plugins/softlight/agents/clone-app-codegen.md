@@ -13,7 +13,8 @@ tools: >-
   Write
 skills:
   - softlight:start-tunnel
-model: opus
+model: sonnet
+effort: medium
 ---
 
 # Input

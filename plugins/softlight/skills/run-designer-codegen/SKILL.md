@@ -74,10 +74,10 @@ framing and puts one decision in front of the PM: *given this framing, what solu
 The variants inside bet on different answers to that decision. Before creating one, name the
 framing it commits to, the decision it forces inside that framing, what each variant is
 betting on, and what the PM's reaction to any given variant would teach you about what they
-actually care about. Push for 5-7 variants — enough that the PM has a real spread to react
+actually care about. Push for 3-4 variants — enough that the PM has a real spread to react
 against, enough to surface answers they hadn't considered. Every variant has to earn its
 spot by embodying a meaningfully different tradeoff. If two variants bet on the same thing,
-you have one variant presented twice. If you can't find 5-7 genuinely different answers, you
+you have one variant presented twice. If you can't find 3-4 genuinely different answers, you
 haven't pushed hard enough on what the question could mean. The deliverable isn't the set of
 variants — it's the conversation the variants provoke.
 
@@ -178,7 +178,7 @@ actually betting on}
 Your workspace. Call `get_project` with the `project_id` to see everything: prototypes, comments,
 captions, the problem statement, and previous explorations.
 
-The canvas is organized into **explorations** — titled groups of prototypes in one row that each investigate solutions to problem(s). Multiple explorations can run in parallel. Each exploration has 5-7 prototypes.
+The canvas is organized into **explorations** — titled groups of prototypes in one row that each investigate solutions to problem(s). Multiple explorations can run in parallel. Each exploration has 3-4 prototypes.
 
 Slots on the canvas can be prototypes, comments, text, or images. Each prototype (iframe
 element) has:
@@ -290,13 +290,26 @@ Before doing anything, confirm with the user:
 Do not proceed until the user has provided all three. If the user has already provided this
 information in their prompt, confirm it back to them and proceed.
 
-1. **Clone the app.** Dispatch the `clone-app-codegen` agent. Your next tool call
-   must be reading its result — no `Bash`, `Read`, `Write`, `Glob`/`Grep`, or anything
-   else in between. The `Agent` tool is async; if you do other work first, you'll see
-   the subagent's half-built clone on disk and incorrectly conclude it failed.
+1. **Clone the app.** Dispatch the `clone-app-codegen` agent. Pass `model: "sonnet"`
+   on the Agent tool call — the cloning work is mechanical (read source, copy into a
+   Vite scaffold, fix build errors, validate in browser) and does not need the parent
+   session's Opus budget. The agent's frontmatter declares `model: sonnet` too, but
+   Claude Code currently ignores subagent frontmatter `model` and inherits the
+   parent's instead, so it must be passed at invocation time.
+
+   **This `model` override applies ONLY to `clone-app-codegen`.** Every other Agent
+   dispatch in this skill — `present-canvas`, `generate-prototype`, and any retries —
+   must omit the `model` parameter so they inherit the parent's Opus model. Those
+   agents are doing design reasoning, narrative writing, and visual prototype work
+   that genuinely need Opus quality; downgrading them would degrade the canvas.
+
+   Your next tool call must be reading its result — no `Bash`, `Read`, `Write`,
+   `Glob`/`Grep`, or anything else in between. The `Agent` tool is async; if you do
+   other work first, you'll see the subagent's half-built clone on disk and
+   incorrectly conclude it failed.
 
    On success, save `baseline_dir` and `tunnel_id` from the result. On error,
-   re-dispatch `clone-app-codegen`.
+   re-dispatch `clone-app-codegen` with the same `model: "sonnet"` override.
 
 2. **Explore the codebase.** Read, Glob, Grep. Understand the product, tensions, design
    system, components, routing, data models, user flows, and business logic that's relevant and adjacent to the what the PM told you. You need to make sure you have enough product/code context to inform your framings of the problem and design work that follows. When in doubt, over-fetch to make sure you're fully informed. This is your foundation for everything that follows.
