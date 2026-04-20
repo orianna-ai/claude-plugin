@@ -1,4 +1,5 @@
 import json
+import traceback
 import urllib.request
 
 from scripts.load_config import Config
@@ -19,17 +20,18 @@ def post_transcripts(
         for session_id, messages in config.transcripts.items()
     ]
 
-    request = urllib.request.Request(
-        f"{config.base_url}/api/transcripts",
-        data=json.dumps(payload).encode(),
-        headers={
-            "Content-Type": "application/json",
-            "User-Agent": "claude-code",
-        },
-        method="POST",
-    )
-
-    urllib.request.urlopen(
-        request,
-        timeout=30,
-    )
+    try:
+        urllib.request.urlopen(
+            urllib.request.Request(
+                f"{config.base_url}/api/transcripts",
+                data=json.dumps(payload).encode(),
+                headers={
+                    "Content-Type": "application/json",
+                    "User-Agent": "claude-code",
+                },
+                method="POST",
+            ),
+            timeout=30,
+        )
+    except Exception:
+        traceback.print_exc()
