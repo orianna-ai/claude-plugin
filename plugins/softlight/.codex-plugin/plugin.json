@@ -7,5 +7,5 @@
   "mcpServers": "./.mcp.json",
   "name": "softlight",
   "skills": "./skills",
-  "version": "5.65.1"
+  "version": "5.71.0"
 }

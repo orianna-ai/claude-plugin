@@ -10,6 +10,7 @@ tools: >-
   mcp__plugin_softlight_playwright__get_schema,
   mcp__plugin_softlight_playwright__search,
   Read,
+  ToolSearch,
   Write
 skills:
   - softlight:start-tunnel
