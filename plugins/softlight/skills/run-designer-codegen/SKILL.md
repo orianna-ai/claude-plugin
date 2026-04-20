@@ -221,14 +221,14 @@ standalone copy of the baseline app with design changes made directly in the sou
 subagent copies the baseline, edits the source, runs the app on its own port, starts a tunnel,
 and registers it on the canvas.
 
-The subagent needs a spec (what to build) and codebase context (how the app works). Write
-the spec to a file and upload it to drive. **Do NOT use `echo`** — specs contain em dashes,
-quotes, and unicode that break shell quoting. Use a heredoc instead:
+The subagent needs a spec (what to build) and codebase context (how the app works). Pipe
+the spec straight to drive. **Do NOT use `echo`** — specs contain em dashes, quotes, and
+unicode that break shell quoting. Use a single-quoted heredoc piped into curl:
+
 ```bash
-cat <<'SPEC_EOF' > /tmp/spec_<slot_id>.json
+curl -sF 'file=@-;filename=spec.json' https://drive.orianna.ai/api/v2/upload <<'EOF'
 {"spec": "<your spec text>"}
-SPEC_EOF
-curl -sF 'file=@/tmp/spec_<slot_id>.json' https://drive.orianna.ai/api/v2/upload
+EOF
 ```
 
 Then dispatch the `generate-prototype` agent with this prompt:
@@ -284,7 +284,7 @@ information in their prompt, confirm it back to them and proceed.
 
 3. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
    resize to 1716x1065) and screenshot the key screen(s) relevant to the design problem.
-   Upload to drive — you'll pass these URLs in `<images>` for every prototype subagent.
+   You'll pass these URLs in `<images>` for every prototype subagent.
 
    **Now study what you captured.** Before any design work, describe what you see in the
    screenshot in relation to what the PM told you. Code tells you what elements exist; the screenshot tells you how the
