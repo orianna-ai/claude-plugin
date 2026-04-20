@@ -1,20 +1,6 @@
 ---
 name: generate-prototype
 description: "Build a standalone prototype app from the baseline clone that implements a design idea, run it on its own port, and register it on the canvas."
-tools: >-
-  Bash,
-  Edit,
-  Glob,
-  Grep,
-  mcp__plugin_softlight_playwright__execute,
-  mcp__plugin_softlight_playwright__get_schema,
-  mcp__plugin_softlight_playwright__search,
-  mcp__plugin_softlight_softlight__get_project,
-  mcp__plugin_softlight_softlight__update_iframe_element,
-  mcp__plugin_softlight_softlight__update_text_element,
-  Read,
-  ToolSearch,
-  Write
 skills:
   - softlight:start-tunnel
 model: opus
