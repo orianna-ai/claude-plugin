@@ -106,8 +106,11 @@ arranged relative to each other, where narrative text goes, how sections are str
    - `p` — analysis, reasoning, observations, transitions
    - `small` — notes, caveats
 
-   The default width works for most text. Eye tracking is hard the wider it gets, so you
-   should rarely be going wider than the default, if ever.
+   **Never pass `width`.** All text uses the default 1720, even above a wider exploration —
+   wider than 1720 is unreadable. The only exception is the pre-made title slot from
+   `create_exploration`, which is fixed at the exploration's full width and can't be resized;
+   keep its text to a short label (≤6 words). Anything longer goes in its own
+   `create_text_element` block at 1720.
 
 5. **Build narrative that shows the arc of thinking.** The narrative isn't labeling — it's
    the connective tissue that makes the explorations make sense. Let the work determine the
@@ -162,7 +165,6 @@ Canvas units:
 - Text line heights: h1 ~135, h2 ~112, h3 ~90, p ~60, small ~42.
 - Allow ~400-600 vertical units between sections.
 - Allow ~200-400 vertical units between a text block and the exploration below it.
-- The default text width (1720) works for most text. Eye tracking is hard the wider it gets,
-  so you should rarely be going wider than the default, if ever. When showing fewer than 3
-  prototypes side by side, keep narrative text at the default 1720 width — don't stretch it
-  to match the exploration width.
+- Text is always 1720 wide — never pass `width`, never stretch to match a wide exploration.
+- Pre-made title slots span the exploration width and can't be resized; keep their text to a
+  short label (≤6 words).
