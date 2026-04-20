@@ -17,6 +17,8 @@ def spawn_reaper(
             sys.executable,
             "-m",
             "scripts.spawn_reaper",
+            "--ppid",
+            str(os.getppid()),
             "--pid",
             str(os.getpid()),
             "--project-id",
@@ -84,11 +86,15 @@ def _kill_subprocesses_macos(
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--ppid", type=int, required=True)
     parser.add_argument("--pid", type=int, required=True)
     parser.add_argument("--project-id", type=str, required=True)
     args = parser.parse_args()
 
-    _wait_for_exit(args.pid)
+    _wait_for_exit(args.ppid)
+
+    with contextlib.suppress(OSError):
+        os.kill(args.pid, signal.SIGKILL)
 
     if sys.platform == "linux":
         _kill_subprocesses_linux(args.project_id)
