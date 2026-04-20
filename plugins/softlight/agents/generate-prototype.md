@@ -159,11 +159,7 @@ changes to screenshot them (the codebase, spec_url, and source code can help you
 
 1. Navigate to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`
 2. Check that the page loaded, then find the design changes described in the spec. You  may need to interact with the application to get the app into a state where the design change is visible. Reminder: pages could be broken or stuck loading. If that happens, move on — do not wait indefinitely.
-3. Take a screenshot with `browser_take_screenshot` (`fullPage` set to `true`). This returns
-   a **local filename**, not a URL. Upload it to drive to get a URL:
-   ```bash
-   curl -sF 'file=@<local_screenshot_path>' https://drive.orianna.ai/api/v2/upload
-   ```
+3. Take a screenshot with `browser_take_screenshot` (`fullPage` set to `true`). This returns a URL.
 4. Call `close_session` to clean up the browser
 
 ## Phase 5: Register on the canvas
