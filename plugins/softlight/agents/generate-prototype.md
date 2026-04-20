@@ -13,6 +13,7 @@ tools: >-
   mcp__plugin_softlight_softlight__update_iframe_element,
   mcp__plugin_softlight_softlight__update_text_element,
   Read,
+  ToolSearch,
   Write
 skills:
   - softlight:start-tunnel

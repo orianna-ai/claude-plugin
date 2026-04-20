@@ -5,7 +5,8 @@ tools: >-
   mcp__plugin_softlight_softlight__get_project,
   mcp__plugin_softlight_softlight__move_slots,
   mcp__plugin_softlight_softlight__create_text_element,
-  mcp__plugin_softlight_softlight__update_text_element
+  mcp__plugin_softlight_softlight__update_text_element,
+  ToolSearch
 model: opus
 effort: max
 ---
