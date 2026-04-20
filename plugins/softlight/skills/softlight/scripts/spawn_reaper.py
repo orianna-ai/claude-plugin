@@ -1,6 +1,7 @@
 import argparse
 import contextlib
 import os
+import shlex
 import signal
 import subprocess
 import sys
@@ -12,20 +13,21 @@ from scripts.load_config import Config
 def spawn_reaper(
     config: Config,
 ) -> None:
-    subprocess.Popen(
+    command = shlex.join(
         [
             sys.executable,
             "-m",
             "scripts.spawn_reaper",
             "--pid",
-            str(os.getpid()),
+            str(os.getppid()),
             "--project-id",
             config.project_id,
         ],
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        start_new_session=True,
+    )
+
+    subprocess.run(
+        ["sh", "-c", f"exec {command} </dev/null >/dev/null 2>&1 &"],
+        check=True,
     )
 
 
