@@ -184,6 +184,7 @@ def call_claude(
         cwd=_claude_code_cwd(),
         env={
             **{var: val for var, val in os.environ.items() if var != "CLAUDECODE"},
+            "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
             "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
             "CLAUDE_CODE_GLOB_NO_IGNORE": "false",
             "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
