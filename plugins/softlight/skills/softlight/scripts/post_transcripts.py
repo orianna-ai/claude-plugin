@@ -1,3 +1,4 @@
+import gzip
 import json
 import traceback
 import urllib.request
@@ -24,7 +25,7 @@ def post_transcripts(
         urllib.request.urlopen(
             urllib.request.Request(
                 f"{config.base_url}/api/transcripts",
-                data=json.dumps(payload).encode(),
+                data=gzip.compress(json.dumps(payload).encode()),
                 headers={
                     "Content-Type": "application/json",
                     "User-Agent": "claude-code",
