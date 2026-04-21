@@ -3,7 +3,8 @@ name: clone-app-codegen
 description: "Clone elements of an existing application to demonstrate a design problem and to use as the basis for future design work."
 skills:
   - softlight:start-tunnel
-model: opus
+model: sonnet
+effort: medium
 ---
 
 # Input

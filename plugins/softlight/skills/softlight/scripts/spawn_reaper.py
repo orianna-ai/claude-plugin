@@ -15,6 +15,7 @@ def spawn_reaper(
 ) -> None:
     command = shlex.join(
         [
+            *(["/usr/bin/caffeinate", "-i"] if sys.platform == "darwin" else []),
             sys.executable,
             "-m",
             "scripts.spawn_reaper",

@@ -1,7 +1,11 @@
-from typing import Any, overload
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, overload
 
 from scripts.call_claude import call_claude
-from scripts.load_config import Config
+
+if TYPE_CHECKING:
+    from scripts.load_config import Config
 
 
 @overload
