@@ -84,6 +84,13 @@ def call_claude(
     session_id: str | None = None,
     tools: list[str] | None = None,
 ) -> str | dict[str, Any]:
+    # prepend the project id to the session id
+    if parent_session_id is not None:
+        parent_session_id = f"{config.project_id}:{parent_session_id}"
+
+    if session_id is not None:
+        session_id = f"{config.project_id}:{session_id}"
+
     # assemble the claude code command
     cmd = [
         "claude",
