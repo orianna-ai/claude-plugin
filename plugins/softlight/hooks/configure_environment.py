@@ -19,4 +19,6 @@ with env_file.open("a") as file:
         file.write("export PYTHONUNBUFFERED=1\n")
 
     if "PYTHONPATH" not in env:
-        file.write(f"export PYTHONPATH={shlex.quote(str(plugin_dir / 'skills' / 'softlight'))}\n")
+        file.write(
+            f"export PYTHONPATH={shlex.quote(str(plugin_dir / 'skills' / 'softlight'))}\n",
+        )
