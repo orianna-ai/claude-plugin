@@ -88,6 +88,7 @@ def call_claude(
     cmd = [
         "claude",
         "-p",
+        "--dangerously-skip-permissions",
         "--exclude-dynamic-system-prompt-sections",
         "--input-format",
         "stream-json",
