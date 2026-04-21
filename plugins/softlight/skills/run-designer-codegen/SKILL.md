@@ -212,7 +212,7 @@ You don't need to upload baseline screenshots — those are already on the proje
 
 ### The codebase
 
-You can explore the app's source code at any time — Read, Glob, Grep. Understand the design system, components, data models, routing, users flows, and business logic. Every subagent you dispatch can also explore the codebase. Do NOT dispatch Explore agents — read the code yourself so you build deep, firsthand understanding.
+You can explore the app's source code at any time — do so by dispatching the built-in `Explore` subagents. Understand the design system, components, data models, routing, users flows, and business logic. Every subagent you dispatch can also explore the codebase. Use ONLY `Explore` subagents for code discovery — let them do the reading so you build deep understanding of the app without bloating your own context.
 
 ### Prototype generation
 
@@ -293,7 +293,7 @@ information in their prompt, confirm it back to them and proceed.
    baseline tunnel. On error, re-dispatch `clone-app-codegen` with the same
    `model: "sonnet"` override.
 
-2. **Explore the codebase.** Read, Glob, Grep. Understand the product, tensions, design
+2. **Explore the codebase.** Dispatch `Explore` subagents to do codebase exploration without bloating your context window. Use only `Explore` subagents. Understand the product, tensions, design
    system, components, routing, data models, user flows, and business logic that's relevant and adjacent to the what the PM told you. You need to make sure you have enough product/code context to inform your framings of the problem and design work that follows. When in doubt, over-fetch to make sure you're fully informed. This is your foundation for everything that follows.
 
 3. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
