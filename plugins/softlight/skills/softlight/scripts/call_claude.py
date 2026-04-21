@@ -85,6 +85,8 @@ def call_claude(
     cmd = [
         "claude",
         "-p",
+        "--disallowed-tools",
+        "AskUserQuestion",
         "--exclude-dynamic-system-prompt-sections",
         "--input-format",
         "stream-json",
@@ -163,7 +165,11 @@ def call_claude(
             "type": "user",
             "message": {
                 "role": "user",
-                "content": prompt.strip(),
+                "content": f"""\
+You are an agent working on Softlight project {config.project_id}.
+
+{prompt.strip()}
+""",
             },
         },
     )
@@ -188,6 +194,7 @@ def call_claude(
             "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
             "CLAUDE_CODE_GLOB_NO_IGNORE": "false",
             "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
+            "MCP_TOOL_TIMEOUT": "300000",  # 5m
             "SOFTLIGHT_PROJECT_ID": config.project_id,
         },
         text=True,

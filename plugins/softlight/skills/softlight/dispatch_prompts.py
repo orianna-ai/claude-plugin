@@ -41,17 +41,14 @@ def _handle_prompt(
     try:
         call_claude(
             config=config,
-            prompt=f"""\
-You are an agent working on Softlight project {config.project_id}. You are running in a
-non-interactive environment. Do not ask the user questions - they have no way to answer.
-
-{prompt["text"]}
-""",
+            prompt=prompt["text"],
             effort=prompt.get("effort"),
             model=prompt.get("model"),
             session_id=f"{config.project_id}:{prompt['key']}",
         )
     except Exception:
+        traceback.print_exc()
+
         post_events(
             config=config,
             events=[
