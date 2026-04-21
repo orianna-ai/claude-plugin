@@ -81,7 +81,9 @@ def dispatch_prompts(
         cursor = 0
 
         while True:
-            if events := _fetch_events(config):
+            events = _fetch_events(config)
+
+            if len(events) > cursor:
                 for event in events[cursor:]:
                     if event.get("type") == "prompt_created":
                         executor.submit(

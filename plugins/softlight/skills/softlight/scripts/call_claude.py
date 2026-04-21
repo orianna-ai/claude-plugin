@@ -196,8 +196,8 @@ You are an agent working on Softlight project {config.project_id}.
             else:
                 config.transcripts[session_id] = [message]
 
-    # run claude code as a subprocess
-    claude_code = subprocess.Popen(
+    # run claude code as a subprocess and stream the output in real-time
+    with subprocess.Popen(
         cmd,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
@@ -213,28 +213,28 @@ You are an agent working on Softlight project {config.project_id}.
             "SOFTLIGHT_PROJECT_ID": config.project_id,
         },
         text=True,
-    )
+    ) as claude_code:
+        assert claude_code.stdin is not None
+        claude_code.stdin.write("\n".join([json.dumps(message) for message in input]))
+        claude_code.stdin.close()
 
-    assert claude_code.stdin is not None
-    claude_code.stdin.write("\n".join([json.dumps(message) for message in input]))
-    claude_code.stdin.close()
+        assert claude_code.stdout is not None
+        last_message: dict[str, Any] = {}
 
-    # stream the claude code output so that transcripts update in real-time
-    assert claude_code.stdout is not None
-    last_message: dict[str, Any] = {}
+        for line in claude_code.stdout:
+            print(line)
 
-    for line in claude_code.stdout:
-        print(line)
+            last_message = json.loads(line.rstrip("\n"))
 
-        last_message = json.loads(line.rstrip("\n"))
+            if session_id is not None:
+                config.transcripts[session_id].append(last_message)
 
-        if session_id is not None:
-            config.transcripts[session_id].append(last_message)
+            if last_message.get("type") == "result":
+                claude_code.terminate()
 
-    # extract the result from the last message produced by claude code
-    if last_message.get("is_error"):
-        raise RuntimeError(last_message["result"])
-    elif json_schema:
-        return last_message["structured_output"]
-    else:
-        return last_message["result"]
+                if last_message.get("is_error"):
+                    raise RuntimeError(last_message["result"])
+                elif json_schema:
+                    return last_message["structured_output"]
+                else:
+                    return last_message["result"]

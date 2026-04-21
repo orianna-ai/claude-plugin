@@ -1,10 +1,6 @@
 ---
 name: generate-prototype
 description: "Build a standalone prototype app from the baseline clone that implements a design idea, run it on its own port, and register it on the canvas."
-skills:
-  - softlight:start-tunnel
-model: opus
-effort: max
 ---
 
 # Generate Prototype
@@ -78,7 +74,8 @@ whatever you need about the app. Read local source files, not the tunnel URL.
 
 4. **Make the design changes.** Edit the prototype's files to implement the spec. The result
    should feel like a well-designed, fully functioning app — not a rough mockup. If your
-   changes introduce new UI that needs data, seed realistic mock data.
+   changes introduce new UI that needs data, seed realistic mock data. Generate all code for
+   the prototype in one `.tsx` file and generate all styles for the prototype in one `.css` file.
 
    ### Styling rules
 

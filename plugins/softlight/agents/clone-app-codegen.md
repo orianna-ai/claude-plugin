@@ -24,7 +24,8 @@ tell which is which.
 You will scaffold a Vite + React app, clone the relevant code, run
 `pnpm build` and `pnpm preview --host` to serve the production build,
 start a tunnel, and validate the app actually renders in a browser with
-no runtime errors.
+no runtime errors. Generate all code for the clone in one `.tsx` file
+and generate all styles for the clone in one `.css` file.
 
 Your final message must state the port number the app is running on,
 the absolute path to the clone directory, AND the tunnel ID — these are
