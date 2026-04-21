@@ -99,6 +99,7 @@ def call_claude(
     cmd = [
         "claude",
         "-p",
+        "--dangerously-skip-permissions",
         "--disallowed-tools",
         "AskUserQuestion",
         "--exclude-dynamic-system-prompt-sections",
