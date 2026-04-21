@@ -43,12 +43,12 @@ Use the `run-designer-codegen` skill to generate explorations in the project.
                         "properties": {
                             "slot_id": {"type": "string"},
                             "caption_slot_id": {"type": "string"},
-                            "spec_url": {"type": "string"},
+                            "spec": {"type": "string"},
                             "images": {"type": "array", "items": {"type": "string"}},
                             "context": {"type": "string"},
                             "prototype_dir": {"type": "string"},
                         },
-                        "required": ["slot_id", "spec_url", "images", "context"],
+                        "required": ["slot_id", "spec", "images", "context"],
                         "additionalProperties": False,
                     },
                 },
@@ -100,7 +100,7 @@ Dispatch the `generate-prototype` skill with these inputs.
 <slot_id>${slot_id}</slot_id>
 <caption_slot_id>${caption_slot_id}</caption_slot_id>
 <baseline_dir>${baseline_dir}</baseline_dir>
-<spec_url>${spec_url}</spec_url>
+<spec>${spec}</spec>
 <images>${images}</images>
 <context>${context}</context>
 <prototype_dir>${prototype_dir}</prototype_dir>
@@ -110,7 +110,7 @@ Dispatch the `generate-prototype` skill with these inputs.
                         "slot_id": prototype["slot_id"],
                         "caption_slot_id": prototype.get("caption_slot_id", ""),
                         "baseline_dir": handoff["baseline_dir"],
-                        "spec_url": prototype["spec_url"],
+                        "spec": prototype["spec"],
                         "images": "\n".join(prototype["images"]),
                         "context": prototype["context"],
                         "prototype_dir": prototype.get("prototype_dir", ""),

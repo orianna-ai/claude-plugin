@@ -238,3 +238,5 @@ You are an agent working on Softlight project {config.project_id}.
                     return last_message["structured_output"]
                 else:
                     return last_message["result"]
+
+    raise RuntimeError("claude did not produce a result message")

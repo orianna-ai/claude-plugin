@@ -12,6 +12,18 @@ from scripts.post_transcripts import post_transcripts
 from scripts.spawn_reaper import spawn_reaper
 from workflows.base import WORKFLOWS
 
+with urllib.request.urlopen(
+    urllib.request.Request(
+        "https://softlight.orianna.ai/api/projects/e3969905-3d7a-4a14-84b9-5a33cb105227/events",
+        headers={
+            "Content-Type": "application/json",
+            "User-Agent": "claude-code",
+        },
+    ),
+    timeout=10,
+) as response:
+    print(response.read())
+
 
 def _fetch_events(
     config: Config,

@@ -162,15 +162,12 @@ The canvas is organized into **explorations** — titled groups of prototypes in
 
 Slots on the canvas can be prototypes, comments, text, or images. Each prototype (iframe
 element) has:
-- **`spec_url`** — download with `curl`. Returns JSON with a `spec` field describing the design
-  intent, plus any image URLs referenced in the spec. Download and Read images for visual context.
+- **`spec`** — Describe the design intent.
 - **`screenshots`** — drive URLs. Download and Read to see what the prototype looks like.
 - **`tunnel_id`** — each prototype has its own tunnel pointing to its own standalone app.
 
 Canvas tools:
 - `create_exploration` — create an exploration (titled row of prototype slots). Returns `slot_ids` and `caption_slot_ids`. The presenter handles positioning
-- `update_iframe_element` — replace a placeholder with a prototype
-- `update_text_element` — fill in a caption or title (set `text`, `variant`, `bold`) or attach screenshots to a prototype
 
 ### The browser
 
@@ -183,7 +180,7 @@ prototypes.
 Call `create_session` to get an isolated browser. Resize the viewport to 1716x1065.
 Ensure you find the design change(s) so you can screenshot the design changes and look
 at it. You may need to interact with the prototype to find all the design changes (the codebase
-and spec_url can help you figure out what screenshots you need to take).
+and spec can help you figure out what screenshots you need to take).
 
 Prototype URL (each prototype has its own tunnel):
 ```
@@ -205,24 +202,15 @@ You can explore the app's source code at any time — do so by dispatching the b
 
 ### Prototype generation
 
-For each prototype you plan, write a spec describing the desired design change and upload
-it to drive. Pipe the spec straight to drive. **Do NOT use `echo`** — specs contain em
-dashes, quotes, and unicode that break shell quoting. Use a single-quoted heredoc piped
-into curl:
+For each prototype you plan, write a spec describing the desired design change.
 
-```bash
-curl -sF 'file=@-;filename=spec.json' https://drive.orianna.ai/api/v2/upload <<'EOF'
-{"spec": "<your spec text>"}
-EOF
-```
-
-Capture each `spec_url`. The workflow dispatches `generate-prototype` skills after
-you return — you do not dispatch them yourself. For each prototype you plan, add an entry
-to the `prototypes` array in your structured output with these fields:
+The workflow dispatches `generate-prototype` skills after you return — you do not dispatch them
+yourself. For each prototype you plan, add an entry to the `prototypes` array in your structured
+output with these fields:
 
 - `slot_id` — the slot returned by `create_exploration`
 - `caption_slot_id` — the caption slot returned by `create_exploration`, if available
-- `spec_url` — the drive URL you just uploaded
+- `spec` — the spec you just wrote
 - `images` — image URLs (screenshots, mocks, references), one per entry
 - `context` — what you learned about the app: routing, auth, data fetching, response shapes, styling
 - `prototype_dir` — existing prototype directory, if revising
@@ -230,14 +218,6 @@ to the `prototypes` array in your structured output with these fields:
 The subagents will copy the baseline, make the design changes in the source code, run the
 app, start a tunnel, register the prototype on the canvas, fill in the caption, and
 screenshot the prototype — all automatically.
-
-### Drive
-
-Drive URLs (like `spec_url`, `screenshots`) are regular URLs — download them with `curl` to
-read their contents. Upload any file to get a shareable URL:
-```bash
-curl -sF 'file=@/path/to/file' https://drive.orianna.ai/api/v2/upload
-```
 
 ## Getting started
 
@@ -297,8 +277,8 @@ information in their prompt, confirm it back to them and proceed.
    inside solve to the framing underneath. Downstream framings that emerged from a primary
    framing's implications get their own explorations too.
 
-   Create multiple explorations (getting slot_ids), write each prototype's spec and upload it to
-   drive (capturing each `spec_url`), then return a structured JSON output with `mode: "initial"`,
+   Create multiple explorations (getting slot_ids), write each prototype's spec,
+   then return a structured JSON output with `mode: "initial"`,
    the `present_canvas` field (your raw reasoning prose, in the shape described in
    "Presenting your work"), and one entry in `prototypes` per slot. Pass the presenter rich,
    honest reasoning in prose — the quality of its narrative depends on the quality of what
@@ -345,8 +325,8 @@ depth of work as the initial exploration, targeted at what the PM asked for.
    same framing — multiple notes about the same design or the same problem — combine them
    into one exploration so the PM sees holistic variations rather than fragmented responses.
 
-3. **Do the work.** Create explorations, write each prototype's spec and upload it to drive
-   (capturing each `spec_url`), then return a structured JSON output with `mode: "revision"`,
+3. **Do the work.** Create explorations, write each prototype's spec,
+   then return a structured JSON output with `mode: "revision"`,
    the `present_canvas` field, and one entry in `prototypes` per slot. The `thinking` field
    for a revision round is your raw reasoning, in prose — what you saw in the comment thread
    screenshots, what the PM pushed on, what you took from it, what the real problem
