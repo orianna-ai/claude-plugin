@@ -3,6 +3,7 @@ from __future__ import annotations
 import functools
 import json
 import os
+import string
 import subprocess
 from typing import TYPE_CHECKING, Any, Literal, overload
 
@@ -49,6 +50,7 @@ def call_claude(
     fork_session: bool = ...,
     json_schema: dict[str, Any],
     model: str | None = ...,
+    params: dict[str, str] | None = ...,
     parent_session_id: str | None = ...,
     session_id: str | None = ...,
     tools: list[str] | None = None,
@@ -65,6 +67,7 @@ def call_claude(
     fork_session: bool = ...,
     json_schema: None = ...,
     model: str | None = ...,
+    params: dict[str, str] | None = ...,
     parent_session_id: str | None = ...,
     session_id: str | None = ...,
     tools: list[str] | None = None,
@@ -80,6 +83,7 @@ def call_claude(
     fork_session: bool = True,
     json_schema: dict[str, Any] | None = None,
     model: str | None = None,
+    params: dict[str, str] | None = None,
     parent_session_id: str | None = None,
     session_id: str | None = None,
     tools: list[str] | None = None,
@@ -178,7 +182,7 @@ def call_claude(
                 "content": f"""\
 You are an agent working on Softlight project {config.project_id}.
 
-{prompt.strip()}
+{string.Template(prompt).safe_substitute(params or {}).strip()}
 """,
             },
         },
