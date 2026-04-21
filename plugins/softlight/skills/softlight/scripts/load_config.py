@@ -5,7 +5,7 @@ import pathlib
 from typing import Any
 
 
-@dataclasses.dataclass(kw_only=True)
+@dataclasses.dataclass
 class Config:
     """Mutable configuration that is preserved across ``claude`` invocations."""
 
