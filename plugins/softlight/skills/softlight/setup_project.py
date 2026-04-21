@@ -24,14 +24,8 @@ def setup_project(
             {
                 "type": "prompt_created",
                 "prompt": {
-                    "text": """\
-Invoke the `run-designer-codegen` skill to create the project and generate the initial explorations.
-Do not stop until you have generated every prototype in every exploration that you create in the
-project.
-""",
+                    "workflow": "generate_prototypes",
                     "key": "generate_prototypes",
-                    "effort": "max",
-                    "model": "opus",
                 },
             },
         ],

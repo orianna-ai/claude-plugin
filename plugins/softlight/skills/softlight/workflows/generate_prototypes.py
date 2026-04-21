@@ -44,7 +44,7 @@ Use the handoff file at ${handoff_file_path}.
             "handoff_file_path": run_designer_codegen_output["handoff_file_path"],
         },
         config=config,
-        effort="xhigh",
+        effort="max",
         model="opus",
         session_id="present_and_generate",
     )
