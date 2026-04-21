@@ -6,11 +6,11 @@ import traceback
 import urllib.request
 from typing import Any
 
-from scripts.call_claude import call_claude
 from scripts.load_config import Config, load_config
 from scripts.post_events import post_events
 from scripts.post_transcripts import post_transcripts
 from scripts.spawn_reaper import spawn_reaper
+from workflows.base import WORKFLOWS
 
 
 def _fetch_events(
@@ -39,13 +39,10 @@ def _handle_prompt(
     prompt: dict[str, Any],
 ) -> None:
     try:
-        call_claude(
-            config=config,
-            prompt=prompt["text"],
-            effort=prompt.get("effort"),
-            model=prompt.get("model"),
-            session_id=prompt["key"],
-        )
+        if workflow := WORKFLOWS.get(prompt["workflow"]):
+            workflow(config, prompt.get("params") or {})
+        else:
+            raise ValueError(f"workflow {prompt['workflow']} does not exist")
     except Exception:
         traceback.print_exc()
 

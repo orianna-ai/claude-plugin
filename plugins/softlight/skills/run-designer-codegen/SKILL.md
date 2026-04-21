@@ -366,10 +366,4 @@ exploration, targeted at what the PM asked for.
    way you'd talk it through, not as a form. The presenter translates this into canvas
    narrative — don't structure it like output.
 
-   Then load the `present-and-generate` skill into your own context with the Skill tool and
-   follow its instructions yourself, passing the handoff file path. **Do NOT dispatch it as
-   a subagent** (no Agent/Task call) — it must run in *this* session, as a skill swap, not
-   as a forked subagent. **After invoking it, your turn ends — do not continue.** The skill
-   dispatches the presenter, dispatches the prototype subagents, validates, and retries any
-   that didn't land. When it returns, the canvas should show clear progress on what the PM
-   asked for.
+   Then, return the path to the handoff file path.
