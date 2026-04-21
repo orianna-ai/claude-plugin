@@ -1,10 +1,13 @@
+from __future__ import annotations
+
 import functools
 import json
 import os
 import subprocess
-from typing import Any, Literal, overload
+from typing import TYPE_CHECKING, Any, Literal, overload
 
-from scripts.load_config import Config
+if TYPE_CHECKING:
+    from scripts.load_config import Config
 
 
 @functools.cache
