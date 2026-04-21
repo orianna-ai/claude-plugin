@@ -35,6 +35,14 @@ sudo apt-get install -y nodejs
 
 ## Claude Code Terminal
 
+If Claude is already installed, make sure it is up-to-date.
+
+```bash
+claude update
+```
+
+Then, install our Claude plugin.
+
 ```bash
 /plugin marketplace add orianna-ai/claude-plugin
 /plugin install softlight@orianna-ai-claude-plugin
