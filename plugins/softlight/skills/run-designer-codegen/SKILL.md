@@ -72,10 +72,10 @@ framing and puts one decision in front of the PM: *given this framing, what solu
 The variants inside bet on different answers to that decision. Before creating one, name the
 framing it commits to, the decision it forces inside that framing, what each variant is
 betting on, and what the PM's reaction to any given variant would teach you about what they
-actually care about. Push for 3-4 variants — enough that the PM has a real spread to react
+actually care about. Push for 2-4 variants — enough that the PM has a real spread to react
 against, enough to surface answers they hadn't considered. Every variant has to earn its
 spot by embodying a meaningfully different tradeoff. If two variants bet on the same thing,
-you have one variant presented twice. If you can't find 3-4 genuinely different answers, you
+you have one variant presented twice. If you can't find 2-4 genuinely different answers, you
 haven't pushed hard enough on what the question could mean. The deliverable isn't the set of
 variants — it's the conversation the variants provoke.
 
@@ -158,7 +158,7 @@ The `present_canvas` object holds two strings:
 Your workspace. Call `get_project` with the `project_id` to see everything: prototypes, comments,
 captions, the problem statement, and previous explorations.
 
-The canvas is organized into **explorations** — titled groups of prototypes in one row that each investigate solutions to problem(s). Multiple explorations can run in parallel. Each exploration has 3-4 prototypes.
+The canvas is organized into **explorations** — titled groups of prototypes in one row that each investigate solutions to problem(s). Multiple explorations can run in parallel. Each exploration has 2-4 prototypes, with a hard cap of 7 prototypes total per round.
 
 Slots on the canvas can be prototypes, comments, text, or images. Each prototype (iframe
 element) has:
