@@ -44,7 +44,7 @@ def _handle_prompt(
             prompt=prompt["text"],
             effort=prompt.get("effort"),
             model=prompt.get("model"),
-            session_id=f"{config.project_id}:{prompt['key']}",
+            session_id=prompt["key"],
         )
     except Exception:
         traceback.print_exc()
