@@ -125,7 +125,7 @@ Use the `plugin:softlight:playwright` MCP tools:
 
 1. Call `create_session` to get an isolated browser instance.
 2. Call `browser_navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`.
-3. Call `browser_take_screenshot` and verify the page has real rendered content —
+3. Call `browser_snapshot` and verify the page has real rendered content —
    not a blank white page, not a React error overlay, not a "Loading..."
    spinner stuck forever. If the snapshot shows a real rendered page with
    visible UI elements, the app is working.
