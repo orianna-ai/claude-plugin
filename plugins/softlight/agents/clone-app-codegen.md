@@ -190,7 +190,7 @@ fix, rebuild, and rerun the application on the same port. It is often helpful to
 use the`browser_console_messages` tool to gather diagnostic information from the
 browser to debug the failure.
 =======
-If the snapshot looks broken (it is blank, shows an error, etc.) we'll need to 
+If the snapshot looks broken (it is blank, shows an error, etc.) we'll need to
 fix, rebuild, rerun the application on the same port, and recheck it. It is often
 helpful to use the`browser_console_messages` tool to gather diagnostic information
 from the browser to debug the failure.
