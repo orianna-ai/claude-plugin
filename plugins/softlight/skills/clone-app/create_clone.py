@@ -139,7 +139,8 @@ def _copy_src(
         dirnames[:] = [
             dirname
             for dirname in dirnames
-            if dirname not in {"node_modules", ".git", "dist", ".next", ".turbo", "build"}
+            if dirname
+            not in {"node_modules", ".git", "dist", ".next", ".turbo", "build"}
         ]
 
         for filename in filenames:
@@ -164,7 +165,9 @@ def _copy_src(
                     queue.append(imported_file)
             else:
                 for typescript_suffix in _TYPESCRIPT_SUFFIXES:
-                    imported_file_with_suffix = imported_file.with_suffix(typescript_suffix)
+                    imported_file_with_suffix = imported_file.with_suffix(
+                        typescript_suffix,
+                    )
                     if imported_file_with_suffix.is_file():
                         if imported_file_with_suffix not in source_files:
                             source_files.add(imported_file_with_suffix)
