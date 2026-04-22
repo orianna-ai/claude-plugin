@@ -184,7 +184,7 @@ Use the Playwright MCP tools to check if everything is working properly:
 
 3. Call `browser_take_screenshot` to take a screenshot.
 
-If the screenshot looks broken (it is blank, shows an error, etc.) we'll need to 
+If the screenshot looks broken (it is blank, shows an error, etc.) we'll need to
 fix, rebuild, and rerun the application on the same port. It is often helpful to
 use the`browser_console_messages` tool to gather diagnostic information from the
 browser to debug the failure.
