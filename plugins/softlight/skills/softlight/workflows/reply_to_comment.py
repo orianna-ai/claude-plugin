@@ -38,5 +38,5 @@ design the feedback is about.
         config=config,
         effort="medium",
         model="opus",
-        session_id="reply_to_comment",
+        session_id=f"reply_to_comment:{params['slotId']}",
     )
