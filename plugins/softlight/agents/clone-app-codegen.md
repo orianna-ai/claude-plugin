@@ -184,17 +184,10 @@ Use the Playwright MCP tools to check if everything is working properly:
 
 3. Call `browser_snapshot` to snapshot the application.
 
-<<<<<<< Updated upstream
-If the screenshot looks broken (it is blank, shows an error, etc.) we'll need to
-fix, rebuild, and rerun the application on the same port. It is often helpful to
-use the`browser_console_messages` tool to gather diagnostic information from the
-browser to debug the failure.
-=======
 If the snapshot looks broken (it is blank, shows an error, etc.) we'll need to
 fix, rebuild, rerun the application on the same port, and recheck it. It is often
 helpful to use the`browser_console_messages` tool to gather diagnostic information
 from the browser to debug the failure.
->>>>>>> Stashed changes
 
 If the screenshot looks okay then run `close_session` to tear down the browser and
 return the port number the application is running on, the absolute path to the clone
