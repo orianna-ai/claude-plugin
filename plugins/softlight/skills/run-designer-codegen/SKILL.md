@@ -132,7 +132,6 @@ You hand off by returning a structured JSON object as your final output. It has 
 top-level keys, all required:
 
 - `project_id` — the project you've been working on.
-- `mode` — `"initial"` for the first round, `"revision"` for every round after.
 - `baseline_dir` — the absolute path you saved from `clone-app-codegen`. The workflow passes
   this through to every prototype subagent unchanged; if it's missing, prototype generation
   has nothing to copy from.
