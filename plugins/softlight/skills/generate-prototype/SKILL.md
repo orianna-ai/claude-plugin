@@ -1,10 +1,6 @@
 ---
 name: generate-prototype
 description: "Build a standalone prototype app from the baseline clone that implements a design idea, run it on its own port, and register it on the canvas."
-skills:
-  - softlight:start-tunnel
-model: opus
-effort: max
 ---
 
 # Generate Prototype
@@ -23,11 +19,9 @@ Softlight project UUID.
 
 Canvas slot UUID.
 
-### `<spec_url>`
+### `<spec>`
 
-Drive URL of the design spec. Download it with `curl` first. The response is JSON — extract the `spec` field. That text is a description of the desired change to the application. May contain image URLs (design mocks, screenshots of the current prototype or baseline) — examine these for additional visual context. Use `curl` to download each image URL to a local file first, then
-**Read** it. Do **not** use WebFetch for images — it returns binary data as text and cannot
-render them.
+Description of the desired change to the application.
 
 ### `<images>`
 
@@ -60,17 +54,21 @@ whatever you need about the app. Read local source files, not the tunnel URL.
 ## Phase 1: Create the prototype app
 
 1. **Copy the source.** If `<prototype_dir>` was provided (revising an existing prototype),
-   copy that directory — it already has the prior design changes. Otherwise, copy the baseline:
+   copy that directory — it already has the prior design changes. Otherwise, copy the baseline.
+   Use `rsync` with `--exclude=node_modules` — copying node_modules breaks pnpm's symlinks into
+   the store and wedges module resolution:
+
    ```bash
-   cp -r <prototype_dir or baseline_dir> /tmp/prototype_<slot_id>
-   ```
-   Install dependencies with `pnpm` (fast, deduplicates across prototypes automatically):
-   ```bash
-   cd /tmp/prototype_<slot_id> && pnpm install
+   rsync -a --exclude=node_modules --exclude=dist <prototype_dir or baseline_dir>/ /tmp/prototype_<slot_id>/
    ```
 
-2. **Read the spec.** Download `<spec_url>` with `curl`, extract the `spec` field. View any
-   referenced images. Understand what design change is being requested.
+   Install dependencies with `pnpm` (fast, deduplicates across prototypes automatically):
+
+   ```bash
+   cd /tmp/prototype_<slot_id> && pnpm install --prefer-offline
+   ```
+
+2. **Read the spec.** Understand what design change is being requested.
 
 3. **Explore the codebase.** Read the baseline clone's files and the original application
    source to understand the component structure, design system, routing, data shapes, and
@@ -78,7 +76,8 @@ whatever you need about the app. Read local source files, not the tunnel URL.
 
 4. **Make the design changes.** Edit the prototype's files to implement the spec. The result
    should feel like a well-designed, fully functioning app — not a rough mockup. If your
-   changes introduce new UI that needs data, seed realistic mock data.
+   changes introduce new UI that needs data, seed realistic mock data. Generate all code for
+   the prototype in one `.tsx` file and generate all styles for the prototype in one `.css` file.
 
    ### Styling rules
 
@@ -125,9 +124,8 @@ only surface in the browser.
 Use the `plugin:softlight:playwright` MCP tools:
 
 1. Call `create_session` to get an isolated browser instance.
-2. Call `browser_resize` to set the viewport to 1716x1065.
-3. Call `browser_navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`.
-4. Call `browser_snapshot` and verify the page has real rendered content —
+2. Call `browser_navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`.
+3. Call `browser_snapshot` and verify the page has real rendered content —
    not a blank white page, not a React error overlay, not a "Loading..."
    spinner stuck forever. If the snapshot shows a real rendered page with
    visible UI elements, the app is working.
@@ -155,7 +153,7 @@ If the page isn't loading or the browser becomes unresponsive, check the preview
 Call `create_session` to get an isolated browser instance. Resize the viewport to 1716x1065.
 Ensure you find the design change(s) so you can screenshot the design
 changes and look at it. You may need to interact with the prototype to find all the design
-changes to screenshot them (the codebase, spec_url, and source code can help you figure out what screenshots you need to take).
+changes to screenshot them (the codebase, spec, and source code can help you figure out what screenshots you need to take).
 
 1. Navigate to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`
 2. Check that the page loaded, then find the design changes described in the spec. You  may need to interact with the application to get the app into a state where the design change is visible. Reminder: pages could be broken or stuck loading. If that happens, move on — do not wait indefinitely.
@@ -165,7 +163,7 @@ changes to screenshot them (the codebase, spec_url, and source code can help you
 ## Phase 5: Register on the canvas
 
 Call the `update_iframe_element` MCP tool with `project_id`, `slot_id`, `tunnel_id` (the new
-tunnel from Phase 2), `spec_url` (the `<spec_url>` from your input — pass it through
+tunnel from Phase 2), `spec` (the `<spec>` from your input — pass it through
 unchanged), `screenshot_urls` (the **drive URLs** from Phase 4), and `preview_url` set to the
 screenshot that best represents the core of the design change.
 
