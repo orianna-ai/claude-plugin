@@ -239,4 +239,4 @@ You are an agent working on Softlight project {config.project_id}.
                 else:
                     return last_message["result"]
 
-    raise RuntimeError("claude did not produce a result message")
+    raise RuntimeError("claude did not emit a result message")

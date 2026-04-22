@@ -24,12 +24,13 @@ tell which is which.
 You will scaffold a Vite + React app, clone the relevant code, run
 `pnpm build` and `pnpm preview --host` to serve the production build,
 start a tunnel, and validate the app actually renders in a browser with
-no runtime errors. Generate all code for the clone in one `.tsx` file
-and generate all styles for the clone in one `.css` file.
+no runtime errors.
 
 Your final message must state the port number the app is running on,
 the absolute path to the clone directory, AND the tunnel ID — these are
 the three pieces of information the caller needs from you.
+
+# Guidelines
 
 CRITICAL — always render the FULL PAGE, not just a component:
 
@@ -93,17 +94,6 @@ rendering. If the source app uses a framework that does server-side
 rendering, fully deframework it — the output must have zero dependencies
 on the original framework.
 
-Start by scaffolding the project:
-```bash
-pnpm create vite@latest /tmp/clone -- --template react-ts
-```
-This gives you a working vite.config.ts, index.html, package.json, and
-entry point. Then replace the scaffold's placeholder components with the
-cloned application code.
-
-After installing dependencies and writing all the code run `pnpm build` and fix errors until the
-build succeeds.
-
 CRITICAL — no server-side or Node.js APIs:
 This runs in the browser. You must remove or replace:
 - process.env.* → hardcode the value directly
@@ -143,39 +133,62 @@ UI — how it looks TODAY, before any changes. Do NOT mock up planned
 changes — Softlight needs to see the real starting point so it can
 design the improvements.
 
-# Validation
+# Workflow
 
-After the build succeeds and `pnpm preview --host` is running, you MUST
-validate that the app renders correctly with no runtime errors. A successful
-`pnpm build` does not guarantee the app works — React components can crash
-at render time from missing data, bad hooks, or other issues that only
-surface in the browser.
+# 1. Setup the project
 
-## Start a tunnel
+Start by scaffolding the project into a unique temporary directory so
+concurrent runs don't collide:
 
-Run the `start-tunnel` skill with the port number. It returns a `tunnel_id`
-and `PID`. Capture the `tunnel_id` — you'll need it for browser validation
-and must include it in your final message.
+```bash
+CLONE_DIR=$(mktemp -d -t clone.XXXXXX)
+pnpm create vite@latest "$CLONE_DIR" -- --template react-ts
+```
 
-## Validate in the browser
+This gives you a working vite.config.ts, index.html, package.json, and
+entry point. Use `$CLONE_DIR` (the absolute path printed by `mktemp`) for
+all subsequent commands and report it in your final message.
 
-Use the `plugin:softlight:playwright` MCP tools:
+# 2. Write the code
 
-1. Call `create_session` to get an isolated browser instance.
+Write all the code for the application. Generate all TypeScript code for
+the clone in one `.tsx` file and generate all CSS styles for the clone in
+one `.css` file. This limits the number of tool calls required to generate
+the application and reduces the liklihood of import errors.
+
+# 3. Install dependencies
+
+Align dependency versions with the original application.
+
+Then, run the following command to install dependencies:
+
+```bash
+pnpm install --prefer-offline
+```
+
+# 4. Make the build pass
+
+Keep running `pnpm build` and fixing errors until the build passes.
+
+# 5. Run the application
+
+Run `pnpm build && pnpm preview --host` to run the application. Then, pass
+the port number the application is listening on to the `start-tunnel` skill
+and capture the resulting `tunnel_id` that the application is accessible at.
+
+Use the Playwright MCP tools to check if everything is working properly:
+
+1. Call `create_session` to create a browser session.
+
 2. Call `browser_navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`.
-3. Call `browser_take_screenshot` and verify the page has real rendered content —
-   not a blank white page, not a React error overlay, not a "Loading..."
-   spinner stuck forever. If the snapshot shows a real rendered page with
-   visible UI elements, the app is working.
 
-If the page is broken (blank, error overlay, nothing rendered):
-1. Call `browser_console_messages` to diagnose. Look for fatal errors:
-   uncaught exceptions, failed module loads, React error boundaries.
-   Ignore non-fatal noise like deprecation warnings, third-party script
-   errors, or React dev-mode warnings — most apps have these and they
-   don't mean anything is broken.
-2. Fix the source code in the clone directory.
-3. Rebuild with `pnpm build` and restart `pnpm preview --host`.
-4. Re-check in the browser.
+3. Call `browser_take_screenshot` to take a screenshot.
 
-When validation passes, call `close_session` to clean up the browser.
+If the screenshot looks broken (it is blank, shows an error, etc.) we'll need to 
+fix, rebuild, and rerun the application on the same port. It is often helpful to
+use the`browser_console_messages` tool to gather diagnostic information from the
+browser to debug the failure.
+
+If the screenshot looks okay then run `close_session` to tear down the browser and
+return the port number the application is running on, the absolute path to the clone
+directory, and the tunnel_id you created.

@@ -65,7 +65,7 @@ whatever you need about the app. Read local source files, not the tunnel URL.
    Install dependencies with `pnpm` (fast, deduplicates across prototypes automatically):
 
    ```bash
-   cd /tmp/prototype_<slot_id> && pnpm install
+   cd /tmp/prototype_<slot_id> && pnpm install --prefer-offline
    ```
 
 2. **Read the spec.** Understand what design change is being requested.
@@ -147,7 +147,7 @@ When validation passes, call `close_session` to clean up the browser.
 You MUST use the `plugin:softlight:playwright` MCP for all browser interactions. All standard Playwright browser tools are available through this MCP. It is a thin wrapper around Playwright MCP that gives each session its own isolated browser, so multiple prototype agents can browse in parallel without conflicts.
 
 Open the prototype in a browser and screenshot it so reviewers can see the design changes. The task is to take screenshot(s) of the prototype in states where the design change(s) are visible.
-
+   
 If the page isn't loading or the browser becomes unresponsive, check the preview server output for build errors, fix them, and retry. Try up to 3 times before giving up. If the prototype still won't load, return whatever screenshots you managed to capture (even none) and move on.
 
 Call `create_session` to get an isolated browser instance. Resize the viewport to 1716x1065.
