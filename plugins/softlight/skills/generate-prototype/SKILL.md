@@ -121,7 +121,7 @@ correctly with no runtime errors. A successful `pnpm build` does not guarantee t
 React components can crash at render time from missing data, bad hooks, or other issues that
 only surface in the browser.
 
-Use the `plugin:softlight:playwright` MCP tools:
+Use the `playwright` MCP tools (registered as `mcp__playwright__*`):
 
 1. Call `create_session` to get an isolated browser instance.
 2. Call `browser_navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`.
@@ -144,7 +144,7 @@ When validation passes, call `close_session` to clean up the browser.
 
 ## Phase 4: Screenshot the prototype
 
-You MUST use the `plugin:softlight:playwright` MCP for all browser interactions. All standard Playwright browser tools are available through this MCP. It is a thin wrapper around Playwright MCP that gives each session its own isolated browser, so multiple prototype agents can browse in parallel without conflicts.
+You MUST use the `playwright` MCP (tools registered as `mcp__playwright__*`) for all browser interactions. All standard Playwright browser tools are available through this MCP. It is a thin wrapper around Playwright MCP that gives each session its own isolated browser, so multiple prototype agents can browse in parallel without conflicts.
 
 Open the prototype in a browser and screenshot it so reviewers can see the design changes. The task is to take screenshot(s) of the prototype in states where the design change(s) are visible.
 
