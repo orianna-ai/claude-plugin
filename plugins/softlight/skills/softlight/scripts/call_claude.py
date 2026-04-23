@@ -175,25 +175,26 @@ def call_claude(
     if session_id is not None and session_id in config.transcripts:
         input.extend(config.transcripts[session_id])
 
-    user_message = {
-        "type": "user",
-        "message": {
-            "role": "user",
-            "content": f"""\
+    input.append(
+        {
+            "type": "user",
+            "message": {
+                "role": "user",
+                "content": f"""\
 You are an agent working on Softlight project {config.project_id}.
 
 {string.Template(prompt).safe_substitute(params or {}).strip()}
 """,
+            },
         },
-    }
+    )
 
     if session_id is not None:
-        if session_id in config.transcripts:
-            config.transcripts[session_id].append(user_message)
-        else:
-            config.transcripts[session_id] = [user_message]
-
-    input.append(user_message)
+        for message in input:
+            if session_id in config.transcripts:
+                config.transcripts[session_id].append(message)
+            else:
+                config.transcripts[session_id] = [message]
 
     # run claude code as a subprocess and stream the output in real-time
     with subprocess.Popen(

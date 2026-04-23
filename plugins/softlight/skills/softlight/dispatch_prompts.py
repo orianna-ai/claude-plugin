@@ -50,9 +50,9 @@ def _handle_prompt(
             config=config,
             events=[
                 {
-                    "type": "prompt_failed",
+                    "type": "prompt_completed",
                     "prompt_id": prompt["metadata"]["id"],
-                    "error": traceback.format_exc(),
+                    "status": "failure",
                 },
             ],
         )
@@ -61,8 +61,9 @@ def _handle_prompt(
             config=config,
             events=[
                 {
-                    "type": "prompt_succeeded",
+                    "type": "prompt_completed",
                     "prompt_id": prompt["metadata"]["id"],
+                    "status": "success",
                 },
             ],
         )
