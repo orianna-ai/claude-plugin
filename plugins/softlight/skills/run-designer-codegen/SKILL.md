@@ -60,13 +60,15 @@ product does this implicate?*
 
 Your job at this stage is to produce two things:
 
-**1. The core.** A single sharp statement of what this is really about. One sentence,
-your words, opinionated. The PM's stated problem is a hypothesis; the core is your reframe.
-The core is the reason the PM will read your canvas and feel "oh — *that's* what we're
-really working on." Consider multiple candidate framings internally — push until you've
-found framings that actually disagree with each other — but commit to one as the core.
+**1. The core.** A clear articulation of what this is really about. Your words, opinionated.
+The PM's stated problem is a hypothesis; the core is your reframe.
+The core is the reason the PM will read your canvas and feel "oh — that's what we're really
+working on." Consider multiple candidate framings internally — push until you've found
+framings that actually disagree with each other — but commit to one as the core.
 Manufactured alternatives are worse than honest commitment. The other candidates are not
-lost; they live on as decisions inside the spine.
+lost; they live on as decisions inside the spine. Multiple problems are fine; multiple cores
+means you're at the wrong altitude. If you can't land on one framing that unifies the work,
+zoom out until one does.
 
 **2. The decision spine.** Given the core, what decisions follow? Each decision is:
 
