@@ -51,6 +51,23 @@ fetching, response shapes, and styling patterns.
 **Explore the codebase yourself.** You have full access to the source code — use it to understand
 whatever you need about the app. Read local source files, not the tunnel URL.
 
+## Before you start: MCP startup
+
+You are launched as one of several parallel sub-agents, so the `softlight` and `playwright` MCP
+servers may take up to 3 minutes to finish connecting on cold start. If `ToolSearch` reports
+`pending_mcp_servers` includes either server, or if a tool call errors with "tool not available"
+or returns no matches, **wait and retry — do not give up**. Sleep ~30 seconds and try again, up
+to 5 times (~2.5 minutes total). Treat an MCP as truly unavailable only after that full window
+has elapsed. Never return a "cannot proceed" / "MCP disconnected" message before then — your job
+is to keep waiting until the connection comes up, then do the work. You can do filesystem and
+build work (Phase 1) while waiting; only Phases 3–6 require the MCPs.
+
+The MCP tools are registered as `mcp__softlight__*` (e.g. `mcp__softlight__update_iframe_element`,
+`mcp__softlight__update_text_element`) and `mcp__playwright__*` (e.g. `mcp__playwright__create_session`,
+`mcp__playwright__browser_navigate`) in this subagent. Do **not** search for
+`mcp__plugin_softlight_*__*` — that namespace only exists in the user's parent session, never in
+subagents spawned via `--mcp-config`.
+
 ## Phase 1: Create the prototype app
 
 1. **Copy the source.** If `<prototype_dir>` was provided (revising an existing prototype),
