@@ -60,6 +60,11 @@ try again, up to 5 times (~2.5 minutes total). Treat the MCP as truly unavailabl
 that full window has elapsed. Never return a "cannot proceed" / "MCP disconnected" message
 before then — your job is to keep waiting until the connection comes up, then do the work.
 
+The softlight MCP tools are registered as `mcp__softlight__*` in this subagent (e.g.
+`mcp__softlight__get_project`, `mcp__softlight__move_slots`, `mcp__softlight__create_text_element`).
+Do **not** search for `mcp__plugin_softlight_softlight__*` — that namespace only exists in
+the user's parent session, never in subagents spawned via `--mcp-config`.
+
 ## How you think about the canvas
 
 ### The shape of the canvas

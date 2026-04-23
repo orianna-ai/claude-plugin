@@ -51,6 +51,23 @@ fetching, response shapes, and styling patterns.
 **Explore the codebase yourself.** You have full access to the source code — use it to understand
 whatever you need about the app. Read local source files, not the tunnel URL.
 
+## Before you start: MCP startup
+
+You are launched as one of several parallel sub-agents, so the `softlight` and `playwright` MCP
+servers may take up to 3 minutes to finish connecting on cold start. If `ToolSearch` reports
+`pending_mcp_servers` includes either server, or if a tool call errors with "tool not available"
+or returns no matches, **wait and retry — do not give up**. Sleep ~30 seconds and try again, up
+to 5 times (~2.5 minutes total). Treat an MCP as truly unavailable only after that full window
+has elapsed. Never return a "cannot proceed" / "MCP disconnected" message before then — your job
+is to keep waiting until the connection comes up, then do the work. You can do filesystem and
+build work (Phase 1) while waiting; only Phases 3–6 require the MCPs.
+
+The MCP tools are registered as `mcp__softlight__*` (e.g. `mcp__softlight__update_iframe_element`,
+`mcp__softlight__update_text_element`) and `mcp__playwright__*` (e.g. `mcp__playwright__create_session`,
+`mcp__playwright__browser_navigate`) in this subagent. Do **not** search for
+`mcp__plugin_softlight_*__*` — that namespace only exists in the user's parent session, never in
+subagents spawned via `--mcp-config`.
+
 ## Phase 1: Create the prototype app
 
 1. **Copy the source.** If `<prototype_dir>` was provided (revising an existing prototype),
@@ -102,12 +119,22 @@ whatever you need about the app. Read local source files, not the tunnel URL.
    ```bash
    cd /tmp/prototype_<slot_id> && pnpm build
    ```
-   Fix any build errors until the build succeeds, then serve the production build:
+   Fix any build errors until the build succeeds, then serve the production build.
+   The preview server must outlive this subagent — the canvas iframe will keep loading
+   it for hours after you finish. A bare `&` is **not enough**: when this subagent's
+   shell tears down, the preview process gets SIGHUP'd and dies, leaving the tunnel
+   pointing at nothing (frp returns "page not found"). You must `nohup` to ignore
+   SIGHUP, redirect stdout/stderr to a log so the bash tool returns immediately
+   instead of waiting on the long-running process, and `disown` to detach it from
+   the shell's job table:
    ```bash
    PORT=$(python3 -c "import socket; s=socket.socket(); s.bind(('',0)); print(s.getsockname()[1]); s.close()")
-   cd /tmp/prototype_<slot_id> && pnpm preview --host 127.0.0.1 --port $PORT --strictPort &
+   cd /tmp/prototype_<slot_id>
+   nohup pnpm preview --host 127.0.0.1 --port $PORT --strictPort > preview.log 2>&1 &
+   disown
    ```
-   Wait for the server to print the port it's listening on. Capture that port number.
+   Wait a couple of seconds, then `cat preview.log` to confirm the server printed the
+   port it's listening on. Capture that port number.
 
 ## Phase 2: Start a tunnel
 
@@ -121,7 +148,7 @@ correctly with no runtime errors. A successful `pnpm build` does not guarantee t
 React components can crash at render time from missing data, bad hooks, or other issues that
 only surface in the browser.
 
-Use the `plugin:softlight:playwright` MCP tools:
+Use the `playwright` MCP tools (registered as `mcp__playwright__*`):
 
 1. Call `create_session` to get an isolated browser instance.
 2. Call `browser_navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`.
@@ -144,7 +171,7 @@ When validation passes, call `close_session` to clean up the browser.
 
 ## Phase 4: Screenshot the prototype
 
-You MUST use the `plugin:softlight:playwright` MCP for all browser interactions. All standard Playwright browser tools are available through this MCP. It is a thin wrapper around Playwright MCP that gives each session its own isolated browser, so multiple prototype agents can browse in parallel without conflicts.
+You MUST use the `playwright` MCP (tools registered as `mcp__playwright__*`) for all browser interactions. All standard Playwright browser tools are available through this MCP. It is a thin wrapper around Playwright MCP that gives each session its own isolated browser, so multiple prototype agents can browse in parallel without conflicts.
 
 Open the prototype in a browser and screenshot it so reviewers can see the design changes. The task is to take screenshot(s) of the prototype in states where the design change(s) are visible.
 
