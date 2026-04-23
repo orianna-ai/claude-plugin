@@ -195,6 +195,35 @@ When you're done with the browser, call `close_session` to clean up.
 
 You don't need to upload baseline screenshots — those are already on the project.
 
+### MCP HTTP fallback
+
+Always try to use the built-in MCP tools first. If a needed Softlight or Playwright tool is still
+unavailable after retrying, you may call the same MCP server directly over HTTPS with plain
+`curl`.
+
+- Softlight MCP endpoint: `https://softlight.orianna.ai/mcp/`
+- Playwright MCP endpoint: `https://playwright.orianna.ai/mcp/`
+- This transport is session-based. You must:
+  1. send `initialize`
+  2. capture the `Mcp-Session-Id` response header
+  3. send `notifications/initialized`
+  4. then send `tools/list` or `tools/call` with that same `Mcp-Session-Id`
+- If you need to call a tool over HTTP MCP, it is helpful to call `tools/list` first for that
+  server so you can see the tool schema and use the right argument shape.
+- Responses from HTTP MCP come back as SSE frames such as `event: message` and `data: {...}`.
+  If you need to inspect the JSON result, extract the `data:` line and parse that JSON.
+- Always send:
+  - `Content-Type: application/json`
+  - `Accept: application/json, text/event-stream`
+
+When calling a tool over HTTP MCP, use the bare MCP tool name without the `mcp__softlight__` or
+`mcp__playwright__` prefix. For example:
+- `mcp__softlight__get_project` -> `get_project`
+- `mcp__softlight__create_exploration` -> `create_exploration`
+- `mcp__playwright__create_session` -> `create_session`
+- `mcp__playwright__browser_take_screenshot` -> `browser_take_screenshot`
+- `mcp__playwright__close_session` -> `close_session`
+
 ### The codebase
 
 You can explore the app's source code at any time — do so by dispatching the built-in `Explore` subagents. Understand the design system, components, data models, routing, users flows, and business logic. Every subagent you dispatch can also explore the codebase. Use ONLY `Explore` subagents for code discovery — let them do the reading so you build deep understanding of the app without bloating your own context.
