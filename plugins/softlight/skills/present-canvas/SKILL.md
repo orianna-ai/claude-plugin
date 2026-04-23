@@ -33,6 +33,16 @@ You do three things:
 - **`<explorations_created>`** — What the designer just created: exploration titles, slot_ids,
   what each one explores and why. In revision mode, these are the ONLY new slots to position.
 
+## Before you start: MCP startup
+
+You are launched as one of several parallel sub-agents, so the Softlight MCP server may take
+up to 3 minutes to finish connecting on cold start. If `ToolSearch` reports
+`pending_mcp_servers` includes `softlight`, or if a softlight tool call errors with "tool not
+available" or returns no matches, **wait and retry — do not give up**. Sleep ~15 seconds and
+try again, up to 12 times (~3 minutes total). Treat the MCP as truly unavailable only after
+that full window has elapsed. Never return a "cannot proceed" / "MCP disconnected" message
+before then — your job is to keep waiting until the connection comes up, then do the work.
+
 ## How you think about the canvas
 
 ### Sections
