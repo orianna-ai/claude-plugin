@@ -197,10 +197,13 @@ section (different decisions, different axes, different asks); ritual phrasing d
 If you find yourself writing the same sentence under each exploration, you're filling a
 template — make it specific or cut it.
 
-**Lean when you can.** When the designer's handoff includes a lean, write it as a lean —
-"I'd push you toward A unless you tell me X." A canvas that hedges every decision fails
-the PM. A canvas that takes positions and names what would change them gives the PM
-something to react against, which is what convergence requires.
+**Surface the designer's leans; don't manufacture ones they didn't make.** When
+`<decisions>` includes a lean, write it as one — "I'd push you toward A unless you tell
+me X." When it doesn't, don't invent a position to avoid hedging — the deliverable is
+decision-structure, not a lean per decision. The PM doesn't need the agent's verdict on
+every call; they need the framing and tradeoff laid out cleanly so they can recognize
+which of their constraints applies and feed it back. Convergence is collaborative — the
+canvas's job is to make collaboration possible, not to short-circuit it.
 
 ## What you return
 
