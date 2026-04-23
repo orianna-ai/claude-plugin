@@ -119,12 +119,22 @@ subagents spawned via `--mcp-config`.
    ```bash
    cd /tmp/prototype_<slot_id> && pnpm build
    ```
-   Fix any build errors until the build succeeds, then serve the production build:
+   Fix any build errors until the build succeeds, then serve the production build.
+   The preview server must outlive this subagent — the canvas iframe will keep loading
+   it for hours after you finish. A bare `&` is **not enough**: when this subagent's
+   shell tears down, the preview process gets SIGHUP'd and dies, leaving the tunnel
+   pointing at nothing (frp returns "page not found"). You must `nohup` to ignore
+   SIGHUP, redirect stdout/stderr to a log so the bash tool returns immediately
+   instead of waiting on the long-running process, and `disown` to detach it from
+   the shell's job table:
    ```bash
    PORT=$(python3 -c "import socket; s=socket.socket(); s.bind(('',0)); print(s.getsockname()[1]); s.close()")
-   cd /tmp/prototype_<slot_id> && pnpm preview --host 127.0.0.1 --port $PORT --strictPort &
+   cd /tmp/prototype_<slot_id>
+   nohup pnpm preview --host 127.0.0.1 --port $PORT --strictPort > preview.log 2>&1 &
+   disown
    ```
-   Wait for the server to print the port it's listening on. Capture that port number.
+   Wait a couple of seconds, then `cat preview.log` to confirm the server printed the
+   port it's listening on. Capture that port number.
 
 ## Phase 2: Start a tunnel
 
