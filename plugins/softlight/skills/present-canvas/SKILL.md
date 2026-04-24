@@ -46,9 +46,10 @@ You do three things:
   they saw in the screenshots and learned from the code. Read this carefully and pull
   these pieces out as you compose the canvas. In revision mode, this also covers what the
   PM's feedback exposed and how the round builds on / narrows from the previous one.
-- **`<explorations_created>`** — Exploration titles and slot_ids, with one line per
-  exploration tying it to the decision in the spine. In revision mode, these are the ONLY
-  new slots to position.
+- **`<explorations_created>`** — Per exploration: the title, the `title_slot_id` (the
+  slot that spans the row — anchor decision comments here), the prototype `slot_ids`, and
+  one line tying the exploration to the decision in the spine. In revision mode, these
+  are the ONLY new slots to position.
 
 ## Before you start: MCP startup
 
@@ -61,7 +62,8 @@ that full window has elapsed. Never return a "cannot proceed" / "MCP disconnecte
 before then — your job is to keep waiting until the connection comes up, then do the work.
 
 The softlight MCP tools are registered as `mcp__softlight__*` in this subagent (e.g.
-`mcp__softlight__get_project`, `mcp__softlight__move_slots`, `mcp__softlight__create_text_element`).
+`mcp__softlight__get_project`, `mcp__softlight__move_slots`,
+`mcp__softlight__create_text_element`, `mcp__softlight__create_comment_thread`).
 Do **not** search for `mcp__plugin_softlight_softlight__*` — that namespace only exists in
 the user's parent session, never in subagents spawned via `--mcp-config`.
 
@@ -143,6 +145,7 @@ When calling a tool over HTTP MCP, use the bare MCP tool name without the `mcp__
 - `mcp__softlight__get_project` -> `get_project`
 - `mcp__softlight__move_slots` -> `move_slots`
 - `mcp__softlight__create_text_element` -> `create_text_element`
+- `mcp__softlight__create_comment_thread` -> `create_comment_thread`
 - `mcp__playwright__create_session` -> `create_session`
 
 Set `MCP_URL` to whichever server you need:
@@ -222,11 +225,15 @@ arranged relative to each other, where narrative text goes, how sections are str
    anything.
 
 2. **Plan the layout.** Based on what exists, decide where everything should go. Narrative
-   text goes above explorations. Explorations within a section sit side by side or stacked.
-   Sections are separated by vertical space. Think through the full layout before making any
-   tool calls — including how much text you'll write and how tall it will be (use the
-   reference dimensions below). In revision mode, find the bottom edge of existing content
-   and plan new content below it.
+   text goes above explorations, with the decision comment sitting between the narrative
+   and the title — so the vertical stack for each section reads: narrative text → comment
+   icon → title → prototypes → captions. Reserve ~80-100 vertical units between the
+   narrative text block and the title slot so the decision comment has breathing room to
+   sit there in step 7. Explorations within a section sit side by side or stacked.
+   Sections are separated by vertical space. Think through the full layout before making
+   any tool calls — including how much text you'll write and how tall it will be (use the
+   reference dimensions below). In revision mode, find the bottom edge of existing
+   content and plan new content below it.
 
 3. **Refine positions with `move_slots` — do this BEFORE creating any text.**
    The designer's explorations start at rough auto-placed positions (stacked below existing content). In initial mode, reposition every slot. In revision mode, only reposition the slots from `<explorations_created>` — do not move existing slots. Move titles, prototypes, and captions into the layout you've planned. Each exploration consists of a title slot, N prototype slots in a row, and N caption slots below them. Move them all as a group, preserving their relative spacing (title at top, prototypes
@@ -262,11 +269,33 @@ arranged relative to each other, where narrative text goes, how sections are str
 
 6. **Make the convergence asks explicit and substantive.** The PM should not have to guess
    what kind of context would help — surface the convergence ask for each decision in the
-   designer's expert-hypothesis voice. This is
-   not a generic "where your input matters" header repeated under each exploration —
-   that's template. Each ask is decision-specific and substantive, naming the actual
-   constraint axis. It belongs inside the section's prose, but it should be unmistakable
-   that the PM is being handed a question with shape, not a comment box.
+   designer's expert-hypothesis voice. This is not a generic "where your input matters"
+   header repeated under each exploration — that's template. Each ask is
+   decision-specific and substantive, naming the actual constraint axis. It belongs
+   inside the section's prose as a substantive ask, written so the PM knows exactly what
+   kind of context they could bring to converge.
+
+7. **Drop a decision comment for each decision in the spine.** After the narrative is in
+   place, create *and reposition* one comment thread per decision:
+
+   1. Call `create_comment_thread` to create the thread. The parameter is named
+      `prototype_slot_id` for legacy reasons but accepts any slot ID — pass the
+      exploration's `title_slot_id` (from `<explorations_created>`). The thread is
+      anchored to the title (the row-spanning header that represents the decision
+      itself, not any single variant), but it's created at an auto-position to the
+      right of the row by default — which isn't where you want it.
+   2. Immediately call `move_slots` with the new comment thread's returned `slot_id` to
+      reposition it at the **top-left of the exploration, just above the title**.
+      Readers scan top-to-bottom and left-to-right, so a comment at the top-left of the
+      section is the first thing they see when they reach that decision. Use
+      approximately `x = title.x` and `y = title.y - 60` (the icon's visual transform
+      places it about 85px above the title's top edge, leaving comfortable breathing
+      room).
+
+   This is the conversation channel: the PM replies to it, and you respond next round.
+   The narrative is the static decision map for scanning; the comments are where the
+   back-and-forth happens. See "How to write decision comments" below for what goes in
+   the body.
 
 ## How to write
 
@@ -274,6 +303,15 @@ Write like a senior designer — direct, specific, opinionated.
 
 Name specific things. The specific screens, the specific friction points, the specific
 user emotions. Generic observations are worthless.
+
+**Skip the preamble; open with the insight.** The PM works on this product — they know
+what's on the page, what the existing flow does, what their own prompt said. Don't open
+the canvas (or any section) by recapping any of that. A paragraph that describes the
+existing experience back to the PM is preamble, and preamble pushes the insight further down the page. Reference a
+specific detail from the existing experience only when it's load-bearing for the insight
+you're delivering — never as setup. Same for the PM's prompt: they wrote it, they don't need it
+played back. Lead with what the PM *didn't* see: the reframe, the tension, the decision
+they're now in front of.
 
 **Length varies with the wrestle.** A decision the designer wrestled with deeply earns
 paragraphs; a setup decision earns a sentence or two. Uniform section lengths read as
@@ -307,6 +345,36 @@ positions, convergence ask — and the absence of a lean is itself a signal that
 one for the PM to bring constraint to. Convergence is collaborative; the canvas's job is
 to make collaboration possible, not to short-circuit it.
 
+## How to write decision comments
+
+Each decision in the spine gets one comment thread anchored to its exploration's title
+slot — the row-spanning header that represents the decision itself, not any single
+variant. The comment is the conversation channel: the PM replies, you respond next round,
+the constraint that resolves the decision surfaces through dialogue.
+
+**Lead with the question you actually need the PM to answer.** A real, conversational
+question that pulls out the context only they have. The decision being made and why the
+question matters should be implicit in *how* you ask it — you almost never need a
+separate sentence to set them up. If your question is good, the PM reads it and
+immediately knows both what's being decided and what kind of context they could give back.
+
+**Keep it short.** A few sentences, not paragraphs. The comment is a conversation opener,
+not a mini-essay or a structured writeup. Don't recap what the PM already knows about
+their own product (no "from the code, I noticed…" preamble — they wrote the code), and
+don't restate the decision in formal voice when the question itself is already doing
+that work. The agent's full reasoning lives in the canvas narrative; the comment is just
+the hook for the back-and-forth.
+
+**Weave in a take only when it sharpens the question** — something like "I'd lean A, but
+B is the right call if [the thing you're asking about]." Same wheelhouse rule as the
+canvas narrative: lean when the call is genuinely yours (design execution, what the
+codebase supports, what the screenshots reveal), defer when it hinges on PM-only
+context. Don't pad the comment with a take just to seem more useful — most of the time
+the cleanest comment is a single sharp question with one line of why-it-matters baked in.
+
+The PM should read the comment and immediately know what kind of context to send back.
+That's the whole job.
+
 ## What you return
 
 After writing and organizing, return a brief summary of what you composed — what text you
@@ -319,7 +387,9 @@ Canvas units:
 - Exploration of N prototypes: (N × 1840 − 120) wide, ~1520 tall.
 - Text line heights: h1 ~135, h2 ~112, h3 ~90, p ~60, small ~42.
 - Allow ~400-600 vertical units between sections.
-- Allow ~200-400 vertical units between a text block and the exploration below it.
+- Allow ~200-400 vertical units between a text block and the exploration below it. Of
+  that gap, reserve ~80-100 units immediately above the title for the decision comment
+  icon (positioned via `move_slots` at roughly `y = title.y - 60`).
 - Text is always 1720 wide — never pass `width`, never stretch to match a wide exploration.
 - Pre-made title slots span the exploration width and can't be resized; keep their text to a
   short label (≤6 words).
