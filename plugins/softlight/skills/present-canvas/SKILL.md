@@ -65,6 +65,90 @@ The softlight MCP tools are registered as `mcp__softlight__*` in this subagent (
 Do **not** search for `mcp__plugin_softlight_softlight__*` — that namespace only exists in
 the user's parent session, never in subagents spawned via `--mcp-config`.
 
+### HTTP fallback for MCP tools
+
+This flow primarily uses Softlight MCP tools, but if you unexpectedly need Playwright MCP tools
+you may use the same fallback pattern for either server.
+
+- Softlight MCP endpoint: `https://softlight.orianna.ai/mcp/`
+- Playwright MCP endpoint: `https://playwright.orianna.ai/mcp/`
+
+Always try to use the built-in MCP tools first. If a built-in MCP tool is still unavailable after
+the full retry window, you may call the same MCP server directly over HTTPS with plain `curl`.
+This is still MCP. It just uses raw HTTP instead of the built-in tool binding.
+
+- This transport is session-based. You must:
+  1. send `initialize`
+  2. capture the `Mcp-Session-Id` response header
+  3. send `notifications/initialized`
+  4. then send `tools/list` or `tools/call` with that same `Mcp-Session-Id`
+- If you need to call a tool over HTTP MCP, it is helpful to call `tools/list` first for that
+  server so you can see the tool schema and use the right argument shape.
+- Responses from HTTP MCP come back as SSE frames such as `event: message` and `data: {...}`.
+  If you need to inspect the JSON result, extract the `data:` line and parse that JSON.
+- Always send:
+  - `Content-Type: application/json`
+  - `Accept: application/json, text/event-stream`
+- Always try the built-in MCP tools first. Use direct HTTP MCP only as a fallback when the tool
+  binding is still unavailable after waiting.
+
+Minimal pattern:
+
+```bash
+MCP_URL="https://softlight.orianna.ai/mcp/"
+HDR=$(mktemp)
+INIT=$(mktemp)
+
+curl -s -X POST "$MCP_URL" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -D "$HDR" \
+  -d '{
+    "jsonrpc":"2.0",
+    "id":1,
+    "method":"initialize",
+    "params":{
+      "protocolVersion":"2025-03-26",
+      "capabilities":{},
+      "clientInfo":{"name":"curl","version":"1.0"}
+    }
+  }' >"$INIT"
+
+SESSION_ID=$(grep -i '^mcp-session-id:' "$HDR" | awk '{print $2}' | tr -d '\r\n')
+
+curl -s -X POST "$MCP_URL" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -H "Mcp-Session-Id: $SESSION_ID" \
+  -d '{"jsonrpc":"2.0","method":"notifications/initialized"}' >/dev/null
+
+curl -s -X POST "$MCP_URL" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -H "Mcp-Session-Id: $SESSION_ID" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
+
+rm -f "$HDR" "$INIT"
+```
+
+**Persisting `SESSION_ID` across `Bash` invocations.** Each `Bash` tool call is a fresh
+shell, so variables don't survive. If you need the session id for a follow-up `Bash` call,
+save it with `mktemp` too — e.g. `SID_FILE=$(mktemp); echo "$SESSION_ID" > "$SID_FILE"`,
+then read it back with `$(cat "$SID_FILE")` in subsequent calls. Don't write to a fixed
+path like `/tmp/mcp_session_id` — parallel agents would race on it the same way they would
+on `/tmp/mcp_headers.txt`.
+
+When calling a tool over HTTP MCP, use the bare MCP tool name without the `mcp__softlight__` or
+`mcp__playwright__` prefix. For example:
+- `mcp__softlight__get_project` -> `get_project`
+- `mcp__softlight__move_slots` -> `move_slots`
+- `mcp__softlight__create_text_element` -> `create_text_element`
+- `mcp__playwright__create_session` -> `create_session`
+
+Set `MCP_URL` to whichever server you need:
+- `https://softlight.orianna.ai/mcp/`
+- `https://playwright.orianna.ai/mcp/`
+
 ## How you think about the canvas
 
 ### The shape of the canvas

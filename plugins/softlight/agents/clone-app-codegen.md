@@ -30,6 +30,86 @@ Your final message must state the port number the app is running on,
 the absolute path to the clone directory, AND the tunnel ID — these are
 the three pieces of information the caller needs from you.
 
+# MCP fallback
+
+This flow primarily uses Playwright MCP tools, but if you unexpectedly need Softlight MCP tools
+you may use the same fallback pattern for either server.
+
+- Playwright MCP endpoint: `https://playwright.orianna.ai/mcp/`
+- Softlight MCP endpoint: `https://softlight.orianna.ai/mcp/`
+
+Always try to use the built-in MCP tools first. If the built-in tool binding is still unavailable
+after retrying, you may call the same MCP server directly over HTTPS with plain `curl`.
+
+This HTTP transport is session-based:
+1. send `initialize`
+2. capture the `Mcp-Session-Id` response header
+3. send `notifications/initialized`
+4. then send `tools/list` or `tools/call` with that same `Mcp-Session-Id`
+
+If you need to call a tool over HTTP MCP, it is helpful to call `tools/list` first for that
+server so you can see the tool schema and use the right argument shape.
+
+Responses from HTTP MCP come back as SSE frames such as `event: message` and `data: {...}`.
+If you need to inspect the JSON result, extract the `data:` line and parse that JSON.
+
+Always send:
+- `Content-Type: application/json`
+- `Accept: application/json, text/event-stream`
+
+When calling a tool over HTTP MCP, use the bare MCP tool name without the `mcp__playwright__`
+or `mcp__softlight__` prefix. For example:
+- `mcp__playwright__create_session` -> `create_session`
+- `mcp__playwright__browser_navigate` -> `browser_navigate`
+- `mcp__playwright__browser_snapshot` -> `browser_snapshot`
+- `mcp__playwright__browser_console_messages` -> `browser_console_messages`
+- `mcp__playwright__close_session` -> `close_session`
+- `mcp__softlight__get_project` -> `get_project`
+
+Minimal pattern:
+
+```bash
+MCP_URL="https://playwright.orianna.ai/mcp/"
+HDR=$(mktemp)
+INIT=$(mktemp)
+
+curl -s -X POST "$MCP_URL" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -D "$HDR" \
+  -d '{
+    "jsonrpc":"2.0",
+    "id":1,
+    "method":"initialize",
+    "params":{
+      "protocolVersion":"2025-03-26",
+      "capabilities":{},
+      "clientInfo":{"name":"curl","version":"1.0"}
+    }
+  }' >"$INIT"
+
+SESSION_ID=$(grep -i '^mcp-session-id:' "$HDR" | awk '{print $2}' | tr -d '\r\n')
+
+curl -s -X POST "$MCP_URL" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -H "Mcp-Session-Id: $SESSION_ID" \
+  -d '{"jsonrpc":"2.0","method":"notifications/initialized"}' >/dev/null
+
+rm -f "$HDR" "$INIT"
+```
+
+**Persisting `SESSION_ID` across `Bash` invocations.** Each `Bash` tool call is a fresh
+shell, so variables don't survive. If you need the session id for a follow-up `Bash` call,
+save it with `mktemp` too — e.g. `SID_FILE=$(mktemp); echo "$SESSION_ID" > "$SID_FILE"`,
+then read it back with `$(cat "$SID_FILE")` in subsequent calls. Don't write to a fixed
+path like `/tmp/mcp_session_id` — parallel agents would race on it the same way they would
+on `/tmp/mcp_headers.txt`.
+
+Set `MCP_URL` to whichever server you need:
+- `https://playwright.orianna.ai/mcp/`
+- `https://softlight.orianna.ai/mcp/`
+
 # Guidelines
 
 CRITICAL — always render the FULL PAGE, not just a component:
