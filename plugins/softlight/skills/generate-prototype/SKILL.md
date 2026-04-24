@@ -130,6 +130,13 @@ curl -s -X POST "$MCP_URL" \
 rm -f "$HDR" "$INIT"
 ```
 
+**Persisting `SESSION_ID` across `Bash` invocations.** Each `Bash` tool call is a fresh
+shell, so variables don't survive. If you need the session id for a follow-up `Bash` call,
+save it with `mktemp` too — e.g. `SID_FILE=$(mktemp); echo "$SESSION_ID" > "$SID_FILE"`,
+then read it back with `$(cat "$SID_FILE")` in subsequent calls. Don't write to a fixed
+path like `/tmp/mcp_session_id` — parallel agents would race on it the same way they would
+on `/tmp/mcp_headers.txt`.
+
 To call a tool, send:
 
 ```bash

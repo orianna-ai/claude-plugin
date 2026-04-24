@@ -215,6 +215,11 @@ unavailable after retrying, you may call the same MCP server directly over HTTPS
 - Always send:
   - `Content-Type: application/json`
   - `Accept: application/json, text/event-stream`
+- If you need to persist `SESSION_ID` across separate `Bash` invocations (each `Bash` call
+  is a fresh shell, so variables don't survive), save it with `mktemp` too — e.g.
+  `SID_FILE=$(mktemp); echo "$SESSION_ID" > "$SID_FILE"`, then read it back with
+  `$(cat "$SID_FILE")` in subsequent calls. Don't write to a fixed path like
+  `/tmp/mcp_session_id` — parallel agents would race on it.
 
 When calling a tool over HTTP MCP, use the bare MCP tool name without the `mcp__softlight__` or
 `mcp__playwright__` prefix. For example:
