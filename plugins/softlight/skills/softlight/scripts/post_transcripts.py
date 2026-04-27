@@ -9,8 +9,17 @@ from scripts.load_config import Config
 def post_transcripts(
     config: Config,
 ) -> None:
-    if not config.transcripts:
-        return
+    with config.lock:
+        if not config.transcripts:
+            return
+        payload = [
+            {
+                "messages": list(messages),
+                "project_id": config.project_id,
+                "session_id": session_id,
+            }
+            for session_id, messages in config.transcripts.items()
+        ]
 
     with config.lock:
         payload = [
