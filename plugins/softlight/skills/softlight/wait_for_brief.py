@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import json
 import sys
@@ -6,7 +8,6 @@ import urllib.request
 from typing import Any
 
 from scripts.load_config import load_config
-
 
 _POLL_INTERVAL_S = 2.0
 _TIMEOUT_S = 60 * 30  # 30 minutes
