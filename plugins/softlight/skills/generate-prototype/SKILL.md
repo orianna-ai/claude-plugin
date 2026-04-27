@@ -288,11 +288,9 @@ changes to screenshot them (the codebase, spec, and source code can help you fig
 ## Phase 5: Register on the canvas
 
 Call the `update_iframe_element` MCP tool with `project_id`, `slot_id`, `tunnel_id` (the new
-tunnel from Phase 2), `source_dir` (the absolute path to `/tmp/prototype_<slot_id>` from
-Phase 1 — stamping this lets later agents find the code you wrote), `spec` (the `<spec>`
-from your input — pass it through unchanged), `screenshot_urls` (the **drive URLs** from
-Phase 4), and `preview_url` set to the screenshot that best represents the core of the
-design change.
+tunnel from Phase 2), `spec` (the `<spec>` from your input — pass it through
+unchanged), `screenshot_urls` (the **drive URLs** from Phase 4), and `preview_url` set to the
+screenshot that best represents the core of the design change.
 
 ## Phase 6: Fill in the caption
 
