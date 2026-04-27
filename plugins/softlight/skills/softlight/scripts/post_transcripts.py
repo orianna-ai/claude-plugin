@@ -15,7 +15,7 @@ def post_transcripts(
     with config.lock:
         payload = [
             {
-                "messages": messages,
+                "messages": list(messages),
                 "project_id": config.project_id,
                 "session_id": session_id,
             }
