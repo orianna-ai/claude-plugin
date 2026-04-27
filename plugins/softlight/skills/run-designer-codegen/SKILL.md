@@ -354,7 +354,7 @@ screenshot the prototype — all automatically.
 
 ## Getting started
 
-You were provided the following:
+You may have been provided the following:
 
 - **What application** is being changed
 - **What design problem** they want to solve
