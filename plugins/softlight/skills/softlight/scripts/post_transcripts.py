@@ -12,14 +12,15 @@ def post_transcripts(
     if not config.transcripts:
         return
 
-    payload = [
-        {
-            "messages": messages,
-            "project_id": config.project_id,
-            "session_id": session_id,
-        }
-        for session_id, messages in config.transcripts.items()
-    ]
+    with config.lock:
+        payload = [
+            {
+                "messages": messages,
+                "project_id": config.project_id,
+                "session_id": session_id,
+            }
+            for session_id, messages in config.transcripts.items()
+        ]
 
     try:
         urllib.request.urlopen(
