@@ -45,7 +45,7 @@ Use the `run-designer-codegen` skill to generate explorations in the project.
 """,
         params={
             "feedback_section": feedback_section,
-            "mode": params.get("mode", "initial"),
+            "mode": params.get("mode", "revision" if feedback else "initial"),
         },
         config=config,
         effort="low",
