@@ -17,5 +17,9 @@
   "name": "softlight",
   "repository": "https://github.com/orianna-ai/claude-plugin.git",
   "skills": "./skills",
+<<<<<<< Updated upstream
   "version": "6.4.4"
+=======
+  "version": "6.5.2"
+>>>>>>> Stashed changes
 }

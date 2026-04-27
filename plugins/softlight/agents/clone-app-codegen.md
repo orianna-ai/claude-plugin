@@ -201,6 +201,24 @@ Styling:
     components in the codebase, copy the entire <svg> element including its
     <path> data verbatim. For library icons (e.g. lucide-react), inline
     the standard SVG for that icon.
+<<<<<<< Updated upstream
+=======
+- Fonts: the app's visual identity depends heavily on custom fonts. Copy
+    ALL font files (`.woff`, `.woff2`, `.ttf`, `.otf`, `.eot`) from the
+    source app into the clone's `public/` directory, preserving the original
+    relative path (e.g. `public/assets/fonts/` stays `public/assets/fonts/`).
+    Reproduce every `@font-face` declaration exactly — family name, weight,
+    style, and `src` URL — so the same typefaces render in the clone. Never
+    substitute web-safe fallbacks or Google Fonts for a font that was bundled
+    locally; missing fonts are immediately visible and make the clone look wrong.
+- Static assets: copy ALL images, icons, logos, and other static files
+    that the app references (background images, favicons, illustration
+    files, etc.) from the source app into the clone's `public/` directory,
+    preserving the relative paths used in `src` / `href` attributes. Do
+    not leave any asset references pointing at missing files — a broken
+    image or missing background is immediately visible and makes the clone
+    look wrong.
+>>>>>>> Stashed changes
 
 Data:
 - Replace ALL backend API calls / data fetching with hardcoded mock

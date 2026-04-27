@@ -7,5 +7,9 @@
   "mcpServers": "./.mcp.json",
   "name": "softlight",
   "skills": "./skills",
+<<<<<<< Updated upstream
   "version": "6.4.4"
+=======
+  "version": "6.5.2"
+>>>>>>> Stashed changes
 }
