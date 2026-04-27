@@ -12,6 +12,7 @@ def post_transcripts(
     with config.lock:
         if not config.transcripts:
             return
+
         payload = [
             {
                 "messages": list(messages),
