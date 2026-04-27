@@ -354,13 +354,12 @@ screenshot the prototype — all automatically.
 
 ## Getting started
 
-Before doing anything, confirm with the user:
+You were provided the following:
 
 - **What application** is being changed
 - **What design problem** they want to solve
 
-Do not proceed until the user has provided all three. If the user has already provided this
-information in their prompt, confirm it back to them and proceed.
+Do not ask the user to confirm. If the context passed to you does not tell you where the source code for that application lives, find it yourself. You will need it for when you clone the app.
 
 1. **Clone the app.** Dispatch the `clone-app-codegen` agent with the path to the application
    source code and the design problem. Pass `model: "sonnet"` on the Agent tool call — the
