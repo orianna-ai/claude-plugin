@@ -13,16 +13,19 @@ def build_with_claude(
         prompt="""\
 The user did a design exploration in Softlight. They explored the design space on the canvas and
 selected some design directions they want to implement. These design directions are prototypes —
-sketches of the design implemented in a simplified clone of the running application. Your goal is to
-take those sketched designs and implement them properly in the source code so the application is
-fully functional and all user actions are accounted for.
+standalone copies of parts of the actual application with design changes applied. The
+prototype code lives locally on this machine at the path in each slot's **source_dir** field. Note:
+The prototypes may not be fully functional or mock important functionality/data. Treat them as
+design references. Your goal is to take those design directions and implement them properly in the
+user's real source code so the application is fully functional and all user actions are accounted
+for.
 
 If the design directions conflict with each other, make intelligent decisions to resolve the
 conflicts based on the overall canvas and feedback you have seen the user give in the canvas.
 
 Selected prototypes (use get_project to find these slots, then look at each slot's
-**content_script** field and **screenshots** field — download and read them with curl to understand
-the design change):
+**source_dir** field and **screenshots** field — read the local source_dir and download the
+screenshots with curl to understand the design change):
 
 ${slotList}
 

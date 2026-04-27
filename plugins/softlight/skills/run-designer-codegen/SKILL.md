@@ -263,10 +263,12 @@ Slots on the canvas can be prototypes, comments, text, or images. Each prototype
 element) has:
 - **`spec`** — Describe the design intent.
 - **`screenshots`** — drive URLs. Download and Read to see what the prototype looks like.
+- **`source_dir`** — local filesystem path to the prototype's source code on disk.
 - **`tunnel_id`** — each prototype has its own tunnel pointing to its own standalone app.
 
 Canvas tools:
 - `create_exploration` — create an exploration (titled row of prototype slots). Returns `slot_ids` (the prototypes), `caption_slot_ids` (under each prototype), and `title_slot_id` (the row-spanning header — the presenter uses this to anchor decision-level comments). The presenter handles positioning.
+- `update_project` — update project-level metadata such as the baseline `tunnel_id` and `source_dir` after the app is cloned.
 
 ### The browser
 
@@ -324,6 +326,7 @@ unavailable after retrying, you may call the same MCP server directly over HTTPS
 When calling a tool over HTTP MCP, use the bare MCP tool name without the `mcp__softlight__` or
 `mcp__playwright__` prefix. For example:
 - `mcp__softlight__get_project` -> `get_project`
+- `mcp__softlight__update_project` -> `update_project`
 - `mcp__softlight__create_exploration` -> `create_exploration`
 - `mcp__playwright__create_session` -> `create_session`
 - `mcp__playwright__browser_take_screenshot` -> `browser_take_screenshot`
@@ -346,13 +349,15 @@ output with these fields:
 - `spec` — the spec you just wrote
 - `images` — image URLs (screenshots, mocks, references), one per entry
 - `context` — what you learned about the app: routing, auth, data fetching, response shapes, styling
-- `prototype_dir` — existing prototype directory, if revising
+- `prototype_dir` — existing prototype's source_dir, if revising
 
 The subagents will copy the baseline, make the design changes in the source code, run the
 app, start a tunnel, register the prototype on the canvas, fill in the caption, and
 screenshot the prototype — all automatically.
 
-## Getting started
+## First design round
+
+If you're responding to PM feedback on the canvas or `project.baseline.source_dir` is already set, skip to [After the initial exploration](#after-the-initial-exploration). DO NOT re-clone the app.
 
 You should have been provided the following:
 
@@ -374,7 +379,9 @@ Do not ask the user to confirm. You must work with the context passed to you. If
    Wait for it to finish — it will return the port number, the directory path of the
    baseline clone, and a `tunnel_id`. Save the directory path as `baseline_dir` — every
    prototype subagent needs it. Save the `tunnel_id` — you'll use it for the project
-   baseline tunnel. On error, re-dispatch `clone-app-codegen` with the same
+   baseline tunnel. Then call `update_project` with `tunnel_id` and `source_dir` (pass the
+   `baseline_dir` for this) so downstream agents can find them. On error, re-dispatch
+   `clone-app-codegen` with the same
    `model: "sonnet"` override.
 
 2. **Explore the codebase.** Dispatch `Explore` subagents to do codebase exploration without bloating your context window. Use only `Explore` subagents. Understand the product, tensions, design
@@ -429,8 +436,13 @@ the feedback, create new explorations, and return the structured handoff. This i
 depth of work as the initial exploration, targeted at what the PM asked for.
 
 1. **Understand where things stand.** Call `get_project` to see the full canvas state.
-   Read all comment threads — PM comments have the user's email as `created_by`. Read the
-   full thread to understand where the discussion landed. The prompt you just received may be generic — the real feedback is in the canvas comments.
+   Read all comment threads — PM comments are any comments not created by `softlight`
+   (older projects may have `created_by: null`). Read the full thread to understand where
+   the discussion landed. The prompt you just received may be generic — the real feedback
+   is in the canvas comments.
+
+   If `project.baseline.source_dir` is set, use it as `baseline_dir`. Do not re-dispatch
+   `clone-app-codegen` in revision mode.
 
    Comment threads have a `screenshot` field — a URL showing the canvas area the PM was
    looking at when they commented. Download and look at these screenshots to see what the PM

@@ -19,13 +19,32 @@ def generate_prototypes(
     config: Config,
     params: dict[str, str],
 ) -> None:
+    feedback = params.get("feedback", "").strip()
+    feedback_section = (
+        ""
+        if not feedback
+        else f"""\
+The PM reviewed the canvas and left feedback. Use the `run-designer-codegen` skill to create new
+revisions that address their feedback. The app clone and project have already been created — you do
+not need to do that again. Do not stop until you have generated every prototype in every
+exploration.
+
+<feedback>
+{feedback}
+</feedback>
+
+"""
+    )
+
     handoff = call_claude(
         prompt="""\
+${feedback_section}\
 Use the `run-designer-codegen` skill to generate explorations in the project.
 
 <mode>${mode}</mode>
 """,
         params={
+            "feedback_section": feedback_section,
             "mode": params.get("mode", "initial"),
         },
         config=config,
