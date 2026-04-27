@@ -3,33 +3,62 @@ name: softlight
 description: Create a Softlight project backed by a long-running agent.
 ---
 
-If the user has already provided the following information in their prompt, confirm it back to them and proceed. Otherwise, confirm with the user:
+Do **not** ask the user any questions up front. The voice intake page collects
+the design context. Run the steps below in order.
 
-- **What application** is being changed
-- **What design problem** they want to solve
+## 1. Open the voice intake page
 
-Do not proceed until the user has provided both. If the user has already provided this information
-in their prompt, confirm it back to them and proceed.
-
-Run the following script to setup the Softlight project. The `<title>` should be a short (3-5 words)
-summary of the design problem that we will use to quickly identify the purpose of the project.
+Run this script — it generates a project id and prints the intake URL.
 
 ```bash
-python3 -m setup_project --title <title>
+python3 -m start_intake
 ```
 
-The script will output `project_id=<project_id>` and `project_url=<project_url>`. Open the
-`<project_url>` in the user's browser by running the following command.
+It outputs `project_id=<project_id>` and `intake_url=<intake_url>`. Open the
+intake URL in the user's browser:
 
 ```bash
-${BROWSER:-open} "$PROJECT_URL" 2>/dev/null || xdg-open "$PROJECT_URL" 2>/dev/null || true
+${BROWSER:-open} "$INTAKE_URL" 2>/dev/null || xdg-open "$INTAKE_URL" 2>/dev/null || true
 ```
 
-Run the following script in the background (it will run forever).
+Then tell the user, in one short sentence: "Opened the intake — talk through
+the problem in the browser, then click *Start designing* when you're done."
+Do not ask follow-up questions; let the conversation happen in the browser.
+
+## 2. Wait for the brief
+
+Block on this script. It polls the backend and returns the conversation
+transcript as markdown once the user clicks *Start designing*.
+
+```bash
+python3 -m wait_for_brief --project-id <project_id>
+```
+
+Read its stdout — that is the full intake brief. Treat it as the equivalent
+of what the user would have typed at the prompt in the old flow: it describes
+the application being changed, the design problem, and any constraints they
+surfaced.
+
+## 3. Set up the project
+
+Pick a short (3-5 word) title that summarizes the design problem from the
+brief. Then run:
+
+```bash
+python3 -m setup_project --project-id <project_id> --title "<title>"
+```
+
+It prints `project_url=<project_url>`. Do **not** open this URL — the user is
+already on the canvas; the browser navigated there when they clicked *Start
+designing*.
+
+## 4. Dispatch the designer
+
+Run in the background (it runs forever):
 
 ```bash
 python3 -m dispatch_prompts --project-id <project_id>
 ```
 
-Tell the user the designer agent is working in the background and that they can watch progress on
-the canvas as explorations and prototypes appear.
+Tell the user the designer agent is working in the background and that
+explorations and prototypes will appear on the canvas as they're generated.
