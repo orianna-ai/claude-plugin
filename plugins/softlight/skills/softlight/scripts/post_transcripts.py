@@ -22,16 +22,6 @@ def post_transcripts(
             for session_id, messages in config.transcripts.items()
         ]
 
-    with config.lock:
-        payload = [
-            {
-                "messages": list(messages),
-                "project_id": config.project_id,
-                "session_id": session_id,
-            }
-            for session_id, messages in config.transcripts.items()
-        ]
-
     try:
         urllib.request.urlopen(
             urllib.request.Request(
