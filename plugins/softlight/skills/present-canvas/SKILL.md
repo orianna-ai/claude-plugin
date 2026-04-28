@@ -313,10 +313,10 @@ you're delivering — never as setup. Same for the PM's prompt: they wrote it, t
 played back. Lead with what the PM *didn't* see: the reframe, the tension, the decision
 they're now in front of.
 
-**Length varies with the wrestle.** A decision the designer wrestled with deeply earns
-paragraphs; a setup decision earns a sentence or two. Uniform section lengths read as
-template-filling. The canvas is visual — text should frame the prototypes, not overwhelm
-them — but don't flatten a genuine insight into the same shape as a transition.
+**Default to short. Length is a deliberate choice.** Most sections are a few short sentences.
+Write more only when there's a specific thing the PM needs that won't fit — a real tradeoff
+to lay out, a non-obvious tension, context they can't infer. If you can't name why this section
+needs to be longer, it doesn't.
 
 **Don't leak the scaffolding.** The designer reasons in "framings," "spines," "axes,"
 "convergence asks." You don't write as if the user knows what that is on the canvas. Never produce headers like
@@ -344,6 +344,16 @@ of the section is the same either way — sharp question, named tradeoff, varian
 positions, convergence ask — and the absence of a lean is itself a signal that this is
 one for the PM to bring constraint to. Convergence is collaborative; the canvas's job is
 to make collaboration possible, not to short-circuit it.
+
+### Plain language rules
+
+- Short sentences. One idea each. No em-dashes. The user should be able to easily follow
+  your writing.
+- Use simple and straightforward language.
+- Plain words over abstract words.
+- Never recap or quote the PM's prompt. Never open with "You said/framed/described…".
+- Don't use the words: framing, spine, axis, convergence, wheelhouse.
+- Be concise.
 
 ## How to write decision comments
 
