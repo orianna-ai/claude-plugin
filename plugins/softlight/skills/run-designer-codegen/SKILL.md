@@ -277,6 +277,8 @@ so multiple agents can browse different prototypes in parallel without conflicts
 view the running app and rendered prototypes.
 
 Call `create_session` to get an isolated browser. Resize the viewport to 1716x1065.
+If `create_session` or any other built-in Playwright MCP tool times out once, do not retry the
+built-in tool; use the HTTP MCP fallback below immediately.
 Ensure you find the design change(s) so you can screenshot the design changes and look
 at it. You may need to interact with the prototype to find all the design changes (the codebase
 and spec can help you figure out what screenshots you need to take).
@@ -297,9 +299,13 @@ You don't need to upload baseline screenshots — those are already on the proje
 
 ### MCP HTTP fallback
 
-Always try to use the built-in MCP tools first. If a needed Softlight or Playwright tool is still
-unavailable after retrying, you may call the same MCP server directly over HTTPS with plain
-`curl`.
+Always try to use the built-in MCP tools first. If a needed Softlight or Playwright tool times
+out once or is still unavailable after a short retry window, call the same MCP server directly
+over HTTPS with plain `curl`. Do not loop on the built-in tool after a timeout.
+
+For "tool not available", missing tool listings, or `pending_mcp_servers`, use a short retry
+window only: sleep ~15 seconds and try again, up to 4 times, then fall back
+to HTTP MCP.
 
 - Softlight MCP endpoint: `https://softlight.orianna.ai/mcp/`
 - Playwright MCP endpoint: `https://playwright.orianna.ai/mcp/`

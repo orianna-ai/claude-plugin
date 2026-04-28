@@ -38,8 +38,10 @@ you may use the same fallback pattern for either server.
 - Playwright MCP endpoint: `https://playwright.orianna.ai/mcp/`
 - Softlight MCP endpoint: `https://softlight.orianna.ai/mcp/`
 
-Always try to use the built-in MCP tools first. If the built-in tool binding is still unavailable
-after retrying, you may call the same MCP server directly over HTTPS with plain `curl`.
+Always try to use the built-in MCP tools first. If a built-in MCP tool times out once, do not
+retry that built-in tool; call the same MCP server directly over HTTPS with plain `curl`. If the
+tool binding is unavailable, sleep ~15 seconds and try again, up to 4 times,
+then use the HTTP fallback.
 
 This HTTP transport is session-based:
 1. send `initialize`
