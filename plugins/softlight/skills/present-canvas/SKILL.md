@@ -53,13 +53,12 @@ You do three things:
 
 ## Before you start: MCP startup
 
-You are launched as one of several parallel sub-agents, so the Softlight MCP server may take
-up to 3 minutes to finish connecting on cold start. If `ToolSearch` reports
-`pending_mcp_servers` includes `softlight`, or if a softlight tool call errors with "tool not
-available" or returns no matches, **wait and retry — do not give up**. Sleep ~30 seconds and
-try again, up to 5 times (~2.5 minutes total). Treat the MCP as truly unavailable only after
-that full window has elapsed. Never return a "cannot proceed" / "MCP disconnected" message
-before then — your job is to keep waiting until the connection comes up, then do the work.
+You are launched as one of several parallel sub-agents, so the Softlight MCP server may still
+be connecting on cold start. If `ToolSearch` reports `pending_mcp_servers` includes
+`softlight`, or if a softlight tool call errors with "tool not available" or returns no
+matches, sleep ~15 seconds and try again, up to 4 times. Treat the MCP as
+unavailable after that short window and use the HTTP fallback below. If any built-in MCP tool
+call times out once, do not retry that built-in tool; switch to the HTTP fallback immediately.
 
 The softlight MCP tools are registered as `mcp__softlight__*` in this subagent (e.g.
 `mcp__softlight__get_project`, `mcp__softlight__move_slots`,
@@ -75,8 +74,9 @@ you may use the same fallback pattern for either server.
 - Softlight MCP endpoint: `https://softlight.orianna.ai/mcp/`
 - Playwright MCP endpoint: `https://playwright.orianna.ai/mcp/`
 
-Always try to use the built-in MCP tools first. If a built-in MCP tool is still unavailable after
-the full retry window, you may call the same MCP server directly over HTTPS with plain `curl`.
+Always try to use the built-in MCP tools first. If a built-in MCP tool times out once or is
+still unavailable after the short retry window above, call the same MCP server directly over
+HTTPS with plain `curl`. Do not loop on the built-in tool after a timeout.
 This is still MCP. It just uses raw HTTP instead of the built-in tool binding.
 
 - This transport is session-based. You must:
@@ -91,8 +91,6 @@ This is still MCP. It just uses raw HTTP instead of the built-in tool binding.
 - Always send:
   - `Content-Type: application/json`
   - `Accept: application/json, text/event-stream`
-- Always try the built-in MCP tools first. Use direct HTTP MCP only as a fallback when the tool
-  binding is still unavailable after waiting.
 
 Minimal pattern:
 
