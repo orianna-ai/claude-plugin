@@ -3,33 +3,34 @@ name: softlight
 description: Create a Softlight project backed by a long-running agent.
 ---
 
-If the user has already provided the following information in their prompt, confirm it back to them and proceed. Otherwise, confirm with the user:
+Do **not** ask the user any questions up front. The voice intake page collects
+the design context. Run the steps below in order.
 
-- **What application** is being changed
-- **What design problem** they want to solve
+## 1. Open the voice intake page
 
-Do not proceed until the user has provided both. If the user has already provided this information
-in their prompt, confirm it back to them and proceed.
-
-Run the following script to setup the Softlight project. The `<title>` should be a short (3-5 words)
-summary of the design problem that we will use to quickly identify the purpose of the project.
+Run this script — it generates a `<project_id>` and prints the `<intake_url>`.
 
 ```bash
-python3 -m setup_project --title <title>
+python3 -m setup_project
 ```
 
-The script will output `project_id=<project_id>` and `project_url=<project_url>`. Open the
-`<project_url>` in the user's browser by running the following command.
+Open the `<intake_url>` in the user's browser:
 
 ```bash
-${BROWSER:-open} "$PROJECT_URL" 2>/dev/null || xdg-open "$PROJECT_URL" 2>/dev/null || true
+${BROWSER:-open} '<intake_url>' 2>/dev/null || xdg-open '<intake_url>' 2>/dev/null || true
 ```
 
-Run the following script in the background (it will run forever).
+Then tell the user, in one short sentence: "Opened the intake — talk through
+the problem in the browser, then click *Start designing* when you're done."
+Do not ask follow-up questions; let the conversation happen in the browser.
+
+## 2. Dispatch the designer agent
+
+Run in the background (it runs forever):
 
 ```bash
-python3 -m dispatch_prompts --project-id <project_id>
+python3 -m dispatch_prompts --project-id '<project_id>'
 ```
 
-Tell the user the designer agent is working in the background and that they can watch progress on
-the canvas as explorations and prototypes appear.
+Tell the user the designer agent is working in the background and that
+explorations and prototypes will appear on the canvas as they're generated.
