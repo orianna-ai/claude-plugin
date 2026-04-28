@@ -1,17 +1,9 @@
 import concurrent.futures
-import time
 
 from scripts.call_claude import call_claude
 from scripts.load_config import Config
 
 from workflows.base import workflow
-
-# Stagger between subprocess spawns. Each `claude -p` launches its own
-# `npx mcp-remote` children; spawning all of them in the same instant has
-# starved one of the slower handshakes past Claude Code's deferred-MCP
-# timeout. 2s of spacing lets each child finish its tools/list handshake
-# before the next one starts.
-_SPAWN_STAGGER_S = 2.0
 
 
 @workflow
@@ -19,14 +11,35 @@ def generate_prototypes(
     config: Config,
     params: dict[str, str],
 ) -> None:
+    feedback = params.get("feedback", "").strip()
+    feedback_section = (
+        ""
+        if not feedback
+        else f"""\
+The PM reviewed the canvas and left feedback. Use the `run-designer-codegen` skill to create new
+revisions that address their feedback. The app clone and project have already been created — you do
+not need to do that again. Do not stop until you have generated every prototype in every
+exploration.
+
+<feedback>
+{feedback}
+</feedback>
+
+"""
+    )
+
     handoff = call_claude(
         prompt="""\
+${feedback_section}\
 Use the `run-designer-codegen` skill to generate explorations in the project.
 
 <mode>${mode}</mode>
+<brief>${brief}</brief>
 """,
         params={
+            "feedback_section": feedback_section,
             "mode": params.get("mode", "initial"),
+            "brief": params.get("brief", ""),
         },
         config=config,
         effort="low",
@@ -100,7 +113,6 @@ Dispatch the `present-canvas` skill with these inputs.
         )
 
         for prototype in handoff["prototypes"]:
-            time.sleep(_SPAWN_STAGGER_S)
             futures.append(
                 executor.submit(
                     call_claude,
