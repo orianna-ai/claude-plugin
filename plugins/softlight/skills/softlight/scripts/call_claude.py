@@ -169,31 +169,32 @@ def call_claude(
     # build the input context that will be passed to claude code
     input = []
 
-    if parent_session_id is not None:
-        input.extend(config.transcripts[parent_session_id])
+    with config.lock:
+        if parent_session_id is not None:
+            input.extend(config.transcripts[parent_session_id])
 
-    if session_id is not None and session_id in config.transcripts:
-        input.extend(config.transcripts[session_id])
+        if session_id is not None and session_id in config.transcripts:
+            input.extend(config.transcripts[session_id])
 
-    user_message = {
-        "type": "user",
-        "message": {
-            "role": "user",
-            "content": f"""\
+        user_message = {
+            "type": "user",
+            "message": {
+                "role": "user",
+                "content": f"""\
 You are an agent working on Softlight project {config.project_id}.
 
 {string.Template(prompt).safe_substitute(params or {}).strip()}
 """,
-        },
-    }
+            },
+        }
 
-    if session_id is not None:
-        if session_id in config.transcripts:
-            config.transcripts[session_id].append(user_message)
-        else:
-            config.transcripts[session_id] = [user_message]
+        if session_id is not None:
+            if session_id in config.transcripts:
+                config.transcripts[session_id].append(user_message)
+            else:
+                config.transcripts[session_id] = [user_message]
 
-    input.append(user_message)
+        input.append(user_message)
 
     # run claude code as a subprocess and stream the output in real-time
     with subprocess.Popen(
@@ -226,7 +227,8 @@ You are an agent working on Softlight project {config.project_id}.
             last_message = json.loads(line.rstrip("\n"))
 
             if session_id is not None:
-                config.transcripts[session_id].append(last_message)
+                with config.lock:
+                    config.transcripts[session_id].append(last_message)
 
             if last_message.get("type") == "result":
                 claude_code.terminate()

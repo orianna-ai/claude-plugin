@@ -2,6 +2,7 @@ import dataclasses
 import functools
 import json
 import pathlib
+import threading
 from typing import Any
 
 
@@ -10,6 +11,7 @@ class Config:
     """Mutable configuration that is preserved across ``claude`` invocations."""
 
     base_url: str
+    lock: threading.Lock
     mcp_config: dict[str, Any]
     mcp_config_path: pathlib.Path
     project_id: str
@@ -24,6 +26,7 @@ def load_config(project_id: str) -> Config:
 
     return Config(
         base_url=base_url,
+        lock=threading.Lock(),
         mcp_config=mcp_config,
         mcp_config_path=mcp_config_path,
         project_id=project_id,
