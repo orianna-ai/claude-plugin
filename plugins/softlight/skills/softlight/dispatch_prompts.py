@@ -40,7 +40,13 @@ def _handle_prompt(
 ) -> None:
     try:
         if workflow := WORKFLOWS.get(prompt["workflow"]):
-            workflow(config, prompt.get("params") or {})
+            workflow(
+                config,
+                {
+                    **(prompt.get("params") or {}),
+                    "_prompt_id": prompt["metadata"]["id"],
+                },
+            )
         else:
             raise ValueError(f"workflow {prompt['workflow']} does not exist")
     except Exception:

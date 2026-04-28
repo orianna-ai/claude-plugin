@@ -1,4 +1,5 @@
 import concurrent.futures
+import uuid
 
 from scripts.call_claude import call_claude
 from scripts.load_config import Config
@@ -11,6 +12,7 @@ def generate_prototypes(
     config: Config,
     params: dict[str, str],
 ) -> None:
+    prompt_id = params.get("_prompt_id") or uuid.uuid4().hex
     feedback = params.get("feedback", "").strip()
     feedback_section = (
         ""
@@ -108,7 +110,7 @@ Dispatch the `present-canvas` skill with these inputs.
                 config=config,
                 effort="low",
                 model="opus",
-                session_id="present_canvas",
+                session_id=f"present_canvas:{prompt_id}",
             ),
         )
 
