@@ -186,6 +186,7 @@ Use the tool names exactly as MCP exposes them, without the `mcp__softlight__` o
 3. **Explore the codebase.** Read the baseline clone's files and the original application
    source to understand the component structure, design system, routing, data shapes, and
    styling. You need deep understanding to make changes that feel native to the app.
+   Treat visual fit as a core requirement: use the original application to find the right design patterns to reuse so the result feels native to this app rather than like a new product.
 
 4. **Make the design changes.** Edit the prototype's files to implement the spec. The result
    should feel like a well-designed, fully functioning app — not a rough mockup. If your
@@ -204,6 +205,8 @@ Use the tool names exactly as MCP exposes them, without the `mcp__softlight__` o
    border-radius, transitions — these come from the app's design system. Read the existing CSS
    to find the right classes and values. Never hardcode approximate colors. Never load external
    CSS frameworks or component libraries when the app already has its own.
+   If the clone or provided context does not make the right design system obvious, explore the original application so you can style from its real patterns instead of approximating them.
+   If you need a local font or asset from the original application that is missing in the prototype directory, copy it into the prototype and make sure its references resolve instead of falling back to approximate fonts, images, or brand assets.
 
    **Do not modify existing CSS class definitions.** If you need different behavior, create a
    new element with inline styles rather than changing a class that other elements depend on.

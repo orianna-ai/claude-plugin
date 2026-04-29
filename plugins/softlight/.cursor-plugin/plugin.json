@@ -17,5 +17,5 @@
   "name": "softlight",
   "repository": "https://github.com/orianna-ai/claude-plugin.git",
   "skills": "./skills",
-  "version": "6.7.6"
+  "version": "6.7.7"
 }
