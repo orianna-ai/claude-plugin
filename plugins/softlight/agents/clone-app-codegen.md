@@ -207,7 +207,7 @@ Styling:
     references bundled fonts or static assets, copy those real files into
     the Vite clone and make sure their references resolve instead of falling
     back to approximate fonts, images, or brand assets. Missing fonts and assets are
-    immediately visible and make the clone look wrong.
+    immediately visible and make the clone look wrong, so it is essential we get all of them right.
 
 Data:
 - Replace ALL backend API calls / data fetching with hardcoded mock
