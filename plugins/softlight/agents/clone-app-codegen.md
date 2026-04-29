@@ -203,6 +203,11 @@ Styling:
     components in the codebase, copy the entire <svg> element including its
     <path> data verbatim. For library icons (e.g. lucide-react), inline
     the standard SVG for that icon.
+- Ensure you support local fonts and assets as part of visual fidelity. If the app
+    references bundled fonts or static assets, copy those real files into
+    the Vite clone and make sure their references resolve instead of falling
+    back to approximate fonts, images, or brand assets. Missing fonts and assets are
+    immediately visible and make the clone look wrong.
 
 Data:
 - Replace ALL backend API calls / data fetching with hardcoded mock
