@@ -203,11 +203,21 @@ Styling:
     components in the codebase, copy the entire <svg> element including its
     <path> data verbatim. For library icons (e.g. lucide-react), inline
     the standard SVG for that icon.
-- Ensure you support local fonts and assets as part of visual fidelity. If the app
-    references bundled fonts or static assets, copy those real files into
-    the Vite clone and make sure their references resolve instead of falling
-    back to approximate fonts, images, or brand assets. Missing fonts and assets are
-    immediately visible and make the clone look wrong, so it is essential we get all of them right.
+- Reproduce the app's font setup however it's loaded — Google Fonts
+    `<link>` tags in the root `index.html`, `@import` rules in CSS,
+    `@font-face` with bundled `.woff`/`.woff2`/`.ttf`/`.otf` files,
+    design-system stylesheet imports like `@radix-ui/themes/styles.css`,
+    and any `--default-font-family` / `--heading-font-family` variables
+    those wrappers define. Bring ALL of them over to the clone exactly as
+    the source delivers them. The most common miss is a Google Fonts
+    `<link>` in the root `index.html` paired with a font variable on a
+    theme root — both must come together. Page-level CSS using
+    `font-family: inherit` is a signal the typography is configured higher
+    up in the app shell; go find it before assuming there's nothing to
+    copy. Do the same for static assets (images, icons, logos, brand
+    assets) — copy the real files and preserve the relative paths used in
+    `src` / `href` attributes. Missing fonts and assets are immediately
+    visible and make the clone look wrong.
 
 Data:
 - Replace ALL backend API calls / data fetching with hardcoded mock
