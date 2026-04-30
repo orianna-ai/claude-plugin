@@ -206,7 +206,7 @@ Use the tool names exactly as MCP exposes them, without the `mcp__softlight__` o
    to find the right classes and values. Never hardcode approximate colors. Never load external
    CSS frameworks or component libraries when the app already has its own.
    If the clone or provided context does not make the right design system obvious, explore the original application so you can style from its real patterns instead of approximating them.
-   If you need a local font or asset from the original application that is missing in the prototype directory, copy it into the prototype and make sure its references resolve instead of falling back to approximate fonts, images, or brand assets.
+   If the prototype is missing fonts the original app loads — bundled `.woff`/`.woff2` files, Google Fonts `<link>` tags in `index.html`, `@import` rules in CSS, or design-system stylesheets like `@radix-ui/themes/styles.css` and the `--default-font-family` / `--heading-font-family` variables that go with them — bring them in. Page-level CSS using `font-family: inherit` is a signal the typography is configured higher up in the app shell; find it before approximating. Do the same for missing images, icons, logos, or brand assets — copy the real files and resolve their references instead of falling back to approximations.
 
    **Do not modify existing CSS class definitions.** If you need different behavior, create a
    new element with inline styles rather than changing a class that other elements depend on.
