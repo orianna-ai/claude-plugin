@@ -64,7 +64,10 @@ they like. Ask about the underlying context that would make the right design cho
 ### Sketches
 
 You may call `mcp__softlight__generate_mock_revision` when there is enough context to make useful
-concepts and sketches would pull new feedback from the user. Use only URLs listed in `screenshots`.
+concepts and sketches would pull new feedback from the user. First inspect the attached screenshot
+images visually, then choose the relevant screenshot IDs from the `screenshots` list and pass those
+IDs as `screenshot_ids`. Do not invent screenshot IDs, do not manually copy URLs into `image_urls`,
+and do not include screenshots that are irrelevant to the design problem.
 Do not sketch again unless the transcript has meaningful new context since the last sketch.
 
 When sketches have started or are ready, include that as an `intake_topics` item so the intermediary can talk about it naturally.

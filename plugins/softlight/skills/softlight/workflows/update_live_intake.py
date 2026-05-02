@@ -1,5 +1,6 @@
 import json
 import uuid
+from typing import Any
 
 from scripts.call_claude import call_claude
 from scripts.load_config import Config
@@ -39,8 +40,12 @@ def _live_intake_context(
             screenshots.append(
                 {
                     "caption": event["caption"],
+                    "height": event.get("height"),
+                    "mime_type": event.get("mime_type"),
+                    "screenshot_id": f"screenshot_{len(screenshots) + 1:03d}",
                     "timestamp": event["timestamp"],
                     "url": event["url"],
+                    "width": event.get("width"),
                 },
             )
 
@@ -58,6 +63,40 @@ def _live_intake_context(
         "screenshots": screenshots,
         "transcript": transcript,
     }
+
+
+def _screenshot_content_blocks(
+    screenshots: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    blocks: list[dict[str, Any]] = []
+
+    for screenshot in screenshots:
+        dimensions = (
+            f"{screenshot['width']}x{screenshot['height']}"
+            if screenshot.get("width") and screenshot.get("height")
+            else "unknown size"
+        )
+        blocks.extend(
+            [
+                {
+                    "type": "text",
+                    "text": (
+                        f"{screenshot['screenshot_id']} "
+                        f"({dimensions}, timestamp={screenshot['timestamp']}): "
+                        f"{screenshot['url']}"
+                    ),
+                },
+                {
+                    "type": "image",
+                    "source": {
+                        "type": "url",
+                        "url": screenshot["url"],
+                    },
+                },
+            ],
+        )
+
+    return blocks
 
 
 @workflow
@@ -82,10 +121,15 @@ ${latest_state}
 ${screenshots}
 </screenshots>
 
+The screenshot images are attached to this message in the same order and with the same
+`screenshot_id` values shown above. Actually inspect the images before choosing any screenshots for
+`generate_mock_revision`.
+
 <transcript>
 ${transcript}
 </transcript>
 """,
+        content_blocks=_screenshot_content_blocks(context["screenshots"]),
         params={
             "project_id": config.project_id,
             "latest_state": json.dumps(context["latest_state"], indent=2),
