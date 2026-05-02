@@ -43,7 +43,7 @@ Maintain only this state:
 
 First, quickly update `intake_topics` so the intermediary has fresh guidance as soon as possible. Call `mcp__softlight__update_intake_state` with the best new topics you can infer from the transcript and the current PRD. Preserve or lightly update `intake_prd` if you do not yet have time to improve it.
 
-Then continue thinking. Based on the most recent conversation and previous PRD update, what do you need to learn next? 
+Then continue thinking. Based on the most recent conversation and previous PRD update, what do you need to learn next?
 
 You have the following tools at your disposal for increasing your context:
 
@@ -70,4 +70,3 @@ Do not sketch again unless the transcript has meaningful new context since the l
 When sketches have started or are ready, include that as an `intake_topics` item so the intermediary can talk about it naturally.
 
 Lastly, after that deeper thinking, you MUST update the PRD, open questions, and intake topics. Call `mcp__softlight__update_intake_state` again with the best current `intake_topics` and `intake_prd` if either changed after the first update.
-
