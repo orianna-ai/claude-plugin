@@ -106,31 +106,18 @@ def _live_intake_transcript(
     return transcript
 
 
-def _latest_live_intake_revision(
-    events: list[dict[str, Any]],
-) -> int:
-    revisions = [
-        event["state"]["revision"]
-        for event in events
-        if event.get("type") == "intake_state_updated" and event.get("state")
-    ]
-    return max(revisions, default=0)
-
-
 def _handle_live_intake(
     config: Config,
     *,
-    transcript: list[dict[str, Any]],
-    revision: int,
+    events: list[dict[str, Any]],
     run_id: str,
 ) -> None:
     WORKFLOWS["update_live_intake"](
         config,
         {
+            "events": json.dumps(events),
             "reason": "transcript_update",
-            "revision": str(revision),
             "run_id": run_id,
-            "transcript": json.dumps(transcript),
         },
     )
 
@@ -194,8 +181,7 @@ def dispatch_prompts(
                 live_intake_future = executor.submit(
                     _handle_live_intake,
                     config,
-                    transcript=transcript,
-                    revision=_latest_live_intake_revision(events) + 1,
+                    events=events,
                     run_id=uuid.uuid4().hex,
                 )
                 last_live_intake_at = time.monotonic()
