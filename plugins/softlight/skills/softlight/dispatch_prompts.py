@@ -187,7 +187,9 @@ def dispatch_prompts(
                 transcript
                 and has_new_user_turns
                 and live_intake_future is None
-                and (last_live_intake_at == 0.0 or enough_new_user_turns or stale_enough)
+                and (
+                    last_live_intake_at == 0.0 or enough_new_user_turns or stale_enough
+                )
             ):
                 live_intake_future = executor.submit(
                     _handle_live_intake,
