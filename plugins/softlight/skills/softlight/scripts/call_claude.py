@@ -46,6 +46,7 @@ def call_claude(
     prompt: str,
     *,
     allowed_tools: list[str] | None = ...,
+    content_blocks: list[dict[str, Any]] | None = ...,
     effort: _Effort | None = ...,
     fork_session: bool = ...,
     json_schema: dict[str, Any],
@@ -63,6 +64,7 @@ def call_claude(
     prompt: str,
     *,
     allowed_tools: list[str] | None = ...,
+    content_blocks: list[dict[str, Any]] | None = ...,
     effort: _Effort | None = ...,
     fork_session: bool = ...,
     json_schema: None = ...,
@@ -79,6 +81,7 @@ def call_claude(
     prompt: str,
     *,
     allowed_tools: list[str] | None = None,
+    content_blocks: list[dict[str, Any]] | None = None,
     effort: _Effort | None = None,
     fork_session: bool = True,
     json_schema: dict[str, Any] | None = None,
@@ -176,15 +179,28 @@ def call_claude(
         if session_id is not None and session_id in config.transcripts:
             input.extend(config.transcripts[session_id])
 
+        text_content = f"""\
+You are an agent working on Softlight project {config.project_id}.
+
+{string.Template(prompt).safe_substitute(params or {}).strip()}
+"""
+        message_content: str | list[dict[str, Any]]
+        if content_blocks is None:
+            message_content = text_content
+        else:
+            message_content = [
+                {
+                    "type": "text",
+                    "text": text_content,
+                },
+                *content_blocks,
+            ]
+
         user_message = {
             "type": "user",
             "message": {
                 "role": "user",
-                "content": f"""\
-You are an agent working on Softlight project {config.project_id}.
-
-{string.Template(prompt).safe_substitute(params or {}).strip()}
-""",
+                "content": message_content,
             },
         }
 
