@@ -5,13 +5,13 @@ import tempfile
 
 
 def _create_package_json(
-    target_dir: pathlib.Path,
-    source_dir: pathlib.Path,
+    output_dir: pathlib.Path,
+    source_code_dir: pathlib.Path,
 ) -> None:
     source_package_json = next(
         (
             json.loads(package_json_path.read_text())
-            for dir in (source_dir, *source_dir.parents)
+            for dir in (source_code_dir, *source_code_dir.parents)
             if (package_json_path := dir / "package.json")
             if package_json_path.is_file()
         ),
@@ -40,11 +40,11 @@ def _create_package_json(
         indent=2,
     )
 
-    (target_dir / "package.json").write_text(package_json)
+    (output_dir / "package.json").write_text(package_json)
 
 
 def _create_tsconfig_json(
-    target_dir: pathlib.Path,
+    output_dir: pathlib.Path,
 ) -> None:
     tsconfig_json = json.dumps(
         {
@@ -68,11 +68,11 @@ def _create_tsconfig_json(
         indent=2,
     )
 
-    (target_dir / "tsconfig.json").write_text(tsconfig_json)
+    (output_dir / "tsconfig.json").write_text(tsconfig_json)
 
 
 def _create_index_html(
-    target_dir: pathlib.Path,
+    output_dir: pathlib.Path,
 ) -> None:
     index_html = """\
 <!doctype html>
@@ -89,11 +89,11 @@ def _create_index_html(
 </html>
 """
 
-    (target_dir / "index.html").write_text(index_html)
+    (output_dir / "index.html").write_text(index_html)
 
 
 def _create_vite_config_ts(
-    target_dir: pathlib.Path,
+    output_dir: pathlib.Path,
 ) -> None:
     vite_config_ts = """\
 import { defineConfig } from 'vite'
@@ -104,11 +104,11 @@ export default defineConfig({
 })
 """
 
-    (target_dir / "vite.config.ts").write_text(vite_config_ts)
+    (output_dir / "vite.config.ts").write_text(vite_config_ts)
 
 
 def _create_main_tsx(
-    target_dir: pathlib.Path,
+    output_dir: pathlib.Path,
 ) -> None:
     main_tsx = """\
 import { StrictMode } from 'react'
@@ -122,13 +122,13 @@ createRoot(document.getElementById('root')!).render(
 )
 """
 
-    src_dir = target_dir / "src"
+    src_dir = output_dir / "src"
     src_dir.mkdir(exist_ok=True)
     (src_dir / "main.tsx").write_text(main_tsx)
 
 
 def _create_app_tsx(
-    target_dir: pathlib.Path,
+    output_dir: pathlib.Path,
 ) -> None:
     app_tsx = """\
 export function App() {
@@ -136,13 +136,13 @@ export function App() {
 }
 """
 
-    src_dir = target_dir / "src"
+    src_dir = output_dir / "src"
     src_dir.mkdir(exist_ok=True)
     (src_dir / "App.tsx").write_text(app_tsx)
 
 
 def _install_dependencies(
-    target_dir: pathlib.Path,
+    output_dir: pathlib.Path,
 ) -> None:
     subprocess.run(
         [
@@ -150,23 +150,22 @@ def _install_dependencies(
             "install",
             "--prefer-offline",
         ],
-        cwd=target_dir,
+        cwd=output_dir,
         check=True,
     )
 
 
 def create_app(
-    *,
-    source_dir: pathlib.Path,
+    source_code_dir: pathlib.Path,
 ) -> pathlib.Path:
-    target_dir = pathlib.Path(tempfile.mkdtemp(prefix="clone."))
+    output_dir = pathlib.Path(tempfile.mkdtemp(prefix="clone."))
 
-    _create_package_json(target_dir, source_dir)
-    _create_tsconfig_json(target_dir)
-    _create_index_html(target_dir)
-    _create_vite_config_ts(target_dir)
-    _create_main_tsx(target_dir)
-    _create_app_tsx(target_dir)
-    _install_dependencies(target_dir)
+    _create_package_json(output_dir, source_code_dir)
+    _create_tsconfig_json(output_dir)
+    _create_index_html(output_dir)
+    _create_vite_config_ts(output_dir)
+    _create_main_tsx(output_dir)
+    _create_app_tsx(output_dir)
+    _install_dependencies(output_dir)
 
-    return target_dir
+    return output_dir

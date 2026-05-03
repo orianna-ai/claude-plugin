@@ -3,11 +3,14 @@ from __future__ import annotations
 import functools
 import json
 import os
+import shlex
 import string
 import subprocess
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from scripts.load_config import Config
 
 
@@ -31,6 +34,18 @@ def _claude_code_cwd() -> str | None:
     return session_start_event.get("cwd")
 
 
+def _claude_code_command(
+    cmd: list[str],
+    stdin: str,
+) -> str:
+    sh = shlex.join(cmd)
+
+    if cwd := _claude_code_cwd():
+        sh = f"cd {shlex.quote(cwd)} && {sh}"
+
+    return f"{sh} <<'EOF'\n{stdin}\nEOF"
+
+
 _Effort = Literal[
     "low",
     "medium",
@@ -43,15 +58,14 @@ _Effort = Literal[
 @overload
 def call_claude(
     config: Config,
-    prompt: str,
+    prompt: list[str | dict[str, Any]],
     *,
     allowed_tools: list[str] | None = ...,
-    content_blocks: list[dict[str, Any]] | None = ...,
     effort: _Effort | None = ...,
     fork_session: bool = ...,
     json_schema: dict[str, Any],
     model: str | None = ...,
-    params: dict[str, str] | None = ...,
+    params: Mapping[str, Any] | None = ...,
     parent_session_id: str | None = ...,
     session_id: str | None = ...,
     tools: list[str] | None = None,
@@ -61,15 +75,14 @@ def call_claude(
 @overload
 def call_claude(
     config: Config,
-    prompt: str,
+    prompt: list[str | dict[str, Any]],
     *,
     allowed_tools: list[str] | None = ...,
-    content_blocks: list[dict[str, Any]] | None = ...,
     effort: _Effort | None = ...,
     fork_session: bool = ...,
     json_schema: None = ...,
     model: str | None = ...,
-    params: dict[str, str] | None = ...,
+    params: Mapping[str, Any] | None = ...,
     parent_session_id: str | None = ...,
     session_id: str | None = ...,
     tools: list[str] | None = None,
@@ -78,15 +91,14 @@ def call_claude(
 
 def call_claude(
     config: Config,
-    prompt: str,
+    prompt: list[str | dict[str, Any]],
     *,
     allowed_tools: list[str] | None = None,
-    content_blocks: list[dict[str, Any]] | None = None,
     effort: _Effort | None = None,
     fork_session: bool = True,
     json_schema: dict[str, Any] | None = None,
     model: str | None = None,
-    params: dict[str, str] | None = None,
+    params: Mapping[str, Any] | None = None,
     parent_session_id: str | None = None,
     session_id: str | None = None,
     tools: list[str] | None = None,
@@ -179,28 +191,29 @@ def call_claude(
         if session_id is not None and session_id in config.transcripts:
             input.extend(config.transcripts[session_id])
 
-        text_content = f"""\
-You are an agent working on Softlight project {config.project_id}.
+        content = [
+            {
+                "type": "text",
+                "text": f"You are an agent working on Softlight project {config.project_id}.",
+            },
+        ]
 
-{string.Template(prompt).safe_substitute(params or {}).strip()}
-"""
-        message_content: str | list[dict[str, Any]]
-        if content_blocks is None:
-            message_content = text_content
-        else:
-            message_content = [
-                {
-                    "type": "text",
-                    "text": text_content,
-                },
-                *content_blocks,
-            ]
+        for item in prompt:
+            if isinstance(item, str):
+                content.append(
+                    {
+                        "type": "text",
+                        "text": string.Template(item).safe_substitute(params or {}).strip(),
+                    },
+                )
+            elif isinstance(item, dict):
+                content.append(item)
 
         user_message = {
             "type": "user",
             "message": {
                 "role": "user",
-                "content": message_content,
+                "content": content,
             },
         }
 
@@ -211,6 +224,8 @@ You are an agent working on Softlight project {config.project_id}.
                 config.transcripts[session_id] = [user_message]
 
         input.append(user_message)
+
+    stdin = "\n".join(json.dumps(message) for message in input)
 
     # run claude code as a subprocess and stream the output in real-time
     with subprocess.Popen(
@@ -231,7 +246,7 @@ You are an agent working on Softlight project {config.project_id}.
         text=True,
     ) as claude_code:
         assert claude_code.stdin is not None
-        claude_code.stdin.write("\n".join([json.dumps(message) for message in input]))
+        claude_code.stdin.write(stdin)
         claude_code.stdin.close()
 
         assert claude_code.stdout is not None
@@ -250,10 +265,14 @@ You are an agent working on Softlight project {config.project_id}.
                 claude_code.terminate()
 
                 if last_message.get("is_error"):
-                    raise RuntimeError(last_message["result"])
+                    raise RuntimeError(
+                        f"{last_message['result']}:\n{_claude_code_command(cmd, stdin)}",
+                    )
                 elif json_schema:
                     return last_message["structured_output"]
                 else:
                     return last_message["result"]
 
-    raise RuntimeError("claude did not emit a result message")
+    raise RuntimeError(
+        f"claude did not emit a result message:\n{_claude_code_command(cmd, stdin)}",
+    )

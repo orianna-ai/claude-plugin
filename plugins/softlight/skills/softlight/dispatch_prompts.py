@@ -4,7 +4,6 @@ import json
 import time
 import traceback
 import urllib.request
-import uuid
 from typing import Any
 
 from scripts.load_config import Config, load_config
@@ -13,9 +12,7 @@ from scripts.post_transcripts import post_transcripts
 from scripts.spawn_reaper import spawn_reaper
 from workflows.base import WORKFLOWS
 
-LIVE_INTAKE_INTERVAL_SECONDS = 20
-LIVE_INTAKE_USER_TURN_BATCH_SIZE = 3
-POLL_INTERVAL_SECONDS = 5
+_POLL_INTERVAL_SECONDS = 5
 
 
 def _fetch_events(
@@ -45,13 +42,7 @@ def _handle_prompt(
 ) -> None:
     try:
         if workflow := WORKFLOWS.get(prompt["workflow"]):
-            workflow(
-                config,
-                {
-                    **(prompt.get("params") or {}),
-                    "_prompt_id": prompt["metadata"]["id"],
-                },
-            )
+            workflow.call(config, prompt.get("params") or {})
         else:
             raise ValueError(f"workflow {prompt['workflow']} does not exist")
     except Exception:
@@ -79,49 +70,6 @@ def _handle_prompt(
         )
 
 
-def _live_intake_transcript(
-    events: list[dict[str, Any]],
-) -> list[dict[str, Any]]:
-    seen_turn_ids: set[str] = set()
-    transcript = []
-
-    for event in events:
-        if event.get("type") != "intake_transcript_turn_added":
-            continue
-
-        turn_id = event["turn_id"]
-        if turn_id in seen_turn_ids:
-            continue
-
-        seen_turn_ids.add(turn_id)
-        transcript.append(
-            {
-                "role": event["role"],
-                "text": event["text"],
-                "turn_id": turn_id,
-                "timestamp_ms": event["timestamp_ms"],
-            },
-        )
-
-    return transcript
-
-
-def _handle_live_intake(
-    config: Config,
-    *,
-    events: list[dict[str, Any]],
-    run_id: str,
-) -> None:
-    WORKFLOWS["update_live_intake"](
-        config,
-        {
-            "events": json.dumps(events),
-            "reason": "transcript_update",
-            "run_id": run_id,
-        },
-    )
-
-
 def dispatch_prompts(
     *,
     project_id: str,
@@ -132,21 +80,9 @@ def dispatch_prompts(
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
         cursor = 0
-        live_intake_future: concurrent.futures.Future[None] | None = None
-        last_live_intake_at = 0.0
-        last_live_intake_user_turn_count = 0
 
         while True:
             events = _fetch_events(config)
-
-            if live_intake_future is not None and live_intake_future.done():
-                try:
-                    live_intake_future.result()
-                except Exception:
-                    traceback.print_exc()
-                    last_live_intake_user_turn_count = 0
-                finally:
-                    live_intake_future = None
 
             if len(events) > cursor:
                 for event in events[cursor:]:
@@ -159,35 +95,7 @@ def dispatch_prompts(
 
                 cursor = len(events)
 
-            transcript = _live_intake_transcript(events)
-            user_turn_count = sum(1 for turn in transcript if turn["role"] == "user")
-            has_new_user_turns = user_turn_count > last_live_intake_user_turn_count
-            enough_new_user_turns = (
-                user_turn_count - last_live_intake_user_turn_count
-                >= LIVE_INTAKE_USER_TURN_BATCH_SIZE
-            )
-            stale_enough = (
-                time.monotonic() - last_live_intake_at >= LIVE_INTAKE_INTERVAL_SECONDS
-            )
-
-            if (
-                transcript
-                and has_new_user_turns
-                and live_intake_future is None
-                and (
-                    last_live_intake_at == 0.0 or enough_new_user_turns or stale_enough
-                )
-            ):
-                live_intake_future = executor.submit(
-                    _handle_live_intake,
-                    config,
-                    events=events,
-                    run_id=uuid.uuid4().hex,
-                )
-                last_live_intake_at = time.monotonic()
-                last_live_intake_user_turn_count = user_turn_count
-
-            time.sleep(POLL_INTERVAL_SECONDS)
+            time.sleep(_POLL_INTERVAL_SECONDS)
 
             post_transcripts(config)
 

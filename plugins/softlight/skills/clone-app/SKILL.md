@@ -1,10 +1,6 @@
 ---
-name: clone-app-codegen
+name: clone-app
 description: "Clone elements of an existing application to demonstrate a design problem and to use as the basis for future design work."
-skills:
-  - softlight:start-tunnel
-model: sonnet
-effort: medium
 ---
 
 # Input
@@ -13,22 +9,30 @@ effort: medium
 
 Description of a design problem the user is exploring in the application.
 
+## `<source_code_dir>`
+
+Absolute path to the source application's codebase. Read TSX/CSS/asset files
+from here when collecting the page you need to reproduce.
+
+## `<cloned_code_dir>`
+
+Absolute path to the pre-scaffolded clone project. Write all your output here.
+The harness has already populated this directory with `package.json`,
+`vite.config.ts`, `tsconfig.json`, `index.html`, `src/main.tsx`, and a
+placeholder `src/App.tsx`, and has run `pnpm install`.
+
 # Output
 
-Your goal is to generate a clone of the application described by the
-`<problem>` in a temporary directory that shows EXACTLY what a user would
-see if they opened the real application in their browser right now. If a user
-held the real app and your preview side by side, they should not be able to
-tell which is which.
+Your goal is to write the source code for a clone of the application described
+by the `<problem>` into `<cloned_code_dir>` so it shows EXACTLY what a user
+would see if they opened the real application in their browser right now. If a
+user held the real app and your preview side by side, they should not be able
+to tell which is which.
 
-You will scaffold a Vite + React app, clone the relevant code, run
-`pnpm build` and `pnpm preview --host` to serve the production build,
-start a tunnel, and validate the app actually renders in a browser with
-no runtime errors.
-
-Your final message must state the port number the app is running on,
-the absolute path to the clone directory, AND the tunnel ID — these are
-the three pieces of information the caller needs from you.
+You are responsible for writing the application code into
+`<cloned_code_dir>/src/` and getting `pnpm build` (run from
+`<cloned_code_dir>`) to pass. Do not scaffold a new project, do not run
+`pnpm preview`, and do not start a tunnel — the harness owns those.
 
 # MCP fallback
 
@@ -232,60 +236,16 @@ design the improvements.
 
 # Workflow
 
-# 1. Setup the project
+# 1. Write the code
 
-Start by scaffolding the project into a unique temporary directory so
-concurrent runs don't collide:
+Write all the code for the application into `src/`. Generate all TypeScript
+code for the clone in one `.tsx` file (replacing the placeholder
+`src/App.tsx`) and generate all CSS styles for the clone in one `.css`
+file. This limits the number of tool calls required to generate the
+application and reduces the likelihood of import errors.
 
-```bash
-CLONE_DIR=$(mktemp -d -t clone.XXXXXX)
-cd "$CLONE_DIR" && pnpm create vite@latest --no-interactive --template react-ts .
-```
+# 2. Make the build pass
 
-This gives you a working vite.config.ts, index.html, package.json, and
-entry point. Use `$CLONE_DIR` (the absolute path printed by `mktemp`) for
-all subsequent commands and report it in your final message.
-
-# 2. Write the code
-
-Write all the code for the application. Generate all TypeScript code for
-the clone in one `.tsx` file and generate all CSS styles for the clone in
-one `.css` file. This limits the number of tool calls required to generate
-the application and reduces the liklihood of import errors.
-
-# 3. Install dependencies
-
-Align dependency versions with the original application.
-
-Then, run the following command to install dependencies:
-
-```bash
-pnpm install --prefer-offline
-```
-
-# 4. Make the build pass
-
-Keep running `pnpm build` and fixing errors until the build passes.
-
-# 5. Run the application
-
-Run `pnpm build && pnpm preview --host` to run the application. Then, pass
-the port number the application is listening on to the `start-tunnel` skill
-and capture the resulting `tunnel_id` that the application is accessible at.
-
-Use the Playwright MCP tools to check if everything is working properly:
-
-1. Call `create_session` to create a browser session.
-
-2. Call `browser_navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`.
-
-3. Call `browser_snapshot` to snapshot the application.
-
-If the snapshot looks broken (it is blank, shows an error, etc.) we'll need to
-fix, rebuild, rerun the application on the same port, and recheck it. It is often
-helpful to use the`browser_console_messages` tool to gather diagnostic information
-from the browser to debug the failure.
-
-If the screenshot looks okay then run `close_session` to tear down the browser and
-return the port number the application is running on, the absolute path to the clone
-directory, and the tunnel_id you created.
+Keep running `pnpm build` (from the clone directory) and fixing errors
+until the build passes. The harness will run and tunnel the app once you
+return.

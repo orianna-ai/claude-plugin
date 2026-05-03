@@ -1,5 +1,6 @@
 import concurrent.futures
 import uuid
+from typing import TypedDict
 
 from scripts.call_claude import call_claude
 from scripts.load_config import Config
@@ -7,13 +8,20 @@ from scripts.load_config import Config
 from workflows.base import workflow
 
 
+class GeneratePrototypesParams(TypedDict):
+    mode: str
+    brief: str
+    feedback: str
+
+
 @workflow
 def generate_prototypes(
     config: Config,
-    params: dict[str, str],
+    params: GeneratePrototypesParams,
 ) -> None:
-    prompt_id = params.get("_prompt_id") or uuid.uuid4().hex
-    feedback = params.get("feedback", "").strip()
+    """Generate design prototype variants in the project from a brief or PM feedback."""
+    prompt_id = uuid.uuid4().hex
+    feedback = params["feedback"].strip()
     feedback_section = (
         ""
         if not feedback
@@ -31,17 +39,19 @@ exploration.
     )
 
     handoff = call_claude(
-        prompt="""\
+        prompt=[
+            """\
 ${feedback_section}\
 Use the `run-designer-codegen` skill to generate explorations in the project.
 
 <mode>${mode}</mode>
 <brief>${brief}</brief>
 """,
+        ],
         params={
             "feedback_section": feedback_section,
-            "mode": params.get("mode", "initial"),
-            "brief": params.get("brief", ""),
+            "mode": params["mode"],
+            "brief": params["brief"],
         },
         config=config,
         effort="low",
@@ -91,7 +101,8 @@ Use the `run-designer-codegen` skill to generate explorations in the project.
         futures.append(
             executor.submit(
                 call_claude,
-                prompt="""\
+                prompt=[
+                    """\
 Dispatch the `present-canvas` skill with these inputs.
 
 <project_id>${project_id}</project_id>
@@ -99,13 +110,12 @@ Dispatch the `present-canvas` skill with these inputs.
 <thinking>${thinking}</thinking>
 <explorations_created>${explorations_created}</explorations_created>
 """,
+                ],
                 params={
                     "project_id": handoff["project_id"],
-                    "mode": params.get("mode", "initial"),
+                    "mode": params["mode"],
                     "thinking": handoff["present_canvas"]["thinking"],
-                    "explorations_created": handoff["present_canvas"][
-                        "explorations_created"
-                    ],
+                    "explorations_created": handoff["present_canvas"]["explorations_created"],
                 },
                 config=config,
                 effort="low",
@@ -118,7 +128,8 @@ Dispatch the `present-canvas` skill with these inputs.
             futures.append(
                 executor.submit(
                     call_claude,
-                    prompt="""\
+                    prompt=[
+                        """\
 Dispatch the `generate-prototype` skill with these inputs.
 
 <project_id>${project_id}</project_id>
@@ -130,6 +141,7 @@ Dispatch the `generate-prototype` skill with these inputs.
 <context>${context}</context>
 <prototype_dir>${prototype_dir}</prototype_dir>
 """,
+                    ],
                     params={
                         "project_id": handoff["project_id"],
                         "slot_id": prototype["slot_id"],

@@ -1,16 +1,25 @@
+from typing import TypedDict
+
 from scripts.call_claude import call_claude
 from scripts.load_config import Config
 
 from workflows.base import workflow
 
 
+class BuildWithClaudeParams(TypedDict):
+    slotList: str
+    contextSection: str
+
+
 @workflow
 def build_with_claude(
     config: Config,
-    params: dict[str, str],
+    params: BuildWithClaudeParams,
 ) -> None:
+    """Implement selected design directions from the canvas into the application source code."""
     call_claude(
-        prompt="""\
+        prompt=[
+            """\
 The user did a design exploration in Softlight. They explored the design space on the canvas and
 selected some design directions they want to implement. These design directions are prototypes —
 sketches of the design implemented in a simplified clone of the running application. Your goal is to
@@ -42,6 +51,7 @@ all revisions, slots, and comment threads. Use it to understand their thought pr
 Your task is to implement the selected design directions into the app so the user can see it working
 in their actual application.
 """,
+        ],
         params=params,
         config=config,
         effort="medium",
