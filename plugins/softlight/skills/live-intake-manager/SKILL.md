@@ -69,7 +69,7 @@ You MUST complete the workflow in order:
    - Gather more context with code exploration, and sharper user questions when the PRD is still
      missing key context about the user journeys and importnat requirements/constraints.
    - Use sketches only when there is enough confirmed PRD context and specific important designs
-     decisions are ready for visual feedback. 
+     decisions are ready for visual feedback.
 3. Final update: call `mcp__softlight__update_intake_state` again with the improved PRD, open
    questions, and intake topics from step 2.
 
