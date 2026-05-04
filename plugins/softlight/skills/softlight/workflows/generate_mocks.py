@@ -19,6 +19,6 @@ def generate_mocks(
     """Generate visual sketch mocks for the live design conversation from captured screenshots."""
     call_mcp(
         config=config,
-        tool="generate_mock_revision_actually",
+        tool="mcp__plugin_softlight_softlight__generate_mock_revision_actually",
         input=json.loads(params["input"]),
     )
