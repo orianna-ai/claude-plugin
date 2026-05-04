@@ -49,13 +49,7 @@ ${conversations}
         ],
         params={
             "project_id": config.project_id,
-            "latest_state": json.dumps(
-                {
-                    "intake_prd": project.get("prd"),
-                    "intake_topics": project.get("topics") or [],
-                },
-                indent=2,
-            ),
+            "latest_state": json.dumps(project.get("discussion") or {}, indent=2),
             "conversations": json.dumps(conversations, indent=2),
         },
         config=config,
