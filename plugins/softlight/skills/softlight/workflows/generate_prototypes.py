@@ -115,7 +115,9 @@ Dispatch the `present-canvas` skill with these inputs.
                     "project_id": handoff["project_id"],
                     "mode": params["mode"],
                     "thinking": handoff["present_canvas"]["thinking"],
-                    "explorations_created": handoff["present_canvas"]["explorations_created"],
+                    "explorations_created": handoff["present_canvas"][
+                        "explorations_created"
+                    ],
                 },
                 config=config,
                 effort="low",
