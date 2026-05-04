@@ -123,10 +123,9 @@ Use `latest_state.prd` as the sketch memory. Record that sketches were made for 
 decision, the current sketch decision, what the user decided, and the next key design decision to explore.
 
 Sketches are context-gathering probes for solution approaches, not polished final UI. First inspect
-the attached screenshot images visually, then choose the relevant screenshot IDs from the
-`screenshots` list and pass those IDs as `screenshot_ids`. Do not invent screenshot IDs, do not
-manually copy URLs into `image_urls`, and do not include screenshots that are irrelevant to the
-design problem.
+the attached screenshot images visually, then pass the relevant URLs from the `screenshots` list as
+`image_urls`. Do not invent or rewrite URLs, and do not include screenshots that are irrelevant to
+the design problem.
 
 When writing `topics` about sketches:
 
