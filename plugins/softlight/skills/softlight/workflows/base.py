@@ -16,10 +16,11 @@ _Call = Callable[[Config, _Params], None]
 def _infer_schema(
     cls: type[_Params],
 ) -> dict[str, Any]:
+    hints = get_type_hints(cls)
     return {
         "type": "object",
-        "properties": {name: {"type": "string"} for name in cls.__annotations__},
-        "required": list(cls.__annotations__),
+        "properties": {name: {"type": "string"} for name in hints},
+        "required": list(hints),
         "additionalProperties": False,
     }
 
