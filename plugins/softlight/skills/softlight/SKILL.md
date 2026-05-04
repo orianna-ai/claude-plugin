@@ -24,12 +24,12 @@ Then tell the user, in one short sentence: "Opened the intake — talk through
 the problem in the browser, then click *Start designing* when you're done."
 Do not ask follow-up questions; let the conversation happen in the browser.
 
-## 2. Dispatch the designer agent
+## 2. Run the designer agent
 
 Run in the background (it runs forever):
 
 ```bash
-python3 -m dispatch_prompts --project-id '<project_id>'
+python3 -m run_agent --project-id '<project_id>'
 ```
 
 Tell the user the designer agent is working in the background and that
