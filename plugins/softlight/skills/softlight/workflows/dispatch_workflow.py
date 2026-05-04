@@ -35,8 +35,7 @@ def _is_workflow_pending(
 def _candidate_workflows(
     project: dict[str, Any],
 ) -> Iterator[Workflow]:
-    if not _is_workflow_pending(project, live_intake_manager):
-        yield live_intake_manager
+    yield live_intake_manager
 
     if project.get("baseline") is None and not _is_workflow_pending(project, clone_app):
         yield clone_app
