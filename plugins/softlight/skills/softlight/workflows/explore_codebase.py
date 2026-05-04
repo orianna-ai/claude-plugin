@@ -43,17 +43,6 @@ def explore_codebase(
                 },
             )
 
-    prompts = [
-        {
-            "key": prompt.get("key"),
-            "status": prompt.get("status"),
-            "workflow": prompt.get("workflow"),
-        }
-        for prompt in project.get("prompts") or []
-        if prompt.get("workflow") == "generate_mocks"
-        or str(prompt.get("key") or "").startswith("generate_mock_revision:")
-    ]
-
     call_claude(
         prompt=[
             """\
@@ -71,10 +60,6 @@ ${conversations}
 <screenshots>
 ${screenshots}
 </screenshots>
-
-<prompts>
-${prompts}
-</prompts>
 """,
             *(
                 {
@@ -89,7 +74,6 @@ ${prompts}
             "latest_state": json.dumps(project.get("discussion") or {}, indent=2),
             "conversations": json.dumps(conversations, indent=2),
             "screenshots": json.dumps(screenshots, indent=2),
-            "prompts": json.dumps(prompts, indent=2),
         },
         config=config,
         effort="low",

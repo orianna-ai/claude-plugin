@@ -17,7 +17,6 @@ You will receive:
 - `latest_state`: the latest state of your PRD thinking, and what topics you sent to be asked before.
 - `conversations`: live transcript updates of the conversation.
 - `screenshots`: captured screenshot records with `id`, `url`, caption, timestamp, and conversation room. Use the `id` values when calling `generate_mock_revision`.
-- `prompts`: project prompts relevant to mock generation, including workflow, status, and key.
 
 ## Required State Shape
 
