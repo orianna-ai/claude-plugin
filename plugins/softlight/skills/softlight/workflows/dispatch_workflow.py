@@ -1,11 +1,11 @@
-from __future__ import annotations
-
 import json
 import uuid
-from typing import TYPE_CHECKING, Any, TypedDict
+from collections.abc import Iterator
+from typing import Any, TypedDict
 
 from scripts.call_claude import call_claude
 from scripts.get_project import get_project
+from scripts.load_config import Config
 from scripts.post_events import post_events
 
 from workflows.base import Workflow, workflow
@@ -13,11 +13,6 @@ from workflows.clone_app import clone_app
 from workflows.do_nothing import do_nothing
 from workflows.explore_codebase import explore_codebase
 from workflows.generate_mocks import generate_mocks
-
-if TYPE_CHECKING:
-    from collections.abc import Iterator
-
-    from scripts.load_config import Config
 
 
 class DispatchWorkflowParams(TypedDict):

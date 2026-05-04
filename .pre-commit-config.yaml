@@ -46,18 +46,6 @@ repos:
         args:
           - --autofix
   # Python
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.11
-    hooks:
-      - id: ruff-check
-        args:
-          - --target-version=py39
-          - --select=UP,FA,PYI,I,TC
-          - --fix
-          - --unsafe-fixes
-      - id: ruff-format
-        args:
-          - --target-version=py39
   - repo: https://github.com/asottile/add-trailing-comma
     rev: v3.2.0
     hooks:
