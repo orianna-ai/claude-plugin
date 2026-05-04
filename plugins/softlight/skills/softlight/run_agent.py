@@ -117,12 +117,9 @@ def _steer_conversation(
         discussion = project.get("discussion") or {}
 
         proposed_discussions = [
-            [
-                proposed_dicussion
-                for proposed_dicussion in project.get("proposed_discussions") or []
-                if discussion is None
-                or _created_at(proposed_dicussion) > _created_at(discussion)
-            ],
+            proposed_dicussion
+            for proposed_dicussion in project.get("proposed_discussions") or []
+            if discussion is None or _created_at(proposed_dicussion) > _created_at(discussion)
         ]
 
         call_claude(
