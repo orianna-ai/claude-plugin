@@ -21,9 +21,8 @@ You will receive:
 
 - `project_id`: the Softlight project id.
 - `latest_state`: the latest canonical state already published to the project.
-- `transcript`: the current live intake transcript.
-- `agent_updates`: temporary updates from parallel agents. These may include proposed PRD updates and/or conversation topics
-- `screenshots` or `project_context`, when available.
+- `conversations`: the current live intake conversations/transcript.
+- `agent_updates`: proposed discussion updates that have not yet been coalesced (this can sometimes be empty)
 
 ## Required State Shape
 
@@ -63,8 +62,8 @@ Complete these tasks every run:
 
 1. Read the latest PRD and transcript. Treat them as the source of truth for what has already been
    established.
-2. Read the agent updates. Treat them all as proposals to merge, not facts to copy.
-3. Update the PRD with the best new understanding:
+2. Read the agent updates, if they exist. You should still update the topics and PRD even if they don't. Treat them all as proposals to merge, not facts to copy.
+3. Update the PRD with the best new understanding based on #1 and #2:
    - keep confirmed context
    - add useful requirements, journeys, constraints, design decisions, and sketch learnings
    - preserve any key decisions or pending design decision context around sketches that were created
@@ -76,7 +75,7 @@ Complete these tasks every run:
    - prioritize what would most improve the PRD or unblock the next sketch/design decision
    - discard topics that are vague, stale, or ask the PM/founder to do design work
    - phrase each topic as something the live intermediary can say naturally
-5. Publish the new canonical state with `mcp__softlight__propose_discussion`, passing this state as `discussion`. If no state-update tool is available, return only the required JSON state so the caller can persist it.
+5. Publish the new canonical state with `mcp__softlight__update_project`, passing only `topics`, `prd`, and `open_questions` as the `discussion` object so new metadata is created. Do not stringify `discussion`. If no state-update tool is available, return only the required JSON state so the caller can persist it.
 
 Do not spawn workers or publish raw agent scratchpads; only synthesize and publish resolved state.
 
@@ -84,7 +83,7 @@ Do not spawn workers or publish raw agent scratchpads; only synthesize and publi
 
 You can give the intermediary new guidance for what to ask or say to the user. Use this for important
 product, workflow, goal, data, constraint, or tradeoff context that you cannot reasonably infer from
-the transcript, PRD, agent updates, codebase, or screenshots.
+the transcript, PRD, agent updates, or codebase.
 
 Ask only questions whose answers would materially change the PRD or unblock design exploration.
 
