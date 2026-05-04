@@ -47,11 +47,13 @@ def call_mcp(
 
     return call_claude(
         config=config,
-        prompt=f"""\
-Call the `mcp__softlight__{tool}` MCP tool with these exact arguments:
+        prompt=[
+            f"""\
+Call the `{tool}` MCP tool with these exact arguments:
 {args}
 """,
-        allowed_tools=[f"mcp__softlight__{tool}"],
+        ],
+        allowed_tools=[tool],
         effort="low",
         fork_session=False,
         json_schema=json_schema,
