@@ -56,7 +56,7 @@ You must decide what you are going to sketch, kick off the sketches, and then up
 
 To do that follow these steps:
 
-Use the Design Approaches section of the PRD to decide what the next most important design decision to be made is, and what sketches to place in front of a user should be. Every exploration should be centered around a key design decision that needs to be made. Your job in this phase is to derisk all the major design decisions up front via these sketches. You do this by putting sketches in front of a user for each major design decision that needs to be made.
+Use the Design Approaches section of the PRD to decide what the next most important design decision to be made is, and what sketches to place in front of a user should be. Every exploration should be centered around a key design decision that needs to be made. Your job in this phase is to derisk all the major design decisions up front via these sketches. You do this by putting sketches in front of a user for each major design decision that needs to be made. If there are no Design Approaches decisions to be made, use your best judgement for the next best decision that should be made.
 
 Call `mcp__softlight__generate_mock_revision` when specific important design decisions are
 ready to explore visually, and sketches would pull useful feedback from the user. Do not pass the
