@@ -34,8 +34,12 @@ def clone_app(
         config=config,
         prompt=[
             """\
-Use the `clone-app` skill to write the application code into the clone directory so it visually
-matches the source app.
+Use the `clone-app` skill to write a baseline clone into the clone directory so it visually
+matches the source app as it exists right now.
+
+This is only a clone task. The problem statement is context for finding the relevant current
+screen/state to reproduce. Do not implement the requested feature, create design explorations,
+start a tunnel, publish to the canvas, or modify the source app.
 
 <problem>
 ${problem}
@@ -57,6 +61,30 @@ ${cloned_code_dir}
         },
         model="sonnet",
         effort="medium",
+        session_id="clone_app",
+        tools=[
+            "Read",
+            "Write",
+            "Edit",
+            "MultiEdit",
+            "Glob",
+            "Grep",
+            "LS",
+            "Bash",
+        ],
+        allowed_tools=[
+            "Read",
+            "Write",
+            "Edit",
+            "MultiEdit",
+            "Glob",
+            "Grep",
+            "LS",
+            "Bash(pnpm install:*)",
+            "Bash(pnpm build:*)",
+            "Bash(mkdir:*)",
+            "Bash(cp:*)",
+        ],
     )
 
     tunnel_id = str(uuid.uuid4())
