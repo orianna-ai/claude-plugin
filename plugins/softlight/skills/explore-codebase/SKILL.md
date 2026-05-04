@@ -26,15 +26,39 @@ Maintain only this state:
 {
   "topics": ["..."],
   "prd": "...",
-  "open_questions": []
+  "open_questions": [],
+  "working_plan": {
+    "stage": "listening | aligning | working | ready_for_handoff",
+    "summary": "...",
+    "active_item_id": "p1",
+    "items": [
+      {
+        "id": "p1",
+        "title": "...",
+        "why": "...",
+        "method": "conversation | codebase | sketches | converge | handoff",
+        "status": "candidate | in_progress | waiting_for_user | waiting_for_sketches | resolved_for_now | reopened | reprioritized | deferred",
+        "priority": 1,
+        "unknowns": ["..."],
+        "success_criteria": "...",
+        "result": null
+      }
+    ],
+    "last_change_reason": null
+  }
 }
 ```
 
-`topics` is all the intermediary sees. Each topic should be a concise spoken instruction for what to ask or talk about next. Use 1-5 topics, prioritized by list order where 1 is most important.
+`topics` is what the intermediary should say or ask next. Each topic should be a concise spoken instruction for what to ask or talk about next. Use 1-5 topics, prioritized by list order where 1 is most important.
 
 `prd` is your living early PRD. It must include: product brief covering context, problem, goals, requirements, user journeys, solution approaches, and constraints.
 
 `open_questions`: latest unknowns that would materially change the design.
+
+`working_plan`: the current flexible plan for leading the PM/founder from the messy problem to
+design/build clarity. Preserve and improve any existing plan in `latest_state`. Use codebase
+findings to add, reprioritize, or resolve plan items when they materially change what needs to be
+de-risked. Keep the plan short and practical.
 
 Structure `prd` around these sections:
 
@@ -56,7 +80,7 @@ You MUST COMPLETE ALL STEPS of the following the workflow in order:
 
 1. Gather Context: Gather more context with code exploration, and sharper user questions when the PRD is still missing key context about the user journeys and important requirements/constraints.
 2. Final update: call `mcp__softlight__propose_discussion` again with the improved PRD, open
-   questions, and topics.
+   questions, topics, and working_plan.
 
 
 #### How to do codebase exploration
@@ -64,6 +88,10 @@ You MUST COMPLETE ALL STEPS of the following the workflow in order:
 Explore the codebase by dispatching the built-in `Explore` subagents. Understand the current user experience, existing behavior, gaps, constraints, and requirements you can infer from the product. Every subagent you dispatch can also explore the codebase. Use ONLY `Explore` subagents for code discovery — let them do the reading so you build understanding of the app without bloating your own context.
 
 Use code exploration to answer questions before asking the user. When the codebase answers something, update your PRD, assumptions, and open questions instead of asking the user to repeat it.
+
+When code exploration changes the plan, update `working_plan.last_change_reason` so the live agent
+can explain the pivot. For example: "The codebase shows this is really a permissions workflow, so
+exception handling moved ahead of visual layout."
 
 #### How to determine questions for the user
 
