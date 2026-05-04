@@ -120,7 +120,8 @@ def _steer_conversation(
             [
                 proposed_dicussion
                 for proposed_dicussion in project.get("proposed_discussions") or []
-                if discussion is None or _created_at(proposed_dicussion) > _created_at(discussion)
+                if discussion is None
+                or _created_at(proposed_dicussion) > _created_at(discussion)
             ],
         ]
 
