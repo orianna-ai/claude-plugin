@@ -9,21 +9,21 @@ from scripts.load_config import Config
 from workflows.base import workflow
 
 
-class LiveIntakeManagerParams(TypedDict):
+class ExploreCodebaseParams(TypedDict):
     pass
 
 
 @workflow
-def live_intake_manager(
+def explore_codebase(
     config: Config,
-    params: LiveIntakeManagerParams,
+    params: ExploreCodebaseParams,
 ) -> None:
-    """Update the live-intake topics and PRD from the conversation so far, and generate sketch
-    mocks when there is enough context to make them useful.
-    """
+    """Do an initial codebase exploration after the user has described the product problem they want
+    to solve to get the available product context."""
     project = get_project(config)
 
     conversations = project.get("conversations") or []
+
     screenshots = []
     seen_screenshot_urls = set()
     for conversation in conversations:
@@ -42,6 +42,7 @@ def live_intake_manager(
                     "conversation_room": conversation.get("room"),
                 },
             )
+
     prompts = [
         {
             "key": prompt.get("key"),
@@ -56,7 +57,7 @@ def live_intake_manager(
     call_claude(
         prompt=[
             """\
-Use the `live-intake-manager` skill to update the live intake state for Softlight project
+Use the `explore-codebase` skill to update the live intake state for Softlight project
 ${project_id}.
 
 <latest_state>
@@ -93,5 +94,5 @@ ${prompts}
         config=config,
         effort="low",
         model="opus",
-        session_id=f"live_intake_manager:{uuid.uuid4()}",
+        session_id=f"explore_codebase:{uuid.uuid4()}",
     )
