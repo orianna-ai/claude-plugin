@@ -1,44 +1,51 @@
+from __future__ import annotations
+
 import json
 import uuid
-from collections.abc import Iterator
-from typing import Any, TypedDict
+from typing import TYPE_CHECKING, Any, TypedDict
 
 from scripts.call_claude import call_claude
 from scripts.get_project import get_project
-from scripts.load_config import Config
 from scripts.post_events import post_events
 
 from workflows.base import Workflow, workflow
 from workflows.clone_app import clone_app
 from workflows.do_nothing import do_nothing
-from workflows.live_intake_manager import live_intake_manager
+from workflows.explore_codebase import explore_codebase
+from workflows.generate_mocks import generate_mocks
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+    from scripts.load_config import Config
 
 
 class DispatchWorkflowParams(TypedDict):
     pass
 
 
-def _is_workflow_pending(
+def _get_workflow_status(
     project: dict[str, Any],
     workflow: Workflow,
-) -> bool:
-    for prompt in project.get("prompts") or []:
-        if (
-            prompt.get("status") == "pending"
-            and prompt.get("workflow") == workflow.name
-        ):
-            return True
+) -> str | None:
+    for prompt in reversed(project.get("prompts") or []):
+        if prompt.get("workflow") == workflow.name:
+            return prompt.get("status")
 
-    return False
+    return None
 
 
 def _candidate_workflows(
     project: dict[str, Any],
 ) -> Iterator[Workflow]:
-    yield live_intake_manager
+    if _get_workflow_status(project, generate_mocks) != "pending":
+        yield generate_mocks
 
-    if project.get("baseline") is None and not _is_workflow_pending(project, clone_app):
+    if _get_workflow_status(project, clone_app) not in {"pending", "success"}:
         yield clone_app
+
+    if _get_workflow_status(project, explore_codebase) not in {"pending", "success"}:
+        yield explore_codebase
 
 
 @workflow
