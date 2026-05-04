@@ -1,3 +1,4 @@
+import json
 from typing import TypedDict
 
 from scripts.call_mcp import call_mcp
@@ -7,10 +8,7 @@ from workflows.base import workflow
 
 
 class GenerateMocksParams(TypedDict):
-    context: str
-    problem: str
-    supporting_context: str
-    screenshot_ids: str
+    input: str
 
 
 @workflow
@@ -21,12 +19,6 @@ def generate_mocks(
     """Generate visual sketch mocks for the live design conversation from captured screenshots."""
     call_mcp(
         config=config,
-        tool="generate_mock_revision",
-        input={
-            "project_id": config.project_id,
-            "context": params["context"],
-            "problem": params["problem"],
-            "supporting_context": params["supporting_context"],
-            "screenshot_ids": params["screenshot_ids"],
-        },
+        tool="generate_mock_revision_actually",
+        input=json.loads(params["input"]),
     )

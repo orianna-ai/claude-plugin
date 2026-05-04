@@ -61,7 +61,7 @@ Structure `prd` around these sections:
 You MUST complete the workflow in order:
 
 1. Bootstrap only if needed: check `<latest_state>`. If it does not already contain useful
-   `intake_topics` and `intake_prd`, immediately call `mcp__softlight__update_intake_state` with
+   `intake_topics` and `intake_prd`, immediately call `mcp__softlight__propose_discussion` with
    the best current state. "Useful" means topics are non-empty and the PRD has concrete context,
    requirements, or open questions. If useful state already exists, skip this call and use it as
    your starting point.
@@ -70,7 +70,7 @@ You MUST complete the workflow in order:
      missing key context about the user journeys and importnat requirements/constraints.
    - Use sketches only when there is enough confirmed PRD context and specific important designs
      decisions are ready for visual feedback.
-3. Final update: call `mcp__softlight__update_intake_state` again with the improved PRD, open
+3. Final update: call `mcp__softlight__propose_discussion` again with the improved PRD, open
    questions, and intake topics from step 2.
 
 Phases for step 2:
@@ -110,10 +110,10 @@ whole problem straight into a mock revision. Pick one decision, then use sketche
 approaches to that slice of the problem.
 
 This is how you create new sketches:
-1. Call `mcp__softlight__update_intake_state` with topics that say sketches are starting, name the
+1. Call `mcp__softlight__propose_discussion` with topics that say sketches are starting, name the
    decision being tested, and preview the approaches.
 2. Call `mcp__softlight__generate_mock_revision` for that one decision.
-3. Call `mcp__softlight__update_intake_state` again with sketch status and sketch-centered topics.
+3. Call `mcp__softlight__propose_discussion` again with sketch status and sketch-centered topics.
 
 Explore one set of sketches at a time. Once the user has finished discussing that important design decision, move to the next most important decision or approach to explore.
 
@@ -141,4 +141,4 @@ When writing `intake_topics` about sketches:
 Once you have gotten through all the sketches ensure you put a topic in that the sketches are finished and the users should click the "Begin Hi-Fi design phase".
 
 Do not stop after the quick update. The run is complete only after the step 2 work and the final
-`mcp__softlight__update_intake_state` call.
+`mcp__softlight__propose_discussion` call.
