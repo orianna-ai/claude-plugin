@@ -18,10 +18,21 @@ class DispatchWorkflowParams(TypedDict):
     pass
 
 
+def _has_pending_workflow(
+    project: dict[str, Any],
+    workflow_name: str,
+) -> bool:
+    return any(
+        prompt.get("workflow") == workflow_name and prompt.get("status") == "pending"
+        for prompt in project.get("prompts") or []
+    )
+
+
 def _candidate_workflows(
     project: dict[str, Any],
 ) -> Iterator[Workflow]:
-    yield live_intake_manager
+    if not _has_pending_workflow(project, live_intake_manager.name):
+        yield live_intake_manager
 
     if project.get("baseline") is None:
         yield clone_app
