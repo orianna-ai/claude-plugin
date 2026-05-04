@@ -18,26 +18,25 @@ class DispatchWorkflowParams(TypedDict):
     pass
 
 
-def _has_pending_workflow(
+def _is_workflow_pending(
     project: dict[str, Any],
-    workflow_name: str,
+    workflow: Workflow,
 ) -> bool:
-    return any(
-        prompt.get("workflow") == workflow_name and prompt.get("status") == "pending"
-        for prompt in project.get("prompts") or []
-    )
+    for prompt in project.get("prompts") or []:
+        if prompt.get("status") == "pending" and prompt.get("workflow") == workflow.name:
+            return True
+
+    return False
 
 
 def _candidate_workflows(
     project: dict[str, Any],
 ) -> Iterator[Workflow]:
-    if not _has_pending_workflow(project, live_intake_manager.name):
+    if not _is_workflow_pending(project, live_intake_manager):
         yield live_intake_manager
 
-    if project.get("baseline") is None:
+    if project.get("baseline") is None and not _is_workflow_pending(project, clone_app):
         yield clone_app
-
-    yield do_nothing
 
 
 @workflow
@@ -50,7 +49,12 @@ def dispatch_workflow(
 
     candidate_workflows = list(_candidate_workflows(project))
 
-    invocation_id = uuid.uuid4()
+    if not candidate_workflows:
+        return
+
+    candidate_workflows.append(do_nothing)
+
+    session_id = f"dispatch_workflow:{uuid.uuid4()}"
 
     decision = call_claude(
         prompt=[
@@ -60,9 +64,9 @@ Pick the workflow that best matches the project's current state and provide its 
 The project may have multiple `conversations` — each is a separate LiveKit session. Look across
 all of them when deciding what to do next.
 
-<workflows>
-${workflows}
-</workflows>
+<candidate_workflows>
+${candidate_workflows}
+</candidate_workflows>
 
 <project>
 ${project}
@@ -70,10 +74,13 @@ ${project}
 """,
         ],
         params={
-            "project": json.dumps(project),
-            "workflows": "\n".join(
+            "candidate_workflows": "\n".join(
                 f"- {candidate_workflow.name}: {candidate_workflow.description}"
                 for candidate_workflow in candidate_workflows
+            ),
+            "project": json.dumps(
+                project,
+                indent=2,
             ),
         },
         json_schema={
@@ -106,19 +113,20 @@ ${project}
         config=config,
         effort="low",
         model="opus",
-        session_id=f"dispatch_workflow:{invocation_id}",
+        session_id=session_id,
     )
 
-    post_events(
-        config=config,
-        events=[
-            {
-                "type": "prompt_created",
-                "prompt": {
-                    "workflow": decision["next_workflow"]["workflow"],
-                    "params": decision["next_workflow"]["params"],
-                    "key": f"dispatch_workflow:{invocation_id}",
+    if decision["next_workflow"]["workflow"] != do_nothing.name:
+        post_events(
+            config=config,
+            events=[
+                {
+                    "type": "prompt_created",
+                    "prompt": {
+                        "workflow": decision["next_workflow"]["workflow"],
+                        "params": decision["next_workflow"]["params"],
+                        "key": session_id,
+                    },
                 },
-            },
-        ],
-    )
+            ],
+        )

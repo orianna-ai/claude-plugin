@@ -21,11 +21,7 @@ def clone_app(
     config: Config,
     params: CloneAppParams,
 ) -> None:
-    """Create a baseline clone of the user's app as a starting point for design exploration.
-
-    This should only be called once per project. Do not call it again if there is a pending prompt
-    for the clone_app workflow.
-    """
+    """Create a baseline clone of the user's app as a starting point for design exploration."""
     source_code_dir = pathlib.Path(
         params["source_code_dir"],
     )
