@@ -158,9 +158,9 @@ ${agent_updates}
                 "agent_updates": json.dumps(proposed_discussions, indent=2),
             },
             config=config,
-            effort="low",
+            effort="medium",
             fork_session=False,
-            model="opus",
+            model="sonnet",
             session_id=f"steering_manager:{uuid.uuid4()}",
         )
 

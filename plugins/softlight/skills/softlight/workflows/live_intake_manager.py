@@ -91,7 +91,7 @@ ${prompts}
             "prompts": json.dumps(prompts, indent=2),
         },
         config=config,
-        effort="low",
-        model="opus",
+        effort="medium",
+        model="sonnet",
         session_id=f"live_intake_manager:{uuid.uuid4()}",
     )
