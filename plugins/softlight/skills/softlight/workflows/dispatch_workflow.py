@@ -10,6 +10,7 @@ from scripts.post_events import post_events
 
 from workflows.base import Workflow, workflow
 from workflows.clone_app import clone_app
+from workflows.do_nothing import do_nothing
 from workflows.live_intake_manager import live_intake_manager
 
 
@@ -24,6 +25,8 @@ def _candidate_workflows(
 
     if project.get("baseline") is None:
         yield clone_app
+
+    yield do_nothing
 
 
 @workflow

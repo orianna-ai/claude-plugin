@@ -1,4 +1,5 @@
 import json
+import uuid
 from typing import TypedDict
 
 from scripts.call_claude import call_claude
@@ -70,5 +71,5 @@ ${prompts}
         config=config,
         effort="low",
         model="opus",
-        session_id="live_intake_manager",
+        session_id=f"live_intake_manager:{uuid.uuid4()}",
     )
