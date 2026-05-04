@@ -1,16 +1,25 @@
+from typing import TypedDict
+
 from scripts.call_claude import call_claude
 from scripts.load_config import Config
 
 from workflows.base import workflow
 
 
+class ReplyToCommentParams(TypedDict):
+    slotId: str
+    commentText: str
+
+
 @workflow
 def reply_to_comment(
     config: Config,
-    params: dict[str, str],
+    params: ReplyToCommentParams,
 ) -> None:
+    """Reply to a user comment on the design canvas."""
     call_claude(
-        prompt="""\
+        prompt=[
+            """\
 The user left a comment on the design canvas (slot_id="${slotId}"):
 
 "${commentText}"
@@ -34,6 +43,7 @@ design the feedback is about.
   could explore in future revisions, but do NOT attempt to generate those revisions yourself.
 - Your sole output is a comment reply via create_comment. Nothing else.
 """,
+        ],
         params=params,
         config=config,
         effort="medium",

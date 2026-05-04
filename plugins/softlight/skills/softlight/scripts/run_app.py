@@ -8,13 +8,15 @@ from typing import TYPE_CHECKING
 from scripts.start_tunnel import start_tunnel
 
 if TYPE_CHECKING:
+    import pathlib
+
     from scripts.load_config import Config
 
 
 def run_app(
     config: Config,
     *,
-    source_code_dir: str,
+    source_code_dir: pathlib.Path,
     tunnel_id: str,
 ) -> None:
     # install third-party dependencies and build the app
