@@ -23,7 +23,10 @@ def _is_workflow_pending(
     workflow: Workflow,
 ) -> bool:
     for prompt in project.get("prompts") or []:
-        if prompt.get("status") == "pending" and prompt.get("workflow") == workflow.name:
+        if (
+            prompt.get("status") == "pending"
+            and prompt.get("workflow") == workflow.name
+        ):
             return True
 
     return False
