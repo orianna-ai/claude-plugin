@@ -119,8 +119,7 @@ def _steer_conversation(
         proposed_discussions = [
             proposed_dicussion
             for proposed_dicussion in project.get("proposed_discussions") or []
-            if not discussion
-            or _created_at(proposed_dicussion) > _created_at(discussion)
+            if not discussion or _created_at(proposed_dicussion) > _created_at(discussion)
         ]
 
         call_claude(
@@ -163,8 +162,6 @@ ${agent_updates}
             model="sonnet",
             session_id=f"steering_manager:{uuid.uuid4()}",
         )
-
-        time.sleep(15)
 
 
 def run_agent(
