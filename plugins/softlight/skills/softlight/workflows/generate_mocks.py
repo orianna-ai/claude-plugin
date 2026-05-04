@@ -21,7 +21,9 @@ def generate_mocks(
     """
     If the PRD has some context coverage, and clear design decisions in the Design Approaches'
     section, use this tool to generate mocks for the next most imporatnt design decision that needs
-    to be made.
+    to be made. While we need some context to understand the core problem, we don't need a complete
+    PRD to generate mocks. We want to show the user the next most important design decision quickly
+    visually, so they can give feedback on it.
 
     Default to generating a first focused set of mocks after the user has answered roughly 2-4
     substantive discovery questions, or sooner, if there is a clear Design Approaches decision that
