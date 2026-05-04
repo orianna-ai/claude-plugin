@@ -23,6 +23,16 @@ def live_intake_manager(
     project = get_project(config)
 
     conversations = project.get("conversations") or []
+    prompts = [
+        {
+            "key": prompt.get("key"),
+            "status": prompt.get("status"),
+            "workflow": prompt.get("workflow"),
+        }
+        for prompt in project.get("prompts") or []
+        if prompt.get("workflow") == "generate_mocks"
+        or str(prompt.get("key") or "").startswith("generate_mock_revision:")
+    ]
 
     call_claude(
         prompt=[
@@ -37,6 +47,10 @@ ${latest_state}
 <conversations>
 ${conversations}
 </conversations>
+
+<prompts>
+${prompts}
+</prompts>
 """,
             *(
                 {
@@ -51,6 +65,7 @@ ${conversations}
             "project_id": config.project_id,
             "latest_state": json.dumps(project.get("discussion") or {}, indent=2),
             "conversations": json.dumps(conversations, indent=2),
+            "prompts": json.dumps(prompts, indent=2),
         },
         config=config,
         effort="low",

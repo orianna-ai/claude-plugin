@@ -17,6 +17,7 @@ You will receive:
 - `latest_state`: the latest state of your PRD thinking, and what topics you sent to be asked before.
 - `screenshots`: screenshot urls of the existing experience.
 - `transcript`: live transcript updates of the conversation
+- `prompts`: project prompts relevant to mock generation, including workflow, status, and key.
 
 ## Required State Shape
 
