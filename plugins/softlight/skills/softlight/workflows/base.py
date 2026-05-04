@@ -25,7 +25,7 @@ def _infer_schema(
     }
 
 
-@dataclasses.dataclass(frozen=True, slots=True)
+@dataclasses.dataclass
 class Workflow(Generic[_Params]):
     call: _Call[_Params]
     description: str
