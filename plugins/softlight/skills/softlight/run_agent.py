@@ -196,7 +196,8 @@ def _mock_generation_state(
             slot_updates.append({**update, "status": status})
 
     statuses = sorted(
-        {update["status"] for update in slot_updates} | {failure["status"] for failure in failures},
+        {update["status"] for update in slot_updates}
+        | {failure["status"] for failure in failures},
     )
 
     return {
