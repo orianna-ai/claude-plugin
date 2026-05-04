@@ -26,15 +26,38 @@ Maintain only this state:
 {
   "topics": ["..."],
   "prd": "...",
-  "open_questions": []
+  "open_questions": [],
+  "working_plan": {
+    "stage": "listening | aligning | working | ready_for_handoff",
+    "summary": "...",
+    "active_item_id": "p1",
+    "items": [
+      {
+        "id": "p1",
+        "title": "...",
+        "why": "...",
+        "method": "conversation | codebase | sketches | converge | handoff",
+        "status": "candidate | in_progress | waiting_for_user | waiting_for_sketches | resolved_for_now | reopened | reprioritized | deferred",
+        "priority": 1,
+        "unknowns": ["..."],
+        "success_criteria": "...",
+        "result": null
+      }
+    ],
+    "last_change_reason": null
+  }
 }
 ```
 
-`topics` is all the intermediary sees. Each topic should be a concise spoken instruction for what to ask or talk about next. Use 1-5 topics, prioritized by list order where 1 is most important.
+`topics` is what the intermediary should say or ask next. Each topic should be a concise spoken instruction for what to ask or talk about next. Use 1-5 topics, prioritized by list order where 1 is most important.
 
 `prd` is your living early PRD. It must include: product brief covering context, problem, goals, requirements, user journeys, solution approaches, and constraints.
 
 `open_questions`: latest unknowns that would materially change the design.
+
+`working_plan`: the flexible plan for leading the PM/founder from messy problem context to
+design/build clarity. Preserve it, update the active item after sketching, and use it as the source
+of truth for what to sketch.
 
 Structure `prd` around these sections:
 
@@ -56,11 +79,18 @@ You must decide what you are going to sketch, kick off the sketches, and then up
 
 To do that follow these steps:
 
-Use the Design Approaches section of the PRD to decide what the next most important design decision to be made is, and what sketches to place in front of a user should be. Every exploration should be centered around a key design decision that needs to be made. Your job in this phase is to derisk all the major design decisions up front via these sketches. You do this by putting sketches in front of a user for each major design decision that needs to be made.
+Use `latest_state.working_plan` to decide what to sketch. Sketch only the active plan item when its
+`method` is `sketches` and it is not already `waiting_for_sketches` or `resolved_for_now`. If the
+working plan is missing, stale, or the active item is not ready for sketches, do not invent a sketch
+target; call `mcp__softlight__propose_discussion` with an updated working plan and topics that lead
+the user/codebase exploration toward the next needed clarity.
+
+Every exploration should be centered around one active plan item: the title, why, unknowns, and
+success criteria should define what feedback the sketches are meant to pull out of the PM/founder.
 
 Call `mcp__softlight__generate_mock_revision` when specific important design decisions are
 ready to explore visually, and sketches would pull useful feedback from the user. Do not pass the
-whole problem straight into a mock revision. Pick one decision, then use sketches to compare
+whole problem straight into a mock revision. Use the active plan item, then use sketches to compare
 approaches to that slice of the problem.
 
 Call `mcp__softlight__generate_mock_revision` with:
@@ -80,12 +110,14 @@ Call `mcp__softlight__generate_mock_revision` with:
 This is how you create new sketches:
 1. Call `mcp__softlight__generate_mock_revision` for that one decision.
 2. Call `mcp__softlight__propose_discussion` with topics that say you tried to kick off sketches for
-   that decision, name the decision being tested, and preview the approaches.
+   that decision, name the active plan item being tested, preview the approaches, and update
+   `working_plan` so the active item has `status: waiting_for_sketches`.
 
 Explore one set of sketches at a time. Once the user has finished discussing that important design decision, move to the next most important decision or approach to explore.
 
-Use `latest_state.prd` as the sketch memory. Record that sketches were made for a design
-decision, the current sketch decision, what the user decided, and the next key design decision to explore.
+Use `latest_state.prd` and `latest_state.working_plan` as the sketch memory. Record that sketches
+were made for the active plan item, what feedback would resolve it, and which plan item should come
+next after feedback.
 
 Sketches are context-gathering probes for solution approaches, not polished final UI.
 
@@ -101,6 +133,8 @@ When writing `topics` about sketches:
 - Do not ask the user what UI/UX change they want to make that design should own, such as specific controls, layout, navigation, interaction patterns, or visual treatment. Ask for the underlying context that would make the right design choice clear.
 - If the current sketch decision has landed, topics should record what was decided and announce the
   next key design decision being sketched.
+- When calling `mcp__softlight__propose_discussion`, pass the updated `working_plan`; do not
+  stringify it.
 
 Once you have gotten through all the sketches ensure you put a topic in that the sketches are finished and the users should click the "Begin Hi-Fi design phase".
 

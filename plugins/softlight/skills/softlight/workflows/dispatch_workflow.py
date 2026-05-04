@@ -34,10 +34,46 @@ def _get_workflow_status(
     return None
 
 
+def _active_working_plan_item(
+    project: dict[str, Any],
+) -> dict[str, Any] | None:
+    discussion = project.get("discussion") or {}
+    working_plan = discussion.get("working_plan") or {}
+    items = working_plan.get("items") or []
+    active_item_id = working_plan.get("active_item_id")
+
+    for item in items:
+        if item.get("id") == active_item_id:
+            return item
+
+    return None
+
+
+def _should_generate_mocks(
+    project: dict[str, Any],
+) -> bool:
+    if _get_workflow_status(project, generate_mocks) == "pending":
+        return False
+
+    active_item = _active_working_plan_item(project)
+    if active_item is None:
+        return False
+
+    if active_item.get("method") != "sketches":
+        return False
+
+    return active_item.get("status") in {
+        "candidate",
+        "in_progress",
+        "reopened",
+        "reprioritized",
+    }
+
+
 def _candidate_workflows(
     project: dict[str, Any],
 ) -> Iterator[Workflow]:
-    if _get_workflow_status(project, generate_mocks) != "pending":
+    if _should_generate_mocks(project):
         yield generate_mocks
 
     if _get_workflow_status(project, clone_app) not in {"pending", "success"}:
