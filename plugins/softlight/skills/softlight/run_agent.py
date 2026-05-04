@@ -18,6 +18,8 @@ from scripts.post_transcripts import post_transcripts
 from scripts.spawn_reaper import spawn_reaper
 from workflows.base import WORKFLOWS
 
+_GENERATE_MOCK_REVISION_KEY_PREFIX = "generate_mock_revision:"
+
 
 def _fetch_events(
     config: Config,
@@ -108,19 +110,120 @@ def _created_at(
         return datetime.datetime.min.replace(tzinfo=datetime.UTC)
 
 
+def _mock_slot_status(
+    element: dict[str, Any] | None,
+) -> str | None:
+    if not isinstance(element, dict):
+        return None
+
+    element_type = element.get("type")
+    if element_type == "image":
+        return "loaded" if str(element.get("url") or "").strip() else "loading"
+    if element_type == "placeholder":
+        return "loading"
+    if element_type == "error":
+        return "failed"
+
+    return None
+
+
+def _is_mock_generation_prompt(
+    prompt: dict[str, Any],
+) -> bool:
+    return prompt.get("workflow") == "generate_mocks" or str(
+        prompt.get("key") or "",
+    ).startswith(_GENERATE_MOCK_REVISION_KEY_PREFIX)
+
+
+def _mock_generation_state(
+    *,
+    events: list[dict[str, Any]],
+    project: dict[str, Any],
+    since: datetime.datetime,
+) -> dict[str, Any]:
+    touched_slots: dict[str, dict[str, Any]] = {}
+    mock_prompt_ids = {
+        prompt.get("metadata", {}).get("id")
+        for prompt in project.get("prompts") or []
+        if _is_mock_generation_prompt(prompt)
+    }
+    failures: list[dict[str, Any]] = []
+
+    for event in events:
+        if _created_at(event) <= since:
+            continue
+
+        event_type = event.get("type")
+        if event_type == "prompt_failed" and event.get("prompt_id") in mock_prompt_ids:
+            failures.append(
+                {
+                    "event_type": event_type,
+                    "event_created_at": event.get("metadata", {}).get("created_at"),
+                    "prompt_id": event.get("prompt_id"),
+                    "status": "failed",
+                },
+            )
+            continue
+
+        if event_type not in {"slot_created", "slot_updated"}:
+            continue
+
+        slot = event.get("slot") or {}
+        slot_id = (
+            slot.get("metadata", {}).get("id")
+            if event_type == "slot_created"
+            else event.get("slot_id")
+        )
+        if slot_id is None:
+            continue
+
+        touched_slots[str(slot_id)] = {
+            "event_type": event_type,
+            "event_created_at": event.get("metadata", {}).get("created_at"),
+            "slot_id": str(slot_id),
+        }
+
+    current_slots = {
+        str(slot.get("metadata", {}).get("id")): slot
+        for revision in project.get("revisions") or []
+        for slot in revision.get("slots") or []
+        if slot.get("metadata", {}).get("id") is not None
+    }
+    slot_updates = []
+    for slot_id, update in touched_slots.items():
+        status = _mock_slot_status((current_slots.get(slot_id) or {}).get("element"))
+        if status is not None:
+            slot_updates.append({**update, "status": status})
+
+    statuses = sorted(
+        {update["status"] for update in slot_updates} | {failure["status"] for failure in failures},
+    )
+
+    return {
+        "since_discussion_created_at": since.isoformat(),
+        "statuses": statuses,
+        "slot_updates": slot_updates,
+        "failures": failures,
+        "has_loading": "loading" in statuses,
+        "has_loaded": "loaded" in statuses,
+        "has_failed": "failed" in statuses,
+    }
+
+
 def _steer_conversation(
     config: Config,
 ) -> None:
     while True:
         project = get_project(config)
+        events = _fetch_events(config)
 
         discussion = project.get("discussion") or {}
+        discussion_created_at = _created_at(discussion)
 
         proposed_discussions = [
             proposed_dicussion
             for proposed_dicussion in project.get("proposed_discussions") or []
-            if not discussion
-            or _created_at(proposed_dicussion) > _created_at(discussion)
+            if not discussion or _created_at(proposed_dicussion) > discussion_created_at
         ]
 
         call_claude(
@@ -140,6 +243,10 @@ ${conversations}
 <agent_updates>
 ${agent_updates}
 </agent_updates>
+
+<mock_generation_state>
+${mock_generation_state}
+</mock_generation_state>
 """,
             ],
             params={
@@ -156,6 +263,14 @@ ${agent_updates}
                     indent=2,
                 ),
                 "agent_updates": json.dumps(proposed_discussions, indent=2),
+                "mock_generation_state": json.dumps(
+                    _mock_generation_state(
+                        events=events,
+                        project=project,
+                        since=discussion_created_at,
+                    ),
+                    indent=2,
+                ),
             },
             config=config,
             effort="medium",

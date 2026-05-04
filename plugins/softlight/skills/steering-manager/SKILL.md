@@ -23,6 +23,8 @@ You will receive:
 - `latest_state`: the latest canonical state already published to the project.
 - `conversations`: the current live intake conversations/transcript.
 - `agent_updates`: proposed discussion updates that have not yet been coalesced (this can sometimes be empty)
+- `mock_generation_state`: slot updates since `latest_state` was published, with each relevant
+  mock slot classified as `loading`, `loaded`, or `failed`.
 
 ## Required State Shape
 
@@ -72,6 +74,8 @@ Complete these tasks every run:
    - preserve uncertainty when it still matters
 4. Choose the next intake topics:
    - always prioritize relevant sketch updates first
+   - use `mock_generation_state.statuses` to decide whether to mention sketch loading, loaded, or
+     failed status
    - prioritize what would most improve the PRD or unblock the next sketch/design decision
    - discard topics that are vague, stale, or ask the PM/founder to do design work
    - phrase each topic as something the live intermediary can say naturally
@@ -97,12 +101,20 @@ When writing `topics` about sketches:
 - Once sketches have started, keep the conversation centered on the current sketches. Topics should
   be framed around the current sketch decision. Do not return to unrelated backlog questions unless
   they block that decision.
-- If sketches have just started or are rendering, tell the user sketches are loading on the canvas,
-  name the decision being tested, and say what tradeoff or context they are meant to explore. This
-  topic does not need to ask a question.
-- If sketches are ready or on the canvas, explicitly ask the user to look at them. Do not ask "what
-  do you think?" Ask targeted questions about the design decision, key tradeoffs, constraints, user
-  needs, failure modes, or context that would make one approach right.
+- Ignore any agent update that claims sketches are loading, loaded, failed, arriving, rendering, or
+  on the canvas unless `mock_generation_state.statuses` supports it. Intake agents can say they
+  tried to kick off sketches, but they are not authoritative about canvas status.
+- If `mock_generation_state.statuses` includes `failed`, make the first sketch topic tell the user
+  mock generation failed and that they need to confirm what new sketches they want.
+- If `mock_generation_state.statuses` includes `loading`, you may tell the user sketches are loading
+  on the canvas, name the decision being tested when known, and say what tradeoff or context they
+  are meant to explore. This topic does not need to ask a question.
+- If `mock_generation_state.statuses` includes `loaded`, you can ask the user to look at the new
+  sketches/revisions on the canvas. Do not ask "what do you think?" Ask targeted questions about the
+  design decision, key tradeoffs, constraints, user needs, failure modes, or context that would make
+  one approach right.
+- If `mock_generation_state.statuses` is empty, do not say sketches are loading, loaded, failed, or
+  on the canvas.
 - If the current sketch decision has landed, topics should record what was decided and announce the
   next key design decision being sketched.
 - Once all sketches are finished, include a topic telling the user the sketch phase is complete and
