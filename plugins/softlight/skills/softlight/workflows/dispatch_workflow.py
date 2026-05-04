@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, TypedDict
 
 from scripts.call_claude import call_claude
 from scripts.get_project import get_project
+from scripts.load_config import Config  # noqa: TC002
 from scripts.post_events import post_events
 
 from workflows.base import Workflow, workflow
@@ -16,8 +17,6 @@ from workflows.generate_mocks import generate_mocks
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
-
-    from scripts.load_config import Config
 
 
 class DispatchWorkflowParams(TypedDict):
