@@ -18,10 +18,22 @@ def generate_mocks(
     config: Config,
     params: GenerateMocksParams,
 ) -> None:
-    """Use when the project PRD has some decent context coverage in Context / Problem / Goals and
-    Requirements / Journeys, and the Design Approaches section contains a specific important
-    unresolved design decision that should be tested with sketches before design can proceed. This
-    workflow should generate one focused set of sketches for that decision.
+    """
+    If the PRD has some context coverage, and clear design decisions in the Design Approaches'
+    section, use this tool to generate mocks for the next most imporatnt design decision that needs
+    to be made.
+
+    Default to generating a first focused set of mocks after the user has answered roughly 2-4
+    substantive discovery questions, or sooner, if there is a clear Design Approaches decision that
+    needs to be made.
+
+    After mocks are generated, call this tool again whenever the user reacts to the latest canvas to
+    give feedback on a design decisions that is needed. Move to the next design decision via this
+    tool as soon as you can.
+
+    Do not wait for finalized requirements, a complete Design Approaches section, or a fully
+    specified unresolved design decision. It is enough that there is a concrete product surface,
+    workflow, or interaction choice that sketches could clarify.
     """
     project = get_project(config)
 
