@@ -164,8 +164,6 @@ ${agent_updates}
             session_id=f"steering_manager:{uuid.uuid4()}",
         )
 
-        time.sleep(15)
-
 
 def run_agent(
     *,
