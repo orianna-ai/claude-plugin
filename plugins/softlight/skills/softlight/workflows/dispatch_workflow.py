@@ -40,7 +40,7 @@ def _created_at(
 ) -> datetime.datetime:
     if created_at := value.get("metadata", {}).get("created_at"):
         return datetime.datetime.fromisoformat(created_at.replace("Z", "+00:00"))
-    return datetime.datetime.min.replace(tzinfo=datetime.UTC)
+    return datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)
 
 
 def _proposed_awaiting_feedback_decision_ids(

@@ -107,7 +107,7 @@ def _created_at(
     if created_at := value.get("metadata", {}).get("created_at"):
         return datetime.datetime.fromisoformat(created_at.replace("Z", "+00:00"))
     else:
-        return datetime.datetime.min.replace(tzinfo=datetime.UTC)
+        return datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)
 
 
 def _mock_slot_status(
