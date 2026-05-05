@@ -71,7 +71,7 @@ ${screenshots}
             "screenshots": json.dumps(screenshots, indent=2),
         },
         config=config,
-        effort="medium",
+        effort="low",
         model="sonnet",
         session_id=f"generate_mocks:{uuid.uuid4()}",
     )
