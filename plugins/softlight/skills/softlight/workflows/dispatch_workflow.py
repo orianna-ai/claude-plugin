@@ -19,6 +19,8 @@ from workflows.generate_mocks import generate_mocks
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
+_GENERATE_MOCK_REVISION_KEY_PREFIX = "generate_mock_revision:"
+
 
 class DispatchWorkflowParams(TypedDict):
     pass
@@ -29,6 +31,9 @@ def _get_workflow_status(
     workflow: Workflow,
 ) -> str | None:
     for prompt in reversed(project.get("prompts") or []):
+        if str(prompt.get("key") or "").startswith(_GENERATE_MOCK_REVISION_KEY_PREFIX):
+            continue
+
         if prompt.get("workflow") == workflow.name:
             return prompt.get("status")
 

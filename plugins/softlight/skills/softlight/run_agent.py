@@ -18,6 +18,8 @@ from scripts.post_transcripts import post_transcripts
 from scripts.spawn_reaper import spawn_reaper
 from workflows.base import WORKFLOWS
 
+_GENERATE_MOCK_REVISION_KEY_PREFIX = "generate_mock_revision:"
+
 
 def _fetch_events(
     config: Config,
@@ -44,6 +46,15 @@ def _handle_prompt(
     config: Config,
     prompt: dict[str, Any],
 ) -> None:
+    prompt_key = str(prompt.get("key") or "")
+    if prompt_key.startswith(_GENERATE_MOCK_REVISION_KEY_PREFIX):
+        print(
+            "Skipping internal mock revision prompt "
+            f"project_id={config.project_id} prompt_key={prompt_key}",
+            flush=True,
+        )
+        return
+
     try:
         if workflow := WORKFLOWS.get(prompt["workflow"]):
             workflow.call(config, prompt.get("params") or {})
@@ -74,29 +85,79 @@ def _handle_prompt(
         )
 
 
+def _prompt_id(
+    prompt: dict[str, Any],
+) -> str | None:
+    prompt_id = prompt.get("metadata", {}).get("id")
+    if prompt_id is None:
+        return None
+
+    return str(prompt_id)
+
+
+def _completed_prompt_ids(
+    events: list[dict[str, Any]],
+) -> set[str]:
+    return {
+        str(event["prompt_id"])
+        for event in events
+        if event.get("type")
+        in {"prompt_succeeded", "prompt_failed", "prompt_completed"}
+        and event.get("prompt_id") is not None
+    }
+
+
+def _should_dispatch_prompt(
+    prompt: dict[str, Any],
+    *,
+    completed_prompt_ids: set[str],
+    submitted_prompt_ids: set[str],
+) -> bool:
+    prompt_key = str(prompt.get("key") or "")
+    if prompt_key.startswith(_GENERATE_MOCK_REVISION_KEY_PREFIX):
+        return False
+
+    prompt_id = _prompt_id(prompt)
+    if prompt_id is not None and prompt_id in completed_prompt_ids:
+        return False
+    if prompt_id is not None and prompt_id in submitted_prompt_ids:
+        return False
+
+    return True
+
+
 def _dispatch_prompts(
     config: Config,
 ) -> None:
     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
         cursor = 0
+        submitted_prompt_ids: set[str] = set()
 
         while True:
             events = _fetch_events(config)
+            completed_prompt_ids = _completed_prompt_ids(events)
 
             if len(events) > cursor:
                 for event in events[cursor:]:
-                    if event.get("type") == "prompt_created":
-                        prompt = event["prompt"]
-                        if str(prompt.get("key") or "").startswith(
-                            "generate_mock_revision:",
-                        ):
-                            continue
+                    if event.get("type") != "prompt_created":
+                        continue
 
-                        executor.submit(
-                            _handle_prompt,
-                            config,
-                            prompt,
-                        )
+                    prompt = event["prompt"]
+                    if not _should_dispatch_prompt(
+                        prompt,
+                        completed_prompt_ids=completed_prompt_ids,
+                        submitted_prompt_ids=submitted_prompt_ids,
+                    ):
+                        continue
+
+                    if prompt_id := _prompt_id(prompt):
+                        submitted_prompt_ids.add(prompt_id)
+
+                    executor.submit(
+                        _handle_prompt,
+                        config,
+                        prompt,
+                    )
 
                 cursor = len(events)
 
