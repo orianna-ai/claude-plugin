@@ -149,7 +149,7 @@ Do not spawn workers or publish raw agent scratchpads; only synthesize and publi
 
 The live intermediary will decide what to ask or say from the structured `decisions` list. Make the
 top unresolved decisions clear enough that the intermediary can explain the focus, ask for missing
-context, or gather sketch feedback without needing a separate topics list.
+context, or gather sketch feedback without needing a separate spoken-guidance list.
 
 Ask only questions whose answers would materially change the PRD or unblock design exploration.
 
@@ -172,8 +172,7 @@ material like:
 When updating decisions about sketches:
 
 - Once sketches have started, keep the conversation centered on the current sketch decision. Do not
-  return to unrelated backlog questions unless
-  they block that decision.
+  return to unrelated backlog questions unless they block that decision.
 - Ignore any agent update that claims sketches are loading, loaded, failed, arriving, rendering, or
   on the canvas unless `mock_generation_state.statuses` supports it. Intake agents can say they
   tried to kick off sketches, but they are not authoritative about canvas status.

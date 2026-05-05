@@ -119,8 +119,7 @@ Sketches are context-gathering probes for solution approaches, not polished fina
 When updating decisions about sketches:
 
 - Once sketches have started, keep the conversation centered on the current sketch decision. Do not
-  return to unrelated backlog questions unless
-  they block that decision.
+  return to unrelated backlog questions unless they block that decision.
 - If you just called `generate_mock_revision`, say you tried to kick off sketches for the current
   decision in the PRD or decision learnings. Do not claim they are loading, ready, failed, arriving,
   rendering, or on the canvas.
