@@ -34,10 +34,26 @@ def _get_workflow_status(
     return None
 
 
+def _should_generate_mocks(
+    project: dict[str, Any],
+) -> bool:
+    if _get_workflow_status(project, generate_mocks) == "pending":
+        return False
+
+    discussion = project.get("discussion") or {}
+    decisions = discussion.get("decisions") or []
+
+    return any(
+        decision.get("status") == "sketching"
+        for decision in decisions
+        if decision.get("status") not in {"resolved", "deferred"}
+    )
+
+
 def _candidate_workflows(
     project: dict[str, Any],
 ) -> Iterator[Workflow]:
-    if _get_workflow_status(project, generate_mocks) != "pending":
+    if _should_generate_mocks(project):
         yield generate_mocks
 
     if _get_workflow_status(project, clone_app) not in {"pending", "success"}:
