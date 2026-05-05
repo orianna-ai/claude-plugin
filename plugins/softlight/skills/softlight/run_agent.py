@@ -18,8 +18,6 @@ from scripts.post_transcripts import post_transcripts
 from scripts.spawn_reaper import spawn_reaper
 from workflows.base import WORKFLOWS
 
-_GENERATE_MOCK_REVISION_KEY_PREFIX = "generate_mock_revision:"
-
 
 def _fetch_events(
     config: Config,
@@ -88,10 +86,16 @@ def _dispatch_prompts(
             if len(events) > cursor:
                 for event in events[cursor:]:
                     if event.get("type") == "prompt_created":
+                        prompt = event["prompt"]
+                        if str(prompt.get("key") or "").startswith(
+                            "generate_mock_revision:",
+                        ):
+                            continue
+
                         executor.submit(
                             _handle_prompt,
                             config,
-                            event["prompt"],
+                            prompt,
                         )
 
                 cursor = len(events)
@@ -132,7 +136,7 @@ def _is_mock_generation_prompt(
 ) -> bool:
     return prompt.get("workflow") == "generate_mocks" or str(
         prompt.get("key") or "",
-    ).startswith(_GENERATE_MOCK_REVISION_KEY_PREFIX)
+    ).startswith("generate_mock_revision:")
 
 
 def _mock_generation_state(
@@ -196,8 +200,7 @@ def _mock_generation_state(
             slot_updates.append({**update, "status": status})
 
     statuses = sorted(
-        {update["status"] for update in slot_updates}
-        | {failure["status"] for failure in failures},
+        {update["status"] for update in slot_updates} | {failure["status"] for failure in failures},
     )
 
     return {
