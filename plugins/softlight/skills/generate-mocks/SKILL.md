@@ -25,12 +25,7 @@ screens, flows, or behavior. It should be specific to the current product surfac
 PM/founder to react to visually. Avoid generic UI preference questions like color, spacing, exact
 controls, or visual style.
 
-Call `mcp__softlight__generate_mock_revision` exactly once.
-
-Do not call `mcp__softlight__propose_discussion`.
-Do not maintain or update a PRD.
-Do not maintain or update structured decisions.
-Do not generate more than one set of sketches in this run.
+Call `mcp__softlight__generate_mock_revision` exactly once. You must call it. Do not call anything else.
 
 Call `mcp__softlight__generate_mock_revision` with:
 
@@ -42,6 +37,3 @@ Call `mcp__softlight__generate_mock_revision` with:
 - `image_urls`: relevant captured screenshot URLs from `screenshots`. Use exact URLs from the input.
 - `supporting_context`: optional transcript details, edge cases, or PM wording that would help the
   sketching agent.
-
-If there is not enough context to choose a useful sketchable decision, do not call the mock tool.
-Return a brief explanation of what context is missing.
