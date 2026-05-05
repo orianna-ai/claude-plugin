@@ -196,8 +196,7 @@ def _mock_generation_state(
             slot_updates.append({**update, "status": status})
 
     statuses = sorted(
-        {update["status"] for update in slot_updates}
-        | {failure["status"] for failure in failures},
+        {update["status"] for update in slot_updates} | {failure["status"] for failure in failures},
     )
 
     return {
@@ -289,9 +288,8 @@ def run_agent(
 
     spawn_reaper(config)
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
         executor.submit(_dispatch_prompts, config)
-        executor.submit(_steer_conversation, config)
 
 
 def main() -> None:
