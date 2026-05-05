@@ -20,18 +20,18 @@ def generate_mocks(
 ) -> None:
     """
     Use this tool when project.discussion.prd has enough context coverage to identify a concrete
-    design decisions that visual mocks could clarify. The criteria for calling this tool is as
+    design decision that visual mocks could clarify. The criteria for calling this tool is as
     follows:
 
     Default to generating a first focused set of mocks after the user has answered roughly 2-4
-    substantive discovery questions, or sooner, even if there is a no clear Design Approaches
-    decision in the PRD that needs to be made. The tool can update the PRD as necessary. If a design
-    decision is ready in the PRD and no mocks have been generated yet, use this tool to generate the
-    first set of mocks for that decision.
+    substantive discovery questions, or sooner, once there is a decision that visual mocks could
+    clarify. The tool can update the PRD and decisions as necessary. If a decision is ready and no
+    mocks have been generated yet, use this tool to generate the first set of mocks for that
+    decision.
 
-    If the PRD's Design Approaches section names a decision to explore, generate mocks for the next
-    most important design decision IF the user has reached the previous design decision related to
-    previous mocks added to the canvas.
+    If the PRD's Decisions section or project.discussion.decisions names a decision to explore,
+    generate mocks for the next most important decision IF the user has reached the previous
+    decision related to previous mocks added to the canvas.
 
     If previous mocks were just generated or in progress, only call this tool again when the user
     has reacted to the latest canvas to give feedback on a design decision that needs exploration.
@@ -40,8 +40,8 @@ def generate_mocks(
 
     Lastly, if a user explicitly asks to generate mocks or sketches, use this tool.
 
-    Do not wait for finalized requirements, a complete PRD, a complete Design Approaches section, or
-    a fully specified unresolved design decision.
+    Do not wait for finalized requirements, a complete PRD, or a fully specified unresolved design
+    decision.
     """
     project = get_project(config)
 
