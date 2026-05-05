@@ -101,7 +101,7 @@ ${cloned_code_dir}
             {
                 "type": "project_updated",
                 "baseline": {
-                    "source_code_dir": cloned_code_dir,
+                    "source_code_dir": str(cloned_code_dir),
                     "tunnel_id": tunnel_id,
                 },
             },
