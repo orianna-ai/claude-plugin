@@ -49,9 +49,19 @@ Maintain only this state:
 requirements, user journeys, constraints, and a Decisions section. The PRD Decisions section is the
 human-readable version of the structured `decisions` list.
 
-`decisions`: prioritized high-level things that must be figured out before build/design can proceed.
-Sketches are one way to gather evidence for a decision. User questions are another. Do not treat
-questions as decisions.
+`decisions`: prioritized decision records. A decision is a load-bearing product/design choice where
+different answers would lead to a meaningfully different product direction, user workflow, sketch, or build requirement. Use this test: if the text asks the PM/founder for information, it belongs in `context_to_gather`. If it describes the product/design fork that information will decide, it belongs in `description`. Questions, research, and sketches are tools for resolving decisions; they are not the decision.
+
+Use these decision fields this way:
+- `id`: stable identifier for the decision. When updating an existing decision, keep the same `id`;
+  only create a new `id` for a genuinely new choice space.
+- `description`: the product/design fork to resolve and the meaningful directions at stake. If you
+  are tempted to write a question, rewrite it as "Determine whether..." or "Choose whether..."
+- `why_it_matters`: the consequence of choosing one direction over another: what changes for the
+  user workflow, product behavior, business goals, or build requirements.
+- `context_to_gather`: missing business/user/workflow signals that would help resolve the decision. These can be gathered through conversation, codebase exploration, or targeted sketch feedback. Write the missing variable, not a question script or sketch request.
+- `learnings`: evidence that narrows the decision, from user answers, mock feedback, codebase
+  findings, or careful inference.
 
 Structure `prd` around these sections:
 
@@ -61,22 +71,15 @@ Structure `prd` around these sections:
 2. Requirements / Journeys: the key capabilities and user workflows the product must support. Focus
    on what design needs to solve, not implementation details. This section answers: what must the
    product support, and what are the key things a user must be able to do?
-3. Decisions: the prioritized decisions that need to become clear enough to build from. This section
-   should mirror the structured `decisions` list in prose: what each decision is, why it matters,
-   what context or mock feedback is still needed, what has been learned, and which decisions are
-   resolved for now. Put approach exploration, sketch status, readiness, and remaining ambiguity
-   inside this Decisions section instead of creating separate sections.
 
 ## What To Do
 
-You must decide what you are going to sketch, kick off the sketches, and then update the discussion via `mcp__softlight__propose_discussion`.
+You must decide what you are going to sketch, kick off the sketches, and then update the discussion via `mcp__softlight__propose_discussion` with the next PRD and updated decisions list.
 
 To do that follow these steps:
 
 Use `latest_state.decisions` to decide what to sketch. Pick the highest-priority unresolved decision
-with `status: sketching`. If there is no such decision, do not invent a broad sketch request; call
-`mcp__softlight__propose_discussion` with updated decisions that move the conversation toward the
-context needed or mark the right decision as `sketching`.
+with `status: sketching`. If there is no such decision, pick the higher-priority decision you think is most ready for sketching.
 
 Every exploration should be centered around one decision: the decision title, description,
 why_it_matters, context_to_gather, and learnings should define what feedback the sketches are meant
@@ -85,7 +88,7 @@ to pull out of the PM/founder.
 Call `mcp__softlight__generate_mock_revision` when specific important design decisions are
 ready to explore visually, and sketches would pull useful feedback from the user. Do not pass the
 whole problem straight into a mock revision. Pick one decision, then use sketches to compare
-approaches to that slice of the problem.
+approaches to that slice of the problem. Only generate one set of sketches.
 
 Call `mcp__softlight__generate_mock_revision` with:
 - `context` (required): what the product is, who uses it, and the specific surface and workflow

@@ -63,15 +63,23 @@ Maintain the same public state shape that your agents already understand:
 }
 ```
 
-`prd` is your living early PRD. It must include: product brief covering context, problem, goals,
-requirements, user journeys, constraints, and a Decisions section. The PRD Decisions section is the
-human-readable version of the structured `decisions` list.
+`prd` is your living early PRD. It must include the key context: product brief, problem, goals,
+requirements, user journeys, and constraints. Do not mirror the structured `decisions` list inside
+the PRD; track decisions only in `decisions`.
 
-`decisions`: the prioritized product/design decisions that must become clear enough to build from.
-Keep this list concise and high-level. Do not turn every question into a decision. A decision should
-name what needs to be figured out; `context_to_gather` names the business/user/workflow context that
-could help resolve it; `learnings` records the user answers, mock feedback, codebase findings, and
-inferences that move the decision toward resolution.
+`decisions`: prioritized decision records. A decision is a load-bearing product/design choice where
+different answers would lead to a meaningfully different product direction, user workflow, sketch, or build requirement. Use this test: if the text asks the PM/founder for information, it belongs in `context_to_gather`. If it describes the product/design fork that information will decide, it belongs in `description`. Questions, research, and sketches are tools for resolving decisions; they are not the decision.
+
+Use these decision fields this way:
+- `id`: stable identifier for the decision. When updating an existing decision, keep the same `id`;
+  only create a new `id` for a genuinely new choice space.
+- `description`: the product/design fork to resolve and the meaningful directions at stake. If you
+  are tempted to write a question, rewrite it as "Determine whether..." or "Choose whether..."
+- `why_it_matters`: the consequence of choosing one direction over another: what changes for the
+  user workflow, product behavior, business goals, or build requirements.
+- `context_to_gather`: missing business/user/workflow signals that would help resolve the decision. These can be gathered through conversation, codebase exploration, or targeted sketch feedback. Write the missing variable, not a question script or sketch request.
+- `learnings`: evidence that narrows the decision, from user answers, mock feedback, codebase
+  findings, or careful inference.
 
 Decision statuses:
 
@@ -80,7 +88,7 @@ Decision statuses:
 - `sketching`: ready for mocks that probe this decision visually.
 - `awaiting_feedback`: mocks exist or are in flight; next progress should come from PM/founder
   feedback on those mocks.
-- `resolved`: clear enough to build from for now.
+- `resolved`: clear enough to build from for now. Doesn't have to be PERFECT - if you feel like there is enough context, you can resolve it.
 - `reopened`: previously resolved or deprioritized, but new context changed it.
 - `deferred`: not needed for the next build/design phase.
 
@@ -96,14 +104,9 @@ Structure `prd` around these sections:
 1. Context / Problem / Goals: what is happening, who it affects, why it matters, and what success
    should look like. This section answers: why are we doing this, what is broken or missing, and
    what would success look like? State non-goals when they prevent scope creep.
-2. Requirements / Journeys: the key capabilities and user workflows the product must support. Focus
-   on what design needs to solve, not implementation details. This section answers: what must the
-   product support, and what are the key things a user must be able to do?
-3. Decisions: the prioritized decisions that need to become clear enough to build from. This section
-   should mirror the structured `decisions` list in prose: what each decision is, why it matters,
-   what context or mock feedback is still needed, what has been learned, and which decisions are
-   resolved for now. Put approach exploration, sketch status, readiness, and remaining ambiguity
-   inside this Decisions section instead of creating separate sections.
+2. Requirements / Journeys / Constraints: the key capabilities, user workflows, and constraints the
+   product must support. Focus on what design needs to solve, not implementation details. This
+   section answers: what must the product support, what are the key things a user must be able to do, and what boundaries matter?
 
 ## Workflow
 
@@ -115,9 +118,8 @@ Complete these tasks every run:
    they don't. Treat them all as proposals to merge, not facts to copy.
 3. Update the PRD with the best new understanding based on #1 and #2:
    - keep confirmed context
-   - add useful requirements, journeys, constraints, decisions, and sketch learnings
-   - preserve pending, resolved, reopened, and deferred decision context around sketches that were created
-   - keep the PRD Decisions section aligned with the structured `decisions` list
+   - add useful requirements, journeys, constraints, and key context
+   - leave pending, resolved, reopened, and deferred decision state in `decisions`
    - merge duplicates
    - remove stale information the transcript or agent explorations have answered
    - preserve uncertainty when it still matters
@@ -127,6 +129,10 @@ Complete these tasks every run:
    - add learnings from user responses, mock feedback, codebase exploration, and justified inference
    - use context_to_gather for context that should be elicited by conversation
    - move decisions to `sketching` when mocks are the best way to gather evidence
+   - do not let intake stall in context-gathering: if the conversation has had roughly 2-4
+     substantive PM/founder turns and no unresolved decision is `sketching`, `awaiting_feedback`, or
+     `resolved`, promote the best current decision to `sketching` even if some context is still
+     missing. Mocks can gather evidence for a decision before requirements are complete.
    - move decisions to `resolved` when the learnings are strong enough to build from
    - reopen decisions when new user context contradicts earlier learnings
 5. Make the decision plan easy for the live intermediary to communicate:
@@ -173,9 +179,9 @@ When updating decisions about sketches:
 
 - Once sketches have started, keep the conversation centered on the current sketch decision. Do not
   return to unrelated backlog questions unless they block that decision.
-- Ignore any agent update that claims sketches are loading, loaded, failed, arriving, rendering, or
-  on the canvas unless `mock_generation_state.statuses` supports it. Intake agents can say they
-  tried to kick off sketches, but they are not authoritative about canvas status.
+- Treat `mock_generation_state` as the only authoritative source for sketch/canvas status. Agent
+  updates may record an attempt to call mock generation, but do not use them to claim sketches are
+  loading, loaded, failed, arriving, rendering, or on the canvas unless `mock_generation_state.statuses` supports it.
 - If `mock_generation_state.statuses` includes `failed`, keep or reopen the decision and add the
   context needed to decide what sketches would be useful next.
 - If `mock_generation_state.statuses` includes `loading`, keep the relevant decision in
