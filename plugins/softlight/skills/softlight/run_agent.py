@@ -97,7 +97,8 @@ def _completed_prompt_ids(
     return {
         str(event["prompt_id"])
         for event in events
-        if event.get("type") in {"prompt_succeeded", "prompt_failed", "prompt_completed"}
+        if event.get("type")
+        in {"prompt_succeeded", "prompt_failed", "prompt_completed"}
         and event.get("prompt_id") is not None
     }
 
