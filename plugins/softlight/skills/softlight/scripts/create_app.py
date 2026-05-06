@@ -167,5 +167,6 @@ def create_app(
     _create_main_tsx(output_dir)
     _create_app_tsx(output_dir)
     _install_dependencies(output_dir)
+    print(f"[clone_app] cloned app scaffold ready at {output_dir}")
 
     return output_dir
