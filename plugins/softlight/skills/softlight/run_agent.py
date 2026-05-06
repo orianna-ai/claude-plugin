@@ -2,16 +2,12 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
-import datetime
 import json
 import time
 import traceback
 import urllib.request
-import uuid
 from typing import Any
 
-from scripts.call_claude import call_claude
-from scripts.get_project import get_project
 from scripts.load_config import Config, load_config
 from scripts.post_events import post_events
 from scripts.post_transcripts import post_transcripts
@@ -101,8 +97,7 @@ def _completed_prompt_ids(
     return {
         str(event["prompt_id"])
         for event in events
-        if event.get("type")
-        in {"prompt_succeeded", "prompt_failed", "prompt_completed"}
+        if event.get("type") in {"prompt_succeeded", "prompt_failed", "prompt_completed"}
         and event.get("prompt_id") is not None
     }
 
@@ -164,186 +159,6 @@ def _dispatch_prompts(
             time.sleep(5)
 
             post_transcripts(config)
-
-
-def _created_at(
-    value: dict[str, Any],
-) -> datetime.datetime:
-    if created_at := value.get("metadata", {}).get("created_at"):
-        return datetime.datetime.fromisoformat(created_at.replace("Z", "+00:00"))
-    else:
-        return datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)
-
-
-def _mock_slot_status(
-    element: dict[str, Any] | None,
-) -> str | None:
-    if not isinstance(element, dict):
-        return None
-
-    element_type = element.get("type")
-    if element_type == "image":
-        return "loaded" if str(element.get("url") or "").strip() else "loading"
-    if element_type == "placeholder":
-        return "loading"
-    if element_type == "error":
-        return "failed"
-
-    return None
-
-
-def _is_mock_generation_prompt(
-    prompt: dict[str, Any],
-) -> bool:
-    return prompt.get("workflow") == "generate_mocks" or str(
-        prompt.get("key") or "",
-    ).startswith("generate_mock_revision:")
-
-
-def _mock_generation_state(
-    *,
-    events: list[dict[str, Any]],
-    project: dict[str, Any],
-    since: datetime.datetime,
-) -> dict[str, Any]:
-    touched_slots: dict[str, dict[str, Any]] = {}
-    mock_prompt_ids = {
-        prompt.get("metadata", {}).get("id")
-        for prompt in project.get("prompts") or []
-        if _is_mock_generation_prompt(prompt)
-    }
-    failures: list[dict[str, Any]] = []
-
-    for event in events:
-        if _created_at(event) <= since:
-            continue
-
-        event_type = event.get("type")
-        if event_type == "prompt_failed" and event.get("prompt_id") in mock_prompt_ids:
-            failures.append(
-                {
-                    "event_type": event_type,
-                    "event_created_at": event.get("metadata", {}).get("created_at"),
-                    "prompt_id": event.get("prompt_id"),
-                    "status": "failed",
-                },
-            )
-            continue
-
-        if event_type not in {"slot_created", "slot_updated"}:
-            continue
-
-        slot = event.get("slot") or {}
-        slot_id = (
-            slot.get("metadata", {}).get("id")
-            if event_type == "slot_created"
-            else event.get("slot_id")
-        )
-        if slot_id is None:
-            continue
-
-        touched_slots[str(slot_id)] = {
-            "event_type": event_type,
-            "event_created_at": event.get("metadata", {}).get("created_at"),
-            "slot_id": str(slot_id),
-        }
-
-    current_slots = {
-        str(slot.get("metadata", {}).get("id")): slot
-        for revision in project.get("revisions") or []
-        for slot in revision.get("slots") or []
-        if slot.get("metadata", {}).get("id") is not None
-    }
-    slot_updates = []
-    for slot_id, update in touched_slots.items():
-        status = _mock_slot_status((current_slots.get(slot_id) or {}).get("element"))
-        if status is not None:
-            slot_updates.append({**update, "status": status})
-
-    statuses = sorted(
-        {update["status"] for update in slot_updates}
-        | {failure["status"] for failure in failures},
-    )
-
-    return {
-        "since_discussion_created_at": since.isoformat(),
-        "statuses": statuses,
-        "slot_updates": slot_updates,
-        "failures": failures,
-        "has_loading": "loading" in statuses,
-        "has_loaded": "loaded" in statuses,
-        "has_failed": "failed" in statuses,
-    }
-
-
-def _steer_conversation(
-    config: Config,
-) -> None:
-    while True:
-        project = get_project(config)
-        events = _fetch_events(config)
-
-        discussion = project.get("discussion") or {}
-        discussion_created_at = _created_at(discussion)
-
-        proposed_discussions = [
-            proposed_dicussion
-            for proposed_dicussion in project.get("proposed_discussions") or []
-            if not discussion or _created_at(proposed_dicussion) > discussion_created_at
-        ]
-
-        call_claude(
-            prompt=[
-                """\
-Use the `steering-manager` skill to coalesce pending discussion updates for Softlight project
-${project_id}.
-
-<latest_state>
-${latest_state}
-</latest_state>
-
-<conversations>
-${conversations}
-</conversations>
-
-<agent_updates>
-${agent_updates}
-</agent_updates>
-
-<mock_generation_state>
-${mock_generation_state}
-</mock_generation_state>
-""",
-            ],
-            params={
-                "project_id": config.project_id,
-                "latest_state": json.dumps(discussion, indent=2),
-                "conversations": json.dumps(
-                    [
-                        {
-                            "room": conversation.get("room"),
-                            "messages": conversation.get("messages") or [],
-                        }
-                        for conversation in project.get("conversations") or []
-                    ],
-                    indent=2,
-                ),
-                "agent_updates": json.dumps(proposed_discussions, indent=2),
-                "mock_generation_state": json.dumps(
-                    _mock_generation_state(
-                        events=events,
-                        project=project,
-                        since=discussion_created_at,
-                    ),
-                    indent=2,
-                ),
-            },
-            config=config,
-            effort="medium",
-            fork_session=False,
-            model="sonnet",
-            session_id=f"steering_manager:{uuid.uuid4()}",
-        )
 
 
 def run_agent(

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime
 import json
 import uuid
 from typing import TYPE_CHECKING, Any, TypedDict
@@ -13,7 +12,6 @@ from scripts.post_events import post_events
 from workflows.base import Workflow, workflow
 from workflows.clone_app import clone_app
 from workflows.do_nothing import do_nothing
-from workflows.explore_codebase import explore_codebase
 from workflows.generate_mocks import generate_mocks
 
 if TYPE_CHECKING:
@@ -40,49 +38,10 @@ def _get_workflow_status(
     return None
 
 
-def _created_at(
-    value: dict[str, Any],
-) -> datetime.datetime:
-    if created_at := value.get("metadata", {}).get("created_at"):
-        return datetime.datetime.fromisoformat(created_at.replace("Z", "+00:00"))
-    return datetime.datetime.min.replace(tzinfo=datetime.timezone.utc)
-
-
-def _proposed_awaiting_feedback_decision_ids(
-    project: dict[str, Any],
-) -> set[str]:
-    discussion = project.get("discussion") or {}
-    discussion_created_at = _created_at(discussion)
-
-    awaiting_feedback_decision_ids: set[str] = set()
-    for proposed_discussion in project.get("proposed_discussions") or []:
-        if _created_at(proposed_discussion) <= discussion_created_at:
-            continue
-
-        for decision in proposed_discussion.get("decisions") or []:
-            decision_id = str(decision.get("id") or "")
-            if decision_id and decision.get("status") == "awaiting_feedback":
-                awaiting_feedback_decision_ids.add(decision_id)
-
-    return awaiting_feedback_decision_ids
-
-
 def _should_generate_mocks(
     project: dict[str, Any],
 ) -> bool:
-    if _get_workflow_status(project, generate_mocks) == "pending":
-        return False
-
-    discussion = project.get("discussion") or {}
-    decisions = discussion.get("decisions") or []
-    awaiting_feedback_decision_ids = _proposed_awaiting_feedback_decision_ids(project)
-
-    return any(
-        decision.get("status") == "sketching"
-        for decision in decisions
-        if decision.get("status") not in {"resolved", "deferred"}
-        and str(decision.get("id") or "") not in awaiting_feedback_decision_ids
-    )
+    return _get_workflow_status(project, generate_mocks) != "pending"
 
 
 def _candidate_workflows(
@@ -93,9 +52,6 @@ def _candidate_workflows(
 
     if _get_workflow_status(project, clone_app) not in {"pending", "success"}:
         yield clone_app
-
-    if _get_workflow_status(project, explore_codebase) not in {"pending", "success"}:
-        yield explore_codebase
 
 
 @workflow
