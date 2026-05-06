@@ -12,11 +12,12 @@ from scripts.post_events import post_events
 from workflows.base import Workflow, workflow
 from workflows.clone_app import clone_app
 from workflows.do_nothing import do_nothing
-from workflows.explore_codebase import explore_codebase
 from workflows.generate_mocks import generate_mocks
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
+
+_GENERATE_MOCK_REVISION_KEY_PREFIX = "generate_mock_revision:"
 
 
 class DispatchWorkflowParams(TypedDict):
@@ -28,23 +29,29 @@ def _get_workflow_status(
     workflow: Workflow,
 ) -> str | None:
     for prompt in reversed(project.get("prompts") or []):
+        if str(prompt.get("key") or "").startswith(_GENERATE_MOCK_REVISION_KEY_PREFIX):
+            continue
+
         if prompt.get("workflow") == workflow.name:
             return prompt.get("status")
 
     return None
 
 
+def _should_generate_mocks(
+    project: dict[str, Any],
+) -> bool:
+    return _get_workflow_status(project, generate_mocks) != "pending"
+
+
 def _candidate_workflows(
     project: dict[str, Any],
 ) -> Iterator[Workflow]:
-    if _get_workflow_status(project, generate_mocks) != "pending":
+    if _should_generate_mocks(project):
         yield generate_mocks
 
     if _get_workflow_status(project, clone_app) not in {"pending", "success"}:
         yield clone_app
-
-    if _get_workflow_status(project, explore_codebase) not in {"pending", "success"}:
-        yield explore_codebase
 
 
 @workflow

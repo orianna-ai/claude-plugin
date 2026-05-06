@@ -19,29 +19,7 @@ def generate_mocks(
     params: GenerateMocksParams,
 ) -> None:
     """
-    Use this tool when project.discussion.prd has enough context coverage to identify a concrete
-    design decisions that visual mocks could clarify. The criteria for calling this tool is as
-    follows:
-
-    Default to generating a first focused set of mocks after the user has answered roughly 2-4
-    substantive discovery questions, or sooner, even if there is a no clear Design Approaches
-    decision in the PRD that needs to be made. The tool can update the PRD as necessary. If a design
-    decision is ready in the PRD and no mocks have been generated yet, use this tool to generate the
-    first set of mocks for that decision.
-
-    If the PRD's Design Approaches section names a decision to explore, generate mocks for the next
-    most important design decision IF the user has reached the previous design decision related to
-    previous mocks added to the canvas.
-
-    If previous mocks were just generated or in progress, only call this tool again when the user
-    has reacted to the latest canvas to give feedback on a design decision that needs exploration.
-    If they have, then use this tool to generate the next set of mocks for the next design
-    decision.
-
-    Lastly, if a user explicitly asks to generate mocks or sketches, use this tool.
-
-    Do not wait for finalized requirements, a complete PRD, a complete Design Approaches section, or
-    a fully specified unresolved design decision.
+    Generate one focused set of sketches from the current intake transcript and screenshots.
     """
     project = get_project(config)
 
@@ -69,12 +47,7 @@ def generate_mocks(
     call_claude(
         prompt=[
             """\
-Use the `generate-mocks` skill to update the live intake state for Softlight project
-${project_id}.
-
-<latest_state>
-${latest_state}
-</latest_state>
+Use the `generate-mocks` skill to generate sketches for Softlight project ${project_id}.
 
 <conversations>
 ${conversations}
@@ -94,12 +67,11 @@ ${screenshots}
         ],
         params={
             "project_id": config.project_id,
-            "latest_state": json.dumps(project.get("discussion") or {}, indent=2),
             "conversations": json.dumps(conversations, indent=2),
             "screenshots": json.dumps(screenshots, indent=2),
         },
         config=config,
         effort="low",
-        model="opus",
+        model="sonnet",
         session_id=f"generate_mocks:{uuid.uuid4()}",
     )
