@@ -6,18 +6,28 @@ description: Create a Softlight project backed by a long-running agent.
 Do **not** ask the user any questions up front. The voice intake page collects
 the design context. Run the steps below in order.
 
-## 1. Open the voice intake page
+## 1. Setup the project
 
-Run this script — it generates a `<project_id>` and prints the `<intake_url>`.
+If the user invoked the skill with an argument, they want to **resume** that
+project. Pass the argument through verbatim. The script accepts a project
+ID (`b4f525d9-6858-4dcf-927e-5876b408da43`) or a project URL
+(`https://softlight.orianna.ai/projects/b4f525d9-6858-4dcf-927e-5876b408da43`).
+
+```bash
+python3 -m setup_project '<project_id_or_url>'
+```
+
+If the user invoked the skill with no argument, create a new project:
 
 ```bash
 python3 -m setup_project
 ```
 
-Open the `<intake_url>` in the user's browser:
+Both invocations output a `<project_id>` and `<redirect_url>`. Open the
+`<redirect_url>` in the user's browser:
 
 ```bash
-${BROWSER:-open} '<intake_url>' 2>/dev/null || xdg-open '<intake_url>' 2>/dev/null || true
+${BROWSER:-open} '<redirect_url>' 2>/dev/null || xdg-open '<redirect_url>' 2>/dev/null || true
 ```
 
 Then tell the user, in one short sentence: "Opened the intake — talk through
