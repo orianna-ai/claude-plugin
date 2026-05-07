@@ -181,8 +181,7 @@ context and preferences for how to approach solving the problem.
    solution to a subproblem. Use the app's source code and the transcript to figure out
    the UI details and key user journeys. Be thorough. It should not be ambiguous to the engineer what a user should be able to do and what the design change should look like. Ensure the
    prototype change follows the design system closely and looks like it is part of the
-   app. Reminder: good design is elegant. Only make UI changes you need to make. Don't
-   over-add UI. Make the solution elegantly fit into the existing experience.
+   app. Reminder: good design is elegant. Only make UI changes you need to make. It is essential that you don't over-add UI. Make the solution elegantly fit into the existing experience.
 7. Return the structured JSON handoff with exactly three prototype entries. Put each
    implementation doc / PRD in that prototype entry's `spec` field.
 
