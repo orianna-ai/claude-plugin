@@ -25,8 +25,6 @@ def clone_app(
 
     The source_code_dir must be a valid directory df"""
 
-    print("calling clone_app")
-    print(params)
     source_code_dir_value = str(params.get("source_code_dir") or "").strip() or "."
     source_code_dir = pathlib.Path(source_code_dir_value)
 
@@ -45,7 +43,7 @@ This is only a clone task. The problem statement is context for finding the rele
 screen/state to reproduce. Do not implement the requested feature, create design explorations,
 start a tunnel, publish to the canvas, or modify the source app.
 
-If source_code_dir is "." (fallback), first infer the most likely source app directory from the
+If source_code_dir is "." or empty, first infer the most likely source app directory from the
 repo and the problem context, then clone that app.
 
 <problem>
