@@ -1,11 +1,45 @@
 import concurrent.futures
-import uuid
-from typing import TypedDict
+import json
+from typing import Any, TypedDict
 
 from scripts.call_claude import call_claude
+from scripts.get_project import get_project
 from scripts.load_config import Config
 
 from workflows.base import workflow
+
+
+def _is_filtered_canvas_slot(
+    slot: dict[str, Any],
+) -> bool:
+    element = slot.get("element") or {}
+    element_type = element.get("type")
+
+    if element_type == "image":
+        return True
+
+    return element_type == "placeholder" and element.get("content_type") == "mock"
+
+
+def _filtered_canvas_context(
+    project: dict[str, Any],
+) -> dict[str, Any]:
+    revisions = []
+    for revision in project.get("revisions") or []:
+        slots = [
+            slot
+            for slot in revision.get("slots") or []
+            if not _is_filtered_canvas_slot(slot)
+        ]
+        revisions.append({**revision, "slots": slots})
+
+    return {
+        "metadata": project.get("metadata"),
+        "title": project.get("title"),
+        "baseline": project.get("baseline"),
+        "revisions": revisions,
+        "pull_requests": project.get("pull_requests") or [],
+    }
 
 
 class GeneratePrototypesParams(TypedDict):
@@ -20,7 +54,7 @@ def generate_prototypes(
     params: GeneratePrototypesParams,
 ) -> None:
     """Generate design prototype variants in the project from a brief or PM feedback."""
-    prompt_id = uuid.uuid4().hex
+    canvas_context = _filtered_canvas_context(get_project(config))
     feedback = params["feedback"].strip()
     feedback_section = (
         ""
@@ -45,13 +79,15 @@ ${feedback_section}\
 Use the `run-designer-codegen` skill to generate explorations in the project.
 
 <mode>${mode}</mode>
-<brief>${brief}</brief>
+<transcript>${transcript}</transcript>
+<canvas_context>${canvas_context}</canvas_context>
 """,
         ],
         params={
             "feedback_section": feedback_section,
             "mode": params["mode"],
-            "brief": params["brief"],
+            "transcript": params["brief"],
+            "canvas_context": json.dumps(canvas_context, indent=2),
         },
         config=config,
         effort="low",
@@ -60,15 +96,6 @@ Use the `run-designer-codegen` skill to generate explorations in the project.
             "properties": {
                 "project_id": {"type": "string"},
                 "baseline_dir": {"type": "string"},
-                "present_canvas": {
-                    "type": "object",
-                    "properties": {
-                        "thinking": {"type": "string"},
-                        "explorations_created": {"type": "string"},
-                    },
-                    "required": ["thinking", "explorations_created"],
-                    "additionalProperties": False,
-                },
                 "prototypes": {
                     "type": "array",
                     "items": {
@@ -86,7 +113,7 @@ Use the `run-designer-codegen` skill to generate explorations in the project.
                     },
                 },
             },
-            "required": ["project_id", "baseline_dir", "present_canvas", "prototypes"],
+            "required": ["project_id", "baseline_dir", "prototypes"],
             "additionalProperties": False,
         },
         model="opus",
@@ -94,37 +121,9 @@ Use the `run-designer-codegen` skill to generate explorations in the project.
     )
 
     with concurrent.futures.ThreadPoolExecutor(
-        max_workers=len(handoff["prototypes"]) + 1,
+        max_workers=len(handoff["prototypes"]),
     ) as executor:
         futures = []
-
-        futures.append(
-            executor.submit(
-                call_claude,
-                prompt=[
-                    """\
-Dispatch the `present-canvas` skill with these inputs.
-
-<project_id>${project_id}</project_id>
-<mode>${mode}</mode>
-<thinking>${thinking}</thinking>
-<explorations_created>${explorations_created}</explorations_created>
-""",
-                ],
-                params={
-                    "project_id": handoff["project_id"],
-                    "mode": params["mode"],
-                    "thinking": handoff["present_canvas"]["thinking"],
-                    "explorations_created": handoff["present_canvas"][
-                        "explorations_created"
-                    ],
-                },
-                config=config,
-                effort="low",
-                model="opus",
-                session_id=f"present_canvas:{prompt_id}",
-            ),
-        )
 
         for prototype in handoff["prototypes"]:
             futures.append(
