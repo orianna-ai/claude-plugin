@@ -26,7 +26,11 @@ def _filtered_canvas_context(
 ) -> dict[str, Any]:
     revisions = []
     for revision in project.get("revisions") or []:
-        slots = [slot for slot in revision.get("slots") or [] if not _is_filtered_canvas_slot(slot)]
+        slots = [
+            slot
+            for slot in revision.get("slots") or []
+            if not _is_filtered_canvas_slot(slot)
+        ]
         revisions.append({**revision, "slots": slots})
 
     return {
