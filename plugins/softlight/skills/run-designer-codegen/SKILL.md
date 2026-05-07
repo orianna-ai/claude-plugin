@@ -171,8 +171,8 @@ context and preferences for how to approach solving the problem.
 
    **Now study what you captured.** Before any design work, describe what you see in the
    screenshot in relation to what the PM told you. Code tells you what elements exist; the screenshot tells you how the
-   experience actually feels. Be thorough. Again, you need to make sure you have enouch product, design, and code context to inform your framings of the problem and design work that follows. Your framing and design work after this must be grounded in both these
-   visual observations and what you learned form the source code.
+   experience actually feels. Be thorough. Again, you need to make sure you have enough product, design, and code context to inform your framings of the problem and design work that follows. Your framing and design work after this must be grounded in both these
+   visual observations and what you learned from the source code.
 5. Create exactly one exploration with `count: 3`.
 6. Use the app's source code and the transcript to generate exactly three implementation
    docs for high-fidelity prototypes that solve the problem described in the transcript
