@@ -24,6 +24,9 @@ def clone_app(
     """Create a baseline clone of the user's app as a starting point for design exploration.
 
     The source_code_dir must be a valid directory df"""
+
+    print("calling clone_app")
+    print(params)
     source_code_dir_value = str(params.get("source_code_dir") or "").strip() or "."
     source_code_dir = pathlib.Path(source_code_dir_value)
 
