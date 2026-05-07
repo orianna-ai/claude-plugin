@@ -21,10 +21,12 @@ def clone_app(
     config: Config,
     params: CloneAppParams,
 ) -> None:
-    """Create a baseline clone of the user's app as a starting point for design exploration."""
-    source_code_dir = pathlib.Path(
-        params["source_code_dir"],
-    )
+    """Create a baseline clone of the user's app as a starting point for design exploration.
+
+    The source_code_dir must be a valid directory df"""
+
+    source_code_dir_value = str(params.get("source_code_dir") or "").strip() or "."
+    source_code_dir = pathlib.Path(source_code_dir_value)
 
     cloned_code_dir = create_app(
         source_code_dir=source_code_dir,
@@ -40,6 +42,9 @@ matches the source app as it exists right now.
 This is only a clone task. The problem statement is context for finding the relevant current
 screen/state to reproduce. Do not implement the requested feature, create design explorations,
 start a tunnel, publish to the canvas, or modify the source app.
+
+If source_code_dir is "." or empty, first infer the most likely source app directory from the
+repo and the problem context, then clone that app.
 
 <problem>
 ${problem}
