@@ -203,9 +203,7 @@ def call_claude(
                 content.append(
                     {
                         "type": "text",
-                        "text": string.Template(item)
-                        .safe_substitute(params or {})
-                        .strip(),
+                        "text": string.Template(item).safe_substitute(params or {}).strip(),
                     },
                 )
             elif isinstance(item, dict):
@@ -242,6 +240,7 @@ def call_claude(
             "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
             "CLAUDE_CODE_GLOB_NO_IGNORE": "false",
             "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
+            "MCP_CONNECTION_NONBLOCKING": "false",
             "MCP_TOOL_TIMEOUT": "300000",  # 5m
             "SOFTLIGHT_PROJECT_ID": config.project_id,
         },
