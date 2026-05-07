@@ -209,7 +209,7 @@ the feedback, create new PRD implementation specs, and return the structured han
    prototypes. Keep the specs focused on what should be built and what should be visible
    in the prototype.
 
-3. **Do the work.** Create the needed explorations, write each prototype's spec, and
+3. **Do the work.** Create exactly one exploration with `count: 3`, write each prototype's spec, and
    return the same structured handoff shape as the previous round: `project_id`,
    `baseline_dir`, and one entry in `prototypes` per slot. The app clone already exists
    in revision mode, so use the baseline source directory from `canvas_context` as
