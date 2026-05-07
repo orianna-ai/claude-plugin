@@ -26,11 +26,7 @@ def _filtered_canvas_context(
 ) -> dict[str, Any]:
     revisions = []
     for revision in project.get("revisions") or []:
-        slots = [
-            slot
-            for slot in revision.get("slots") or []
-            if not _is_filtered_canvas_slot(slot)
-        ]
+        slots = [slot for slot in revision.get("slots") or [] if not _is_filtered_canvas_slot(slot)]
         revisions.append({**revision, "slots": slots})
 
     return {
@@ -119,11 +115,6 @@ Use the `run-designer-codegen` skill to generate explorations in the project.
         model="opus",
         session_id="run_designer_codegen",
     )
-
-    if len(handoff["prototypes"]) != 3:
-        raise RuntimeError(
-            f"run-designer-codegen returned {len(handoff['prototypes'])} prototypes; expected 3",
-        )
 
     with concurrent.futures.ThreadPoolExecutor(
         max_workers=len(handoff["prototypes"]),
