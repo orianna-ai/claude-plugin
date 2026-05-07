@@ -62,29 +62,6 @@ ${cloned_code_dir}
         model="sonnet",
         effort="medium",
         session_id="clone_app",
-        tools=[
-            "Read",
-            "Write",
-            "Edit",
-            "MultiEdit",
-            "Glob",
-            "Grep",
-            "LS",
-            "Bash",
-        ],
-        allowed_tools=[
-            "Read",
-            "Write",
-            "Edit",
-            "MultiEdit",
-            "Glob",
-            "Grep",
-            "LS",
-            "Bash(pnpm install:*)",
-            "Bash(pnpm build:*)",
-            "Bash(mkdir:*)",
-            "Bash(cp:*)",
-        ],
     )
 
     tunnel_id = str(uuid.uuid4())
