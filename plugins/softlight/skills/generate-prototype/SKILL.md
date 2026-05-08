@@ -138,9 +138,7 @@ Data:
 - Hardcode any configuration values (don't use process.env).
 
 IMPORTANT: The code must represent the CURRENT state of the existing
-UI — how it looks TODAY, before any changes. Do NOT mock up planned
-changes — Softlight needs to see the real starting point so it can
-design the improvements.
+UI — how it looks TODAY, before any changes.
 
 # Workflow
 
