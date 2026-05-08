@@ -43,9 +43,7 @@ def _get_pending_prompts(
     events: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     completed_prompts = {
-        event["prompt_id"]
-        for event in events
-        if event.get("type") == "prompt_succeeded"
+        event["prompt_id"] for event in events if event.get("type") == "prompt_succeeded"
     }
 
     pending_prompts = [
@@ -146,6 +144,8 @@ def _update_prototype(
 ) -> None:
     prototype_dir = create_app()
 
+    time.sleep(30)
+
     project = get_project(config)
 
     call_claude(
@@ -177,6 +177,8 @@ Call the `generate-prototype` skill.
     )
 
     while True:
+        project = get_project(config)
+
         call_claude(
             config=config,
             prompt=[
