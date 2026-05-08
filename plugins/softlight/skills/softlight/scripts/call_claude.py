@@ -118,8 +118,6 @@ def call_claude(
         "claude",
         "-p",
         "--dangerously-skip-permissions",
-        "--disallowed-tools",
-        "AskUserQuestion",
         "--exclude-dynamic-system-prompt-sections",
         "--input-format",
         "stream-json",
@@ -176,13 +174,13 @@ def call_claude(
             ],
         )
 
-    if disallowed_tools:
-        cmd.extend(
-            [
-                "--disallowed-tools",
-                *disallowed_tools,
-            ],
-        )
+    cmd.extend(
+        [
+            "--disallowed-tools",
+            "AskUserQuestion",
+            *(disallowed_tools or []),
+        ],
+    )
 
     if json_schema:
         cmd.extend(
