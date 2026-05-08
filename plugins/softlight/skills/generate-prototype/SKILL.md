@@ -18,13 +18,7 @@ placeholder `src/App.tsx`, and has run `pnpm install`.
 
 # Output
 
-Your goal is to write the source code for a clone of the application described
-by the `<conversations>` into `<prototype_dir>` so it shows EXACTLY what a user
-would see if they opened the real application in their browser right now. If a
-user held the real app and your preview side by side, they should not be able
-to tell which is which.
-
-Your goal is to build a standalone prototype: a copy of the baseline app with design changes made directly in the source code. You will write that prototype into `<prototype_dir>`. It should look EXACTLY as if they opened the real application in the browser right now, but with a design change to address the design problem and approach found in `<conversations>`.
+Your goal is to build a standalone prototype: a copy of the baseline app with design changes made on top. You will write that prototype into `<prototype_dir>`. It should look EXACTLY as if they opened the real application in the browser right now, but with a design change to address the design problem and approach found in `<conversations>`.
 
 You are responsible for writing the application code into
 `<prototype_dir>/src/` and getting `pnpm build` (run from
