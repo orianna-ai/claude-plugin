@@ -20,7 +20,7 @@ The directory path of the previous prototype that you are editting. Start from t
 
 ## Workflow
 
-1. Use the existing prototype, the source code for the overall application, and the conversation to determine what design change is needed for the existing prototype
+1. Use the existing prototype, the source code for the overall application the prototype is meant to be based off of, and the conversation to determine what design change is needed for the existing prototype.
 
 2. Edit the prototype found at `<prototype_dir>` with those changes
 
