@@ -8,6 +8,9 @@ import traceback
 import urllib.request
 from typing import Any
 
+from scripts.call_claude import call_claude
+from scripts.create_app import create_app
+from scripts.get_project import get_project
 from scripts.load_config import Config, load_config
 from scripts.post_events import post_events
 from scripts.post_transcripts import post_transcripts
@@ -40,9 +43,7 @@ def _get_pending_prompts(
     events: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     completed_prompts = {
-        event["prompt_id"]
-        for event in events
-        if event.get("type") == "prompt_succeeded"
+        event["prompt_id"] for event in events if event.get("type") == "prompt_succeeded"
     }
 
     pending_prompts = [
@@ -138,6 +139,61 @@ def _upload_transcripts(
         post_transcripts(config)
 
 
+def _update_prototype(
+    config: Config,
+) -> None:
+    prototype_dir = create_app()
+
+    project = get_project(config)
+
+    call_claude(
+        config=config,
+        prompt=[
+            """\
+Call the `generate-prototype` skill.
+
+<conversations>${conversations}</conversations>
+<prototype_dir>${prototype_dir}</prototype_dir>
+""",
+        ],
+        params={
+            "prototype_dir": str(prototype_dir),
+            "conversations": json.dumps(project["conversations"], indent=2),
+        },
+        model="opus",
+        effort="low",
+    )
+
+    post_events(
+        config=config,
+        events=[
+            {
+                "type": "project_updated",
+                "prototype_dir": str(prototype_dir),
+            },
+        ],
+    )
+
+    while True:
+        call_claude(
+            config=config,
+            prompt=[
+                """\
+Call the `edit-prototype` skill.
+
+<conversations>${conversations}</conversations>
+<prototype_dir>${prototype_dir}</prototype_dir>
+""",
+            ],
+            params={
+                "prototype_dir": str(prototype_dir),
+                "conversations": json.dumps(project["conversations"], indent=2),
+            },
+            model="opus",
+            effort="low",
+        )
+
+
 def run_agent(
     *,
     project_id: str,
@@ -150,6 +206,7 @@ def run_agent(
         executor.submit(_dispatch_prompts, config)
         executor.submit(_emit_heartbeats, config)
         executor.submit(_upload_transcripts, config)
+        executor.submit(_update_prototype, config)
 
 
 def main() -> None:
