@@ -1,62 +1,46 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, overload
-
-from scripts.call_claude import call_claude
+import json
+import urllib.request
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from scripts.load_config import Config
 
 
-@overload
 def call_mcp(
     config: Config,
     tool: str,
-    input: dict[str, str],
+    arguments: dict[str, Any],
     *,
-    json_schema: dict[str, Any],
-    timeout: int | None = ...,
-) -> dict[str, Any]: ...
-
-
-@overload
-def call_mcp(
-    config: Config,
-    tool: str,
-    input: dict[str, str],
-    *,
-    json_schema: None = ...,
-    timeout: int | None = ...,
-) -> str: ...
-
-
-def call_mcp(
-    config: Config,
-    tool: str,
-    input: dict[str, str],
-    *,
-    json_schema: dict[str, Any] | None = None,
     timeout: int | None = None,
-) -> str | dict[str, Any]:
-    args = "\n".join(
-        [
-            "- `input`:",
-            *(f"    - `{k}`: {v}" for k, v in input.items()),
-        ],
-    )
+) -> dict[str, Any]:
+    with urllib.request.urlopen(
+        urllib.request.Request(
+            f"{config.base_url}/mcp/",
+            data=json.dumps(
+                {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "tools/call",
+                    "params": {"name": tool, "arguments": arguments},
+                },
+            ).encode(),
+            headers={
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+        ),
+        timeout=timeout,
+    ) as response:
+        payload = json.loads(response.read())
 
-    return call_claude(
-        config=config,
-        prompt=[
-            f"""\
-Call the `{tool}` MCP tool with these exact arguments:
-{args}
-""",
-        ],
-        allowed_tools=[tool],
-        effort="low",
-        fork_session=False,
-        json_schema=json_schema,
-        model="haiku",
-        tools=[],
-    )
+    if error := payload.get("error"):
+        raise RuntimeError(f"{tool} failed: {error.get('message', error)}")
+
+    result = payload["result"]
+
+    if result.get("isError"):
+        raise RuntimeError(f"{tool} failed: {result}")
+
+    return result["structuredContent"]
