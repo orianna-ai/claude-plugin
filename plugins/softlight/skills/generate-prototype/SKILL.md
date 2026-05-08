@@ -1,6 +1,6 @@
 ---
 name: generate-prototype
-description: "Clone elements of an existing application to demonstrate a design problem and to use as the basis for future design work."
+description: "Clone elements of an existing application and layer on a design change to solve a design problem in a prototype."
 ---
 
 # Input
@@ -138,7 +138,7 @@ Data:
 - Hardcode any configuration values (don't use process.env).
 
 IMPORTANT: The code must represent the CURRENT state of the existing
-UI — how it looks TODAY, before any changes.
+UI — how it looks TODAY for the parts that are not represented in the design change. For the design change, make it look like it is part of the app (use the design system).
 
 # Workflow
 
