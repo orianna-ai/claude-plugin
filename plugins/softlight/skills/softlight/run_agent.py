@@ -94,15 +94,6 @@ def _handle_prompt(
 def _dispatch_prompts(
     config: Config,
 ) -> None:
-    post_events(
-        config=config,
-        events=[
-            {
-                "type": "heartbeat",
-            },
-        ],
-    )
-
     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
         cursor = 0
 
@@ -121,16 +112,30 @@ def _dispatch_prompts(
 
             time.sleep(5)
 
-            post_transcripts(config)
 
-            post_events(
-                config=config,
-                events=[
-                    {
-                        "type": "heartbeat",
-                    },
-                ],
-            )
+def _emit_heartbeats(
+    config: Config,
+) -> None:
+    while True:
+        post_events(
+            config=config,
+            events=[
+                {
+                    "type": "heartbeat",
+                },
+            ],
+        )
+
+        time.sleep(30)
+
+
+def _upload_transcripts(
+    config: Config,
+) -> None:
+    while True:
+        time.sleep(10)
+
+        post_transcripts(config)
 
 
 def run_agent(
@@ -141,8 +146,10 @@ def run_agent(
 
     spawn_reaper(config)
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
         executor.submit(_dispatch_prompts, config)
+        executor.submit(_emit_heartbeats, config)
+        executor.submit(_upload_transcripts, config)
 
 
 def main() -> None:
