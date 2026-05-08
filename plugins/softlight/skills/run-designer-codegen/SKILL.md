@@ -20,6 +20,8 @@ You should receive:
 - `transcript`: for initial mode, this is the live design-jam transcript. Treat it as
   the primary requirements and product context.
 - `feedback`: for revision mode, this is the PM's requested follow-up, which was placed via comments on the canvas or on the prototypes in the canvas.
+- `baseline_dir`: the absolute path to the already-created app clone. The workflow has already
+  ensured clone-app completed before invoking you.
 - `canvas_context`: project context about what is on the canvas. It includes
   allowed canvas context such as prototypes, text, previous comments, and baseline data.
 
@@ -39,7 +41,7 @@ the workflow has already fetched and filtered the project context.
 Return a structured JSON object with these top-level keys:
 
 - `project_id` - the Softlight project id.
-- `baseline_dir` — the absolute path you saved from `clone-app-codegen`. The workflow passes
+- `baseline_dir` — the provided app clone path. The workflow passes
   this through to every prototype subagent unchanged; if it's missing, prototype generation
   has nothing to copy from.
 - `prototypes` - exactly three entries, one per prototype slot.
@@ -152,24 +154,13 @@ essential that the end prototypes look and feel like the existing app.
 context and preferences for how to approach solving the problem.
 2. Read the provided `<canvas_context>`. Existing prototypes are allowed. Generated
    sketches/mocks have already been filtered out.
-3. **Clone the app.** Dispatch the `clone-app-codegen` agent with the path to the application
-   source code for this design problem and the design problem. Pass `model: "sonnet"` on the Agent tool call — the cloning work is mechanical (read source, copy into a Vite scaffold, fix build errors, validate in browser) and does not need the parent session's Opus budget. The agent's
-   frontmatter declares `model: sonnet` too, but Claude Code currently ignores subagent
-   frontmatter `model` and inherits the parent's instead, so it must be passed at invocation
-   time.
+3. Use the provided `<baseline_dir>` as `baseline_dir`. Do not clone the app and do not dispatch
+   any clone-app agent from this skill.
+4. **Study the current experience screenshots.** The clone workflow has already captured baseline
+   screenshots and attached them to `canvas_context.baseline.screenshots`. Use those URLs in
+   `<images>` for every prototype subagent.
 
-   **This `model` override applies ONLY to `clone-app-codegen`.**
-
-   Wait for it to finish — it will return the port number, the directory path of the
-   baseline clone, and a `tunnel_id`. Save the directory path as `baseline_dir` — every
-   prototype subagent needs it. Save the `tunnel_id` — you'll use it for the project
-   baseline tunnel. On error, re-dispatch `clone-app-codegen` with the same
-   `model: "sonnet"` override.
-4. **Screenshot and analyze the current experience.** Open the browser (`create_session`,
-   resize to 1716x1065) and screenshot the key screen(s) relevant to the design problem.
-   You'll pass these URLs in `<images>` for every prototype subagent.
-
-   **Now study what you captured.** Before any design work, describe what you see in the
+   **Study what was captured.** Before any design work, describe what you see in the
    screenshot in relation to what the PM told you. Code tells you what elements exist; the screenshot tells you how the
    experience actually feels. Be thorough. Again, you need to make sure you have enough product, design, and code context to inform your framings of the problem and design work that follows. Your framing and design work after this must be grounded in both these
    visual observations and what you learned from the source code.

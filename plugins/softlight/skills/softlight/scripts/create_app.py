@@ -6,39 +6,30 @@ import tempfile
 
 def _create_package_json(
     output_dir: pathlib.Path,
-    source_code_dir: pathlib.Path,
 ) -> None:
-    source_package_json = next(
-        (
-            json.loads(package_json_path.read_text())
-            for dir in (source_code_dir, *source_code_dir.parents)
-            if (package_json_path := dir / "package.json")
-            if package_json_path.is_file()
-        ),
-        {},
-    )
-
-    package_json = json.dumps(
-        {
-            "name": "clone",
-            "private": True,
-            "version": "0.0.0",
-            "type": "module",
-            "scripts": {
-                "build": "tsc -b && vite build",
-                "preview": "vite preview --host 0.0.0.0",
-            },
-            "dependencies": {
-                **source_package_json.get("dependencies", {}),
-            },
-            "devDependencies": {
-                **source_package_json.get("devDependencies", {}),
-                "@vitejs/plugin-react": "^6.0.1",
-                "vite": "^8.0.9",
-            },
-        },
-        indent=2,
-    )
+    package_json = """\
+{
+  "name": "clone",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.9"
+  }
+}
+"""
 
     (output_dir / "package.json").write_text(package_json)
 
@@ -155,12 +146,10 @@ def _install_dependencies(
     )
 
 
-def create_app(
-    source_code_dir: pathlib.Path,
-) -> pathlib.Path:
+def create_app() -> pathlib.Path:
     output_dir = pathlib.Path(tempfile.mkdtemp(prefix="clone."))
 
-    _create_package_json(output_dir, source_code_dir)
+    _create_package_json(output_dir)
     _create_tsconfig_json(output_dir)
     _create_index_html(output_dir)
     _create_vite_config_ts(output_dir)

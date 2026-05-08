@@ -17,6 +17,12 @@ from workflows.base import WORKFLOWS
 _GENERATE_MOCK_REVISION_KEY_PREFIX = "generate_mock_revision:"
 
 
+def _is_clone_app_prompt(
+    prompt: dict[str, Any],
+) -> bool:
+    return prompt.get("workflow") == "clone_app"
+
+
 def _fetch_events(
     config: Config,
 ) -> list[dict[str, Any]]:
@@ -97,8 +103,7 @@ def _completed_prompt_ids(
     return {
         str(event["prompt_id"])
         for event in events
-        if event.get("type")
-        in {"prompt_succeeded", "prompt_failed", "prompt_completed"}
+        if event.get("type") in {"prompt_succeeded", "prompt_failed", "prompt_completed"}
         and event.get("prompt_id") is not None
     }
 
@@ -128,6 +133,7 @@ def _dispatch_prompts(
     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
         cursor = 0
         submitted_prompt_ids: set[str] = set()
+        clone_app_kickoff_seen = False
 
         while True:
             events = _fetch_events(config)
@@ -139,6 +145,11 @@ def _dispatch_prompts(
                         continue
 
                     prompt = event["prompt"]
+                    if _is_clone_app_prompt(prompt):
+                        if clone_app_kickoff_seen:
+                            continue
+                        clone_app_kickoff_seen = True
+
                     if not _should_dispatch_prompt(
                         prompt,
                         completed_prompt_ids=completed_prompt_ids,
