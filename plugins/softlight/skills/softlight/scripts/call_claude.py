@@ -61,6 +61,7 @@ def call_claude(
     prompt: list[str | dict[str, Any]],
     *,
     allowed_tools: list[str] | None = ...,
+    disallowed_tools: list[str] | None = ...,
     effort: _Effort | None = ...,
     fork_session: bool = ...,
     json_schema: dict[str, Any],
@@ -78,6 +79,7 @@ def call_claude(
     prompt: list[str | dict[str, Any]],
     *,
     allowed_tools: list[str] | None = ...,
+    disallowed_tools: list[str] | None = ...,
     effort: _Effort | None = ...,
     fork_session: bool = ...,
     json_schema: None = ...,
@@ -94,6 +96,7 @@ def call_claude(
     prompt: list[str | dict[str, Any]],
     *,
     allowed_tools: list[str] | None = None,
+    disallowed_tools: list[str] | None = None,
     effort: _Effort | None = None,
     fork_session: bool = True,
     json_schema: dict[str, Any] | None = None,
@@ -173,6 +176,14 @@ def call_claude(
             ],
         )
 
+    if disallowed_tools:
+        cmd.extend(
+            [
+                "--disallowed-tools",
+                *disallowed_tools,
+            ],
+        )
+
     if json_schema:
         cmd.extend(
             [
@@ -203,9 +214,7 @@ def call_claude(
                 content.append(
                     {
                         "type": "text",
-                        "text": string.Template(item)
-                        .safe_substitute(params or {})
-                        .strip(),
+                        "text": string.Template(item).safe_substitute(params or {}).strip(),
                     },
                 )
             elif isinstance(item, dict):

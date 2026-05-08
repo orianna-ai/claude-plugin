@@ -5,5 +5,5 @@
   "description": "Generate and implement design directions for product design problems. Explores alternatives, makes code changes, and wires the app so you can see results immediately.",
   "mcpServers": "./.mcp.json",
   "name": "softlight",
-  "version": "6.21.0"
+  "version": "6.22.0"
 }
