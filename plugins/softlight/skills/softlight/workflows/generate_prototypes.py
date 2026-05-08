@@ -1,4 +1,5 @@
 import pathlib
+import time
 import uuid
 from typing import TypedDict
 
@@ -24,24 +25,35 @@ def generate_prototypes(
         config=config,
     )
 
+    slot_id = str(uuid.uuid4())
+
     post_events(
         config=config,
         events=[
             {
                 "type": "slot_created",
-                "element": {
-                    "type": "placeholder",
-                    "content_type": "prototype",
+                "slot": {
+                    "element": {
+                        "type": "placeholder",
+                        "content_type": "prototype",
+                    },
+                    "metadata": {
+                        "id": slot_id,
+                    },
+                    "x": 0,
+                    "y": 0,
+                    "width": 0,
+                    "height": 0,
                 },
-                "x": 0,
-                "y": 0,
-                "width": 0,
-                "height": 0,
             },
         ],
     )
 
     while True:
+        project = get_project(
+            config=config,
+        )
+
         # TODO: maybe if there's a prototype in progress we should wait for it? maybe we should
         # trigger another one? we can figure it out when we get to that.
         if prototypes := project.get("prototypes"):
@@ -66,8 +78,11 @@ def generate_prototypes(
                             "screenshots": [],
                             "tunnel_id": tunnel_id,
                         },
+                        "slot_id": slot_id,
                     },
                 ],
             )
 
             return
+
+        time.sleep(5)
