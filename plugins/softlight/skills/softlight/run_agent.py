@@ -43,9 +43,7 @@ def _get_pending_prompts(
     events: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     completed_prompts = {
-        event["prompt_id"]
-        for event in events
-        if event.get("type") == "prompt_succeeded"
+        event["prompt_id"] for event in events if event.get("type") == "prompt_succeeded"
     }
 
     pending_prompts = [
@@ -166,6 +164,7 @@ Call the `generate-prototype` skill.
         },
         model="opus",
         effort="low",
+        session_id="generate_prototype",
     )
 
     post_events(
@@ -197,6 +196,7 @@ Call the `edit-prototype` skill.
             },
             model="opus",
             effort="low",
+            session_id="generate_prototype",
         )
 
 
