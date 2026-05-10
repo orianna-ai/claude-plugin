@@ -6,16 +6,11 @@ import json
 import time
 import traceback
 import urllib.request
-import uuid
 from typing import Any
 
-from scripts.call_claude import call_claude
-from scripts.create_app import create_app
-from scripts.get_project import get_project
 from scripts.load_config import Config, load_config
 from scripts.post_events import post_events
 from scripts.post_transcripts import post_transcripts
-from scripts.run_app import run_app
 from scripts.spawn_reaper import spawn_reaper
 from workflows.base import WORKFLOWS
 
@@ -45,9 +40,7 @@ def _get_pending_prompts(
     events: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     completed_prompts = {
-        event["prompt_id"]
-        for event in events
-        if event.get("type") == "prompt_succeeded"
+        event["prompt_id"] for event in events if event.get("type") == "prompt_succeeded"
     }
 
     pending_prompts = [
@@ -143,124 +136,6 @@ def _upload_transcripts(
         post_transcripts(config)
 
 
-def _update_prototype(
-    config: Config,
-) -> None:
-    prototype_dir = create_app()
-
-    post_events(
-        config=config,
-        events=[
-            {
-                "type": "project_updated",
-                "prototype_dir": str(prototype_dir),
-            },
-        ],
-    )
-
-    time.sleep(30)
-
-    project = get_project(config)
-
-    call_claude(
-        config=config,
-        prompt=[
-            """\
-Call the `generate-prototype` skill.
-
-<conversations>${conversations}</conversations>
-<prototype_dir>${prototype_dir}</prototype_dir>
-""",
-        ],
-        params={
-            "prototype_dir": str(prototype_dir),
-            "conversations": json.dumps(project["conversations"], indent=2),
-        },
-        model="opus",
-        effort="low",
-        session_id="generate_prototype",
-    )
-
-    tunnel_id = str(uuid.uuid4())
-
-    run_app(
-        config=config,
-        source_code_dir=prototype_dir,
-        tunnel_id=tunnel_id,
-    )
-
-    post_events(
-        config=config,
-        events=[
-            {
-                "type": "slot_created",
-                "slot": {
-                    "element": {
-                        "type": "iframe",
-                        "source_code_dir": str(prototype_dir),
-                        "tunnel_id": tunnel_id,
-                    },
-                    "x": 0,
-                    "y": 0,
-                    "width": 1720,
-                    "height": 1120,
-                },
-            },
-        ],
-    )
-
-    while True:
-        project = get_project(config)
-
-        call_claude(
-            config=config,
-            prompt=[
-                """\
-Call the `edit-prototype` skill.
-
-<conversations>${conversations}</conversations>
-<prototype_dir>${prototype_dir}</prototype_dir>
-""",
-            ],
-            params={
-                "prototype_dir": str(prototype_dir),
-                "conversations": json.dumps(project["conversations"], indent=2),
-            },
-            model="opus",
-            effort="low",
-            session_id="generate_prototype",
-        )
-
-        tunnel_id = str(uuid.uuid4())
-
-        run_app(
-            config=config,
-            source_code_dir=prototype_dir,
-            tunnel_id=tunnel_id,
-        )
-
-        post_events(
-            config=config,
-            events=[
-                {
-                    "type": "slot_created",
-                    "slot": {
-                        "element": {
-                            "type": "iframe",
-                            "source_code_dir": str(prototype_dir),
-                            "screenshots": [],
-                            "tunnel_id": tunnel_id,
-                        },
-                        "x": 0,
-                        "y": 0,
-                        "width": 1720,
-                        "height": 1120,
-                    },
-                },
-            ],
-        )
-
-
 def run_agent(
     *,
     project_id: str,
@@ -269,11 +144,10 @@ def run_agent(
 
     spawn_reaper(config)
 
-    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
         executor.submit(_dispatch_prompts, config)
         executor.submit(_emit_heartbeats, config)
         executor.submit(_upload_transcripts, config)
-        executor.submit(_update_prototype, config)
 
 
 def main() -> None:
