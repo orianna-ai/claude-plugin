@@ -35,6 +35,16 @@ def generate_prototype(
     )
 
     project = get_project(config)
+    spec = (project.get("spec") or "").strip()
+    design_context = (
+        f"<spec>{spec}</spec>"
+        if spec
+        else (
+            f"<conversations>"
+            f"{json.dumps(project.get('conversations', []), indent=2)}"
+            f"</conversations>"
+        )
+    )
 
     call_claude(
         config=config,
@@ -42,13 +52,13 @@ def generate_prototype(
             """\
 Call the `generate-prototype` skill.
 
-<conversations>${conversations}</conversations>
+${design_context}
 <prototype_dir>${prototype_dir}</prototype_dir>
 """,
         ],
         params={
             "prototype_dir": str(prototype_dir),
-            "conversations": json.dumps(project["conversations"], indent=2),
+            "design_context": design_context,
         },
         model="opus",
         effort="low",

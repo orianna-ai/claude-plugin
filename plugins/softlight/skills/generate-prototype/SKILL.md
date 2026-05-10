@@ -9,6 +9,10 @@ description: "Clone elements of an existing application and layer on a design ch
 
 A conversation between a PM and a designer, describing the product problem and approaches for solving the problem.
 
+## `<spec>`
+
+Optional. A PRD/design brief for the prototype. If this is present, treat it as the primary implementation brief. Use `<conversations>` only as fallback context.
+
 ## `<prototype_dir>`
 
 Absolute path to the pre-scaffolded clone project. Write all your output here.
@@ -18,7 +22,7 @@ placeholder `src/App.tsx`, and has run `pnpm install`.
 
 # Output
 
-Your goal is to build a standalone prototype: a copy of the baseline app with design changes made on top. You will write that prototype into `<prototype_dir>`. It should look EXACTLY as if they opened the real application in the browser right now, but with a design change to address the design problem and approach found in `<conversations>`.
+Your goal is to build a standalone prototype: a copy of the baseline app with design changes made on top. You will write that prototype into `<prototype_dir>`. It should look EXACTLY as if they opened the real application in the browser right now, but with a design change to address the design problem and approach found in `<spec>` if present, otherwise `<conversations>`.
 
 You are responsible for writing the application code into
 `<prototype_dir>/src/` and getting `pnpm build` (run from
@@ -144,7 +148,7 @@ UI — how it looks TODAY for the parts that are not represented in the design c
 
 # 1. Write the code to make the app look the same as it does today, with the most relevant design change to solve the product problem
 
-First find the source code for the overall app that you are prototyping off of. Then figure out the initial design change to be made. Then make that clone + design change on top in the `prototype_dir`.
+First find the source code for the overall app that you are prototyping off of. Then figure out the initial design change from `<spec>` if present, otherwise from `<conversations>`. Then make that clone + design change on top in the `prototype_dir`.
 
 Write all the code for the application into `src/`. Generate all TypeScript
 code for the clone in one `.tsx` file (replacing the placeholder
