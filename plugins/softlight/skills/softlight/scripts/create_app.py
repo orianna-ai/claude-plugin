@@ -102,15 +102,10 @@ def _create_main_tsx(
     output_dir: pathlib.Path,
 ) -> None:
     main_tsx = """\
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App'
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+createRoot(document.getElementById('root')!).render(<App />)
 """
 
     src_dir = output_dir / "src"
@@ -122,9 +117,11 @@ def _create_app_tsx(
     output_dir: pathlib.Path,
 ) -> None:
     app_tsx = """\
-export function App() {
-  return <div>Clone</div>
+function App() {
+  return null;
 }
+
+export default App;
 """
 
     src_dir = output_dir / "src"
