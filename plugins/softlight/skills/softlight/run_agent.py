@@ -6,13 +6,18 @@ import json
 import time
 import traceback
 import urllib.request
-from typing import Any
+from typing import TYPE_CHECKING, Any, Literal
 
 from scripts.load_config import Config, load_config
 from scripts.post_events import post_events
 from scripts.post_transcripts import post_transcripts
 from scripts.spawn_reaper import spawn_reaper
 from workflows.base import WORKFLOWS
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+AgentTask = Literal["dispatch_prompts", "emit_heartbeats", "upload_transcripts"]
 
 
 def _fetch_events(
@@ -57,10 +62,27 @@ def _get_pending_prompts(
     return pending_prompts
 
 
+def _post_prompt_started(config: Config, prompt: dict[str, Any]) -> None:
+    try:
+        post_events(
+            config=config,
+            events=[
+                {
+                    "type": "prompt_started",
+                    "prompt_id": prompt["metadata"]["id"],
+                },
+            ],
+        )
+    except Exception:
+        traceback.print_exc()
+
+
 def _handle_prompt(
     config: Config,
     prompt: dict[str, Any],
 ) -> None:
+    _post_prompt_started(config, prompt)
+
     try:
         if workflow := WORKFLOWS.get(prompt["workflow"]):
             workflow.call(config, prompt.get("params") or {})
@@ -138,6 +160,58 @@ def _upload_transcripts(
         post_transcripts(config)
 
 
+def _post_agent_task_failed(
+    config: Config,
+    *,
+    error: str,
+    restart_count: int,
+    task: AgentTask,
+) -> None:
+    try:
+        post_events(
+            config=config,
+            events=[
+                {
+                    "type": "agent_task_failed",
+                    "task": task,
+                    "error": error,
+                    "restart_count": restart_count,
+                },
+            ],
+        )
+    except Exception:
+        traceback.print_exc()
+
+
+def _run_restartable_task(
+    config: Config,
+    *,
+    task: AgentTask,
+    target: Callable[[Config], None],
+) -> None:
+    """Run a long-lived agent task, restarting it with backoff if it crashes."""
+    restart_count = 0
+
+    while True:
+        try:
+            target(config)
+        except Exception:
+            error = traceback.format_exc()
+            traceback.print_exc()
+        else:
+            error = "Task exited without raising an exception"
+
+        restart_count += 1
+        _post_agent_task_failed(
+            config,
+            error=error,
+            restart_count=restart_count,
+            task=task,
+        )
+
+        time.sleep(min(60, 2 ** min(restart_count, 6)))
+
+
 def run_agent(
     *,
     project_id: str,
@@ -147,9 +221,24 @@ def run_agent(
     spawn_reaper(config)
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-        executor.submit(_dispatch_prompts, config)
-        executor.submit(_emit_heartbeats, config)
-        executor.submit(_upload_transcripts, config)
+        executor.submit(
+            _run_restartable_task,
+            config,
+            task="dispatch_prompts",
+            target=_dispatch_prompts,
+        )
+        executor.submit(
+            _run_restartable_task,
+            config,
+            task="emit_heartbeats",
+            target=_emit_heartbeats,
+        )
+        executor.submit(
+            _run_restartable_task,
+            config,
+            task="upload_transcripts",
+            target=_upload_transcripts,
+        )
 
 
 def main() -> None:
