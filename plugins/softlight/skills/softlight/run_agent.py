@@ -62,10 +62,7 @@ def _get_pending_prompts(
     return pending_prompts
 
 
-def _handle_prompt(
-    config: Config,
-    prompt: dict[str, Any],
-) -> None:
+def _post_prompt_started(config: Config, prompt: dict[str, Any]) -> None:
     try:
         post_events(
             config=config,
@@ -76,7 +73,17 @@ def _handle_prompt(
                 },
             ],
         )
+    except Exception:
+        traceback.print_exc()
 
+
+def _handle_prompt(
+    config: Config,
+    prompt: dict[str, Any],
+) -> None:
+    _post_prompt_started(config, prompt)
+
+    try:
         if workflow := WORKFLOWS.get(prompt["workflow"]):
             workflow.call(config, prompt.get("params") or {})
         else:
