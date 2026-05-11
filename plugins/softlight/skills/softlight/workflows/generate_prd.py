@@ -52,7 +52,7 @@ Return structured output matching the provided JSON schema.
         },
         json_schema=_SPEC_SCHEMA,
         model="opus",
-        effort="low",
+        effort="xhigh",
         session_id="generate_prd",
     )
 
