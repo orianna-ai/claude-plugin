@@ -62,6 +62,16 @@ def _handle_prompt(
     prompt: dict[str, Any],
 ) -> None:
     try:
+        post_events(
+            config=config,
+            events=[
+                {
+                    "type": "prompt_started",
+                    "prompt_id": prompt["metadata"]["id"],
+                },
+            ],
+        )
+
         if workflow := WORKFLOWS.get(prompt["workflow"]):
             workflow.call(config, prompt.get("params") or {})
         else:
