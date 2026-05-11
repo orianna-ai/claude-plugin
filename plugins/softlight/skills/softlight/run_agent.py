@@ -191,16 +191,18 @@ def _run_restartable_task(
         except Exception:
             error = traceback.format_exc()
             traceback.print_exc()
+        else:
+            error = "Task exited without raising an exception"
 
-            restart_count += 1
-            _post_agent_task_failed(
-                config,
-                error=error,
-                restart_count=restart_count,
-                task=task,
-            )
+        restart_count += 1
+        _post_agent_task_failed(
+            config,
+            error=error,
+            restart_count=restart_count,
+            task=task,
+        )
 
-            time.sleep(min(60, 2 ** min(restart_count, 6)))
+        time.sleep(min(60, 2 ** min(restart_count, 6)))
 
 
 def run_agent(
