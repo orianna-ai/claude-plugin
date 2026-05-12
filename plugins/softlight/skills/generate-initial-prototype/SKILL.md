@@ -146,13 +146,22 @@ UI — how it looks TODAY for the parts that are not represented in the design c
 
 # 1. Write the code to make the app look the same as it does today, with the most relevant design change to solve the product problem
 
-First find the source code for the overall app that you are prototyping off of. Then figure out the initial design change from `<spec>`. Then make that clone + design change on top in the `prototype_dir`.
+1. Find the source code for the overall app that you are prototyping off of.
 
-Write all the code for the application into `src/`. Generate all TypeScript
-code for the clone in one `.tsx` file (replacing the placeholder
-`src/App.tsx`) and generate all CSS styles for the clone in one `.css`
-file. This limits the number of tool calls required to generate the
-application and reduces the likelihood of import errors.
+2. Figure out the initial design change from `<spec>`.
+
+3. Use the Read tool to read all existing files in `<prototype_dir>`. The
+   harness has pre-populated `<prototype_dir>` with `index.html`,
+   `src/main.tsx`, `src/App.tsx`, and other files. You MUST use the Read
+   tool to read each of these files to avoid "File has not been read yet"
+   errors in the following step.
+
+4. Write all the code for the application into `<prototype_dir>/src/`.
+   Generate all TypeScript code for the clone in one `.tsx` file
+   (replacing the placeholder `src/App.tsx`) and generate all CSS styles
+   for the clone in one `.css` file. This limits the number of tool calls
+   required to generate the application and reduces the likelihood of
+   import errors.
 
 # 2. Make the build pass
 
