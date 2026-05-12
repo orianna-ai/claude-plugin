@@ -1,13 +1,17 @@
+from __future__ import annotations
+
 import json
 import uuid
-from typing import Any, TypedDict
+from typing import TYPE_CHECKING, Any, TypedDict
 
 from scripts.call_claude import call_claude
 from scripts.get_project import get_project
-from scripts.load_config import Config
 from scripts.post_events import post_events
 
 from workflows.base import workflow
+
+if TYPE_CHECKING:
+    from scripts.load_config import Config
 
 
 class GeneratePrdParams(TypedDict):
@@ -29,10 +33,22 @@ _SPEC_SCHEMA = {
 
 def generate_prd_spec(
     *,
+    approach: str | None = None,
     config: Config,
     conversations: list[dict[str, Any]],
     session_id: str,
 ) -> str:
+    approach_section = (
+        ""
+        if not approach
+        else f"""\
+Use this approach/theme as the direction for this PRD. Treat it as the theme to follow when
+determining the design work:
+
+<approach>{approach}</approach>
+
+"""
+    )
     result = call_claude(
         config=config,
         prompt=[
@@ -41,13 +57,16 @@ Call the `generate-prd` skill.
 
 Return structured output matching the provided JSON schema.
 
+${approach_section}\
 <conversations>${conversations}</conversations>
 """,
         ],
         params={
+            "approach_section": approach_section,
             "conversations": json.dumps(conversations, indent=2),
         },
         json_schema=_SPEC_SCHEMA,
+        fork_session=False,
         model="opus",
         effort="xhigh",
         session_id=session_id,

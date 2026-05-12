@@ -34,6 +34,7 @@ ${design_context}
             "prototype_dir": str(prototype_dir),
             "design_context": design_context,
         },
+        fork_session=False,
         model="opus",
         effort="low",
         session_id=session_id,
