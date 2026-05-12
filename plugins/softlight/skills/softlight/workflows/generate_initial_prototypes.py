@@ -14,7 +14,7 @@ from scripts.run_app import run_app
 
 from workflows.base import workflow
 from workflows.generate_initial_prototype import generate_initial_prototype_app
-from workflows.generate_prd import generate_prd_spec
+from workflows.generate_prd import generate_prd_spec, transcript_conversations
 
 if TYPE_CHECKING:
     from scripts.load_config import Config
@@ -33,10 +33,6 @@ class InitialPrototypeApproach(TypedDict):
 _APPROACH_SCHEMA = {
     "type": "object",
     "properties": {
-        "title": {
-            "type": "string",
-            "description": "Short title for the three-prototype exploration.",
-        },
         "approaches": {
             "type": "array",
             "items": {
@@ -56,7 +52,7 @@ _APPROACH_SCHEMA = {
             },
         },
     },
-    "required": ["title", "approaches"],
+    "required": ["approaches"],
     "additionalProperties": False,
 }
 
@@ -90,14 +86,13 @@ def _generate_approaches(
     config: Config,
     conversations: list[dict[str, Any]],
     run_id: str,
-) -> tuple[str, list[InitialPrototypeApproach | None]]:
+) -> list[InitialPrototypeApproach | None]:
     try:
         result = call_claude(
             config=config,
             prompt=[
                 """\
-Generate a concise title and exactly three approaches/themes for an initial Softlight design
-exploration.
+Generate exactly three approaches/themes for an initial Softlight design exploration.
 
 Approach 1 should be the most straightforward way a strong designer would solve the problem.
 Approaches 2 and 3 should be the next things a strong designer would try to test the biggest
@@ -111,7 +106,10 @@ Return structured output matching the provided JSON schema.
 """,
             ],
             params={
-                "conversations": json.dumps(conversations, indent=2),
+                "conversations": json.dumps(
+                    transcript_conversations(conversations),
+                    indent=2,
+                ),
             },
             json_schema=_APPROACH_SCHEMA,
             fork_session=False,
@@ -120,16 +118,15 @@ Return structured output matching the provided JSON schema.
             session_id=f"generate_initial_prototype_approaches:{run_id}",
         )
     except Exception:
-        return "Initial prototypes", [None, None, None]
+        return [None, None, None]
 
-    title = result.get("title", "").strip() or "Initial prototypes"
     approaches = [
         approach
         for approach in result.get("approaches", [])
         if approach.get("title", "").strip() or approach.get("description", "").strip()
     ]
 
-    return title, [*approaches[:3], None, None, None][:3]
+    return [*approaches[:3], None, None, None][:3]
 
 
 def _format_approach(
@@ -242,24 +239,17 @@ def generate_initial_prototypes(
     )
     slot_ids = exploration["slot_ids"]
     caption_slot_ids = exploration.get("caption_slot_ids", [])
-    title_slot_id = exploration["title_slot_id"]
 
     project = get_project(config=config)
     conversations = _conversations_for_prd(
         brief=brief,
         conversations=project.get("conversations", []),
     )
-    exploration_title, approaches = _generate_approaches(
+    approaches = _generate_approaches(
         config=config,
         conversations=conversations,
         run_id=run_id,
     )
-    if exploration_title != "Initial prototypes":
-        _update_text_slot(
-            config=config,
-            slot_id=title_slot_id,
-            text=exploration_title,
-        )
 
     def generate_prd_for_slot(index: int) -> dict[str, Any]:
         approach = approaches[index]

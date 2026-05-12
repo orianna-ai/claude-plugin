@@ -31,6 +31,15 @@ _SPEC_SCHEMA = {
 }
 
 
+def transcript_conversations(
+    conversations: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    return [
+        {key: value for key, value in conversation.items() if key != "screenshots"}
+        for conversation in conversations
+    ]
+
+
 def generate_prd_spec(
     *,
     approach: str | None = None,
@@ -63,7 +72,10 @@ ${approach_section}\
         ],
         params={
             "approach_section": approach_section,
-            "conversations": json.dumps(conversations, indent=2),
+            "conversations": json.dumps(
+                transcript_conversations(conversations),
+                indent=2,
+            ),
         },
         json_schema=_SPEC_SCHEMA,
         fork_session=False,
