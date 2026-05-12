@@ -1,4 +1,5 @@
 import json
+import uuid
 from typing import Any, TypedDict
 
 from scripts.call_claude import call_claude
@@ -65,12 +66,13 @@ def generate_prd(
     params: GeneratePrdParams,
 ) -> None:
     """Generate or update the project-level PRD/design brief."""
+    run_id = str(uuid.uuid4())
     project = get_project(config)
 
     spec = generate_prd_spec(
         config=config,
         conversations=project.get("conversations", []),
-        session_id="generate_prd",
+        session_id=f"generate_prd:{run_id}",
     )
 
     post_events(
