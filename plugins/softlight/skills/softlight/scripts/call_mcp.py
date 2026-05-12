@@ -45,6 +45,7 @@ def call_mcp(
             headers={
                 "Content-Type": "application/json",
                 "Accept": "application/json, text/event-stream",
+                "User-Agent": "claude-code",
             },
         ),
         timeout=timeout,
