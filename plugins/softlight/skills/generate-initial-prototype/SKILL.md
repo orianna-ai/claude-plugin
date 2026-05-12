@@ -142,6 +142,97 @@ Data:
 IMPORTANT: The code must represent the CURRENT state of the existing
 UI — how it looks TODAY for the parts that are not represented in the design change. For the design change, make it look like it is part of the app (use the design system).
 
+# Apply baseline design taste
+
+The decision and the framing you pass downstream should respect these defaults. They are
+grounded primarily in Luke Wroblewski's research and writing at [lukew.com](https://www.lukew.com/) —
+the canonical practitioner reference for forms, primary actions, visual organization, response
+time, and progressive feedback. Use them to rule out non-decisions (which usually have one
+obvious answer once you name the pattern) and to give the sketching agent shared vocabulary.
+
+- **Hierarchy** — take an opinion. Catalogue the information and actions on the screen, then
+  rank them: primary, secondary, tertiary. LukeW's framing: the primary action carries
+  stronger visual weight than every other element on the screen and "illuminates a path" for
+  the user toward completion. Secondary actions get less weight so they don't compete; rarely-
+  used tertiary actions can be hidden until needed. Use size, contrast, placement, and spacing
+  to encode importance — not just color. Sketches should make it obvious what the user sees
+  first, second, third.
+  Sources: [LukeW — Primary & Secondary Actions in Web Forms](https://www.lukew.com/ff/entry.asp?571=),
+  [LukeW — Previous and Next Actions in Web Forms](https://www.lukew.com/ff/entry.asp?730),
+  [LukeW — Visible Narratives: Understanding Visual Organization](https://www.lukew.com/ff/entry.asp?981),
+  [LukeW — The Three Aspects of Visual Design](https://www.lukew.com/ff/entry.asp?42=).
+
+- **Form validation and feedback** — show feedback as a two-way conversation, not a post-hoc
+  audit. LukeW's research with Etre (2009) on inline validation found real-time feedback on
+  blur improved success rates by 22%, cut errors by 22%, raised satisfaction by 31%, and cut
+  completion time by 42%. Rules that hold up:
+  - Field-level errors live next to the field that caused them, in plain language, with the
+    fix stated.
+  - Trigger on blur, not on every keystroke. First keystrokes are always "invalid"; that
+    interruption is hostile.
+  - State constraints (length, format, required fields) up front so the user knows the rules
+    before they type — don't reveal them only on failure.
+  - For long or sensitive forms, real-time feedback also confirms *valid* answers, not just
+    flags errors.
+  Sources: [LukeW — Testing Real Time Feedback in Web Forms (Etre study)](https://www.lukew.com/ff/entry.asp?883=),
+  [LukeW — Inline Validation in Web Forms (A List Apart)](https://alistapart.com/article/inline-validation-in-web-forms/),
+  [LukeW — Web Form Design: Best Practices (PDF)](https://static.lukew.com/webforms_lukew.pdf),
+  [LukeW — Web Form Design (book)](https://www.lukew.com/resources/web_form_design.asp).
+
+- **Loading and progress** — focus on progress, not waiting. LukeW's argument: spinners draw
+  attention to the clock ticking down. Skeleton screens and content-first transitions draw
+  attention to what's about to appear. Match the indicator to the wait:
+  - **< 1s**: no indicator. Looped animations under a second add noise without information.
+  - **1–10s, content with known shape** (lists, cards, dashboards, detail pages): skeleton
+    screen — communicates *what* is loading, not just *that* something is loading.
+  - **2–10s, contextual or in-component** (button save, auth, payment): inline spinner.
+  - **> 10s**: determinate progress bar with percentage, step count, or estimated time.
+    Indeterminate spinners past 10s make users doubt the system is still working.
+  Sources: [LukeW — Mobile Design Details: Avoid The Spinner](https://www.lukew.com/ff/entry.asp?1797=),
+  [LukeW — Web Form Design: Best Practices (PDF)](https://static.lukew.com/webforms_lukew.pdf).
+
+- **Modals / overlays** — reserve for consequential, actionable decisions: destructive or
+  irreversible actions, risk of data loss, focused tasks that must be completed or abandoned
+  before continuing. LukeW's "Overlays in Web Forms" gives concrete examples (additional
+  inputs, confirmation flows, secondary tasks) and is clear that overlays should *not*
+  replace a real screen for primary tasks. Never use a modal for navigation or purely
+  informational content.
+  Sources: [LukeW — Overlays in Web Forms](https://www.lukew.com/ff/entry.asp?999=),
+  [LukeW — Inline Contextual Actions](https://www.lukew.com/ff/entry.asp?246).
+
+- **Toasts / snackbars** — brief, non-interruptive feedback the user does not have to act on
+  (saved, sent, copied, undo-after-action). Never for errors that need action, never for
+  content the user must read to continue. LukeW's framing of feedback as a "two-way
+  conversation" applies here too: a toast is a confirmation, not a place to hide a problem.
+  If the message has two or more actions, or it's important enough to block the screen, it's
+  not a toast — it's a dialog.
+  Sources: [LukeW — Web Form Design: Best Practices (PDF, "feedback and confirmation")](https://static.lukew.com/webforms_lukew.pdf),
+  [Material 3 — Snackbar guidelines (for component-level rules LukeW doesn't cover)](https://m3.material.io/components/snackbar/guidelines).
+
+- **Empty states / the creation chasm** — turn a blank screen into a path forward. LukeW
+  frames this as "the creation chasm" — the gap between an empty document/list/canvas and
+  the user's first useful action. The job of an empty state is to bridge that chasm with a
+  clear explanation of what will appear here and a prominent primary action that unblocks the
+  user. If there are multiple options, one is unambiguously primary. An empty state without a
+  next step is a bug.
+  Sources: [LukeW — Let the AI do the Onboarding (the creation chasm)](https://www.lukew.com/ff/entry.asp?2130=),
+  [LukeW — Tackling Common UX Hurdles with AI](https://www.lukew.com/ff/entry.asp?2132=),
+  [LukeW — articles tagged Onboarding](https://www.lukew.com/ff?tag=onboarding).
+
+- **Realistic density** — design with real content, across the full spectrum: empty → few →
+  many → overflow. LukeW's argument: dummy data and Lorem Ipsum are a veil between the
+  designer and reality — an elegant mock can quickly bloat with unexpected content or break
+  under the weight of actual activity. Use real (or LLM-generated, plausible) content so the
+  sketch reflects what the app must endure: long names, missing fields, seven columns instead
+  of five, fifty rows instead of three. Stress-test the layout with the messy version of the
+  data, not the photoshoot version.
+  Sources: [LukeW — Death to Lorem Ipsum](https://www.lukew.com/ff/entry.asp?927=),
+  [LukeW — The Death of Lorem Ipsum (AI-era update)](https://www.lukew.com/ff/entry.asp?2071=),
+  [Basecamp — Getting Real: Use Real Words](https://basecamp.com/gettingreal/11.4-use-real-words).
+- **Relevant states** — include empty / error / in-progress states only when they meaningfully
+  change the decision being explored. Don't dilute the sketch with states that don't move the
+  question forward.
+
 # Workflow
 
 # 1. Write the code to make the app look the same as it does today, with the most relevant design change to solve the product problem
