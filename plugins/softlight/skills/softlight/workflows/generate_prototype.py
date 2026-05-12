@@ -60,16 +60,6 @@ def generate_prototype(
     """Create a baseline clone of the user's app as a starting point for design exploration."""
     prototype_dir = create_app()
 
-    post_events(
-        config=config,
-        events=[
-            {
-                "type": "project_updated",
-                "prototype_dir": str(prototype_dir),
-            },
-        ],
-    )
-
     project = get_project(config)
     spec = (project.get("spec") or "").strip()
     exploration = call_mcp(

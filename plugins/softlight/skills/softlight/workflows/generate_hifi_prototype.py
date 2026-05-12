@@ -1,5 +1,5 @@
 import uuid
-from typing import TypedDict
+from typing import Any, TypedDict
 
 from scripts.call_mcp import call_mcp
 from scripts.create_app import create_app
@@ -18,6 +18,30 @@ class GenerateHifiPrototypeParams(TypedDict, total=False):
     runId: str
 
 
+def _conversations_for_prd(
+    *,
+    brief: str,
+    conversations: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    if any(conversation.get("messages") for conversation in conversations):
+        return conversations
+    if not brief:
+        return conversations
+    return [
+        {
+            "room": "exported-transcript",
+            "messages": [
+                {
+                    "role": "user",
+                    "text": brief,
+                    "timestamp": 0.0,
+                },
+            ],
+            "screenshots": [],
+        },
+    ]
+
+
 @workflow
 def generate_hifi_prototype(
     config: Config,
@@ -25,11 +49,16 @@ def generate_hifi_prototype(
 ) -> None:
     """Generate one PRD-backed high-fidelity prototype in the project."""
     run_id = params.get("runId") or str(uuid.uuid4())
+    brief = params.get("brief", "").strip()
 
     project = get_project(config=config)
+    conversations = _conversations_for_prd(
+        brief=brief,
+        conversations=project.get("conversations", []),
+    )
     spec = generate_prd_spec(
         config=config,
-        conversations=project.get("conversations", []),
+        conversations=conversations,
         session_id=f"generate_prd:{run_id}",
     )
 
@@ -44,16 +73,6 @@ def generate_hifi_prototype(
     )
 
     prototype_dir = create_app()
-
-    post_events(
-        config=config,
-        events=[
-            {
-                "type": "project_updated",
-                "prototype_dir": str(prototype_dir),
-            },
-        ],
-    )
 
     exploration = call_mcp(
         config=config,
