@@ -272,7 +272,9 @@ def generate_initial_prototypes(
 
         return {
             "approach": approach,
-            "caption_slot_id": (caption_slot_ids[index] if index < len(caption_slot_ids) else None),
+            "caption_slot_id": (
+                caption_slot_ids[index] if index < len(caption_slot_ids) else None
+            ),
             "index": index,
             "slot_id": slot_ids[index],
             "spec": spec,
@@ -331,7 +333,8 @@ def generate_initial_prototypes(
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
         prd_futures = {
-            executor.submit(generate_prd_for_slot, index): index for index in range(len(slot_ids))
+            executor.submit(generate_prd_for_slot, index): index
+            for index in range(len(slot_ids))
         }
         prototype_futures: dict[concurrent.futures.Future, dict[str, Any]] = {}
 
@@ -367,7 +370,8 @@ def generate_initial_prototypes(
     if completed_jobs:
         completed_jobs.sort(key=lambda job: job["index"])
         combined_spec = "\n\n".join(
-            f"## Prototype {job['index'] + 1}\n\n{job['spec']}" for job in completed_jobs
+            f"## Prototype {job['index'] + 1}\n\n{job['spec']}"
+            for job in completed_jobs
         )
         post_events(
             config=config,
