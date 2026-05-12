@@ -1,9 +1,6 @@
-import json
-import pathlib
 import uuid
 from typing import Any, TypedDict
 
-from scripts.call_claude import call_claude
 from scripts.call_mcp import call_mcp
 from scripts.create_app import create_app
 from scripts.get_project import get_project
@@ -12,63 +9,78 @@ from scripts.post_events import post_events
 from scripts.run_app import run_app
 
 from workflows.base import workflow
+from workflows.generate_initial_prototype import generate_initial_prototype_app
+from workflows.generate_prd import generate_prd_spec
 
 
-class GeneratePrototypeParams(TypedDict):
-    pass
+class GenerateInitialPrototypesParams(TypedDict, total=False):
+    brief: str
+    runId: str
 
 
-def generate_prototype_app(
+def _conversations_for_prd(
     *,
-    config: Config,
+    brief: str,
     conversations: list[dict[str, Any]],
-    prototype_dir: pathlib.Path,
-    session_id: str,
-    spec: str,
-) -> None:
-    design_context = (
-        f"<spec>{spec}</spec>"
-        if spec
-        else (f"<conversations>{json.dumps(conversations, indent=2)}</conversations>")
-    )
-
-    call_claude(
-        config=config,
-        prompt=[
-            """\
-Call the `generate-prototype` skill.
-
-${design_context}
-<prototype_dir>${prototype_dir}</prototype_dir>
-""",
-        ],
-        params={
-            "prototype_dir": str(prototype_dir),
-            "design_context": design_context,
+) -> list[dict[str, Any]]:
+    if any(conversation.get("messages") for conversation in conversations):
+        return conversations
+    if not brief:
+        return conversations
+    return [
+        {
+            "room": "exported-transcript",
+            "messages": [
+                {
+                    "role": "user",
+                    "text": brief,
+                    "timestamp": 0.0,
+                },
+            ],
+            "screenshots": [],
         },
-        model="opus",
-        effort="low",
-        session_id=session_id,
-    )
+    ]
 
 
 @workflow
-def generate_prototype(
+def generate_initial_prototypes(
     config: Config,
-    params: GeneratePrototypeParams,
+    params: GenerateInitialPrototypesParams,
 ) -> None:
-    """Create a baseline clone of the user's app as a starting point for design exploration."""
+    """Generate one PRD-backed initial prototype in the project."""
+    run_id = params.get("runId") or str(uuid.uuid4())
+    brief = params.get("brief", "").strip()
+
+    project = get_project(config=config)
+    conversations = _conversations_for_prd(
+        brief=brief,
+        conversations=project.get("conversations", []),
+    )
+    spec = generate_prd_spec(
+        config=config,
+        conversations=conversations,
+        session_id=f"generate_prd:{run_id}",
+    )
+
+    post_events(
+        config=config,
+        events=[
+            {
+                "type": "project_updated",
+                "spec": spec,
+            },
+        ],
+    )
+
     prototype_dir = create_app()
 
-    project = get_project(config)
-    spec = (project.get("spec") or "").strip()
     exploration = call_mcp(
         config=config,
         tool="create_exploration",
         arguments={
             "count": 1,
             "project_id": config.project_id,
-            "title": "High-fidelity prototype",
+            "title": "Initial prototype",
         },
         timeout=30,
     )
@@ -89,11 +101,12 @@ def generate_prototype(
     )
 
     try:
-        generate_prototype_app(
+        project = get_project(config=config)
+        generate_initial_prototype_app(
             config=config,
             conversations=project.get("conversations", []),
             prototype_dir=prototype_dir,
-            session_id="generate_prototype",
+            session_id=f"generate_initial_prototype:{run_id}",
             spec=spec,
         )
 

@@ -1,161 +1,300 @@
 ---
 name: generate-prototype
-description: "Clone elements of an existing application and layer on a design change to solve a design problem in a prototype."
+description: "Build a standalone prototype app from the baseline clone that implements a design idea, run it on its own port, and register it on the canvas."
 ---
 
-# Input
+# Generate Prototype
 
-## `<spec>`
+You are building a standalone prototype — a copy of the baseline app with design changes made
+directly in the source code. Each prototype is its own running application with its own tunnel,
+not a script injected into a shared app.
 
-A PRD/design brief for the prototype. This is the implementation brief. Follow it closely.
+## Input
 
-## `<prototype_dir>`
+### `<project_id>`
 
-Absolute path to the pre-scaffolded clone project. Write all your output here.
-The harness has already populated this directory with `package.json`,
-`vite.config.ts`, `tsconfig.json`, `index.html`, `src/main.tsx`, and a
-placeholder `src/App.tsx`, and has run `pnpm install`.
+Softlight project UUID.
 
-# Output
+### `<slot_id>`
 
-Your goal is to build a standalone prototype: a copy of the baseline app with design changes made on top. You will write that prototype into `<prototype_dir>`.
+Canvas slot UUID.
 
-It should look EXACTLY as if they opened the real application in the browser right now, but with a design change to address the design problem and approach found in `<spec>`.
+### `<spec>`
 
-You are responsible for writing the application code into
-`<prototype_dir>/src/` and getting `pnpm build` (run from
-`<prototype_dir>`) to pass.
+Description of the desired change to the application.
 
-# Guidelines for making it look like the app in question
+### `<images>`
 
-CRITICAL — always render the FULL PAGE, not just a component:
+Optional. Image URLs or local file paths, one per line. If these are passed, view all of these before writing code. The spec references them.
 
-Before gathering code, build a complete picture of the page:
+### `<caption_slot_id>`
 
-1. Find the page the feature lives on. If the user mentions a specific
-    component, walk UP the import chain to find which page-level route
-    component renders it. That page is your starting point — NOT the
-    component itself.
-2. From that page component, walk DOWN: for every child component it
-    imports and renders (<Sidebar />, <Header />, <Card />, etc.), open
-    that component's file AND its CSS/style file together. Read both —
-    the TSX tells you what it renders, the CSS tells you how it looks.
-    Then repeat recursively for that component's children. Keep going
-    until you reach leaf components. Follow the tree for everything
-    rendered on THIS page. Do not follow route navigations or
-    lazy-loaded pages — only components that are part of the current
-    page's visible output.
-3. Now you have the full picture of what the user sees. Every component
-    you read must be included in the code you provide — do NOT skip
-    components because they seem minor or unrelated to the feature.
-    A sidebar, a breadcrumb bar, a loading spinner, an avatar, a
-    header, a footer — they all contribute to what the page actually
-    looks like. Include ALL of them.
-4. Read any global/token CSS files (design tokens, variables, themes)
-    and include them in your code collection.
+Optional. Canvas slot UUID for the caption below this prototype. If provided, fill it in after
+registering the prototype (see Phase 6).
 
-Produce the FULL PAGE with the feature visible — all components
-composed together in their correct positions. NOT a standalone preview
-of the single component the user mentioned. If the feature lives on
-the settings page, you provide the entire settings page. If it lives
-on a dashboard, you provide the entire dashboard. One page, one
-complete browser viewport. Pick the single most representative state
-(e.g. the state where the feature is visible and the page has
-realistic content).
+### `<baseline_dir>`
 
-When the feature involves an element that appears on top of or within
-a page — a dropdown menu, a modal, a tooltip, a popover, a slide-out
-panel, a toast — always provide the full page code with that element
-rendered open and visible. Never provide these elements in isolation.
-The user needs to see where the element is anchored, what it overlays,
-and how it relates to the surrounding UI. Include all sibling elements
-too — for example, if the feature is a new menu item under a user
-icon, the app should show the entire page with the menu open,
-including all existing menu items, not just the menu by itself.
+The directory path of the baseline clone — the already-built, runnable app created by
+`clone-app-codegen`. This is your starting point.
 
-CRITICAL — self-containment (import graph):
-For EVERY relative import in every file you collected, make sure
-the imported file is ALSO in your collection. Walk the full import
-graph — utilities, hooks, types, constants, context providers,
-everything. If a file imports "./utils/cn", that utils file must
-be included. Missing files are the #1 cause of build failures.
+### `<prototype_dir>`
 
-CRITICAL — output a Vite + React app (client-side only):
-The clone is served through a tunnel proxy that rewrites HTML responses
-(rewriting URLs, injecting scripts). Server-side rendering frameworks
-break in this setup because the proxy modifies the server-rendered HTML,
-causing hydration mismatches on the client. The clone must be a plain
-client-side React app built with Vite. No SSR, no hydration, no server
-rendering. If the source app uses a framework that does server-side
-rendering, fully deframework it — the output must have zero dependencies
-on the original framework.
+Optional. If this prototype is a revision of an existing one, the directory path of the
+previous prototype app. Start from there instead of copying the baseline fresh — it already
+has the prior design changes applied.
 
-CRITICAL — no server-side or Node.js APIs:
-This runs in the browser. You must remove or replace:
-- process.env.* → hardcode the value directly
-- fs, path, crypto (Node.js modules) → remove or use browser equivalents
-- Database clients, ORMs → remove, return mock data
-- Any server-only imports → remove
+### `<context>`
 
-Styling:
-- Keep ALL styling EXACTLY as the original app uses it. Copy the CSS
-    classes, CSS files, inline styles, CSS modules — whatever the app uses.
-    Do NOT change the styling approach. If it uses Tailwind, keep Tailwind.
-    If it uses CSS modules, keep CSS modules. If it uses styled-components,
-    keep styled-components.
-- Copy exact CSS values — colors, font sizes, font weights, line heights,
-    letter spacing, padding, margin, border-radius, box-shadow, gap,
-    flex/grid layout — from each component's CSS file. Also copy the exact
-    text content from the TSX (placeholder strings, button labels, headings)
-    — do not rephrase them.
-- If components import from a UI library (shadcn, MUI, Chakra, etc.),
-    include those component source files or inline their markup with the
-    exact same styling.
-- Inline all SVG icons directly as JSX — never use placeholder boxes or
-    missing icon references. If an icon import cannot be resolved, replace
-    it with the actual SVG markup for that icon. For icons defined as SVG
-    components in the codebase, copy the entire <svg> element including its
-    <path> data verbatim. For library icons (e.g. lucide-react), inline
-    the standard SVG for that icon.
-- Reproduce the app's font setup however it's loaded — Google Fonts
-    `<link>` tags in the root `index.html`, `@import` rules in CSS,
-    `@font-face` with bundled `.woff`/`.woff2`/`.ttf`/`.otf` files,
-    design-system stylesheet imports like `@radix-ui/themes/styles.css`,
-    and any `--default-font-family` / `--heading-font-family` variables
-    those wrappers define. Bring ALL of them over to the clone exactly as
-    the source delivers them. The most common miss is a Google Fonts
-    `<link>` in the root `index.html` paired with a font variable on a
-    theme root — both must come together. Page-level CSS using
-    `font-family: inherit` is a signal the typography is configured higher
-    up in the app shell; go find it before assuming there's nothing to
-    copy. Do the same for static assets (images, icons, logos, brand
-    assets) — copy the real files and preserve the relative paths used in
-    `src` / `href` attributes. Missing fonts and assets are immediately
-    visible and make the clone look wrong.
+Optional pre-explored source code and analysis from the caller. May cover routing, auth, data
+fetching, response shapes, and styling patterns.
 
-Data:
-- Replace ALL backend API calls / data fetching with hardcoded mock
-    data that looks realistic. The app has no backend.
-- Replace auth / session checks with simple mocks (always authenticated).
-- Hardcode any configuration values (don't use process.env).
+**Explore the codebase yourself.** You have full access to the source code — use it to understand
+whatever you need about the app. Read local source files, not the tunnel URL.
 
-IMPORTANT: The code must represent the CURRENT state of the existing
-UI — how it looks TODAY for the parts that are not represented in the design change. For the design change, make it look like it is part of the app (use the design system).
+## Before you start: MCP startup
 
-# Workflow
+You are launched as one of several parallel sub-agents, so the `softlight` and `playwright` MCP
+servers may still be connecting on cold start. If `ToolSearch` reports `pending_mcp_servers`
+includes either server, or if a tool call errors with "tool not available" or returns no matches,
+sleep ~15 seconds and try again, up to 4 times. Treat an MCP as unavailable
+after that short window and use the HTTP fallback below. If any built-in MCP tool call times out
+once, do not retry that built-in tool; switch to the HTTP fallback immediately. You can do
+filesystem and build work (Phase 1) while waiting; only Phases 3–6 require the MCPs.
 
-# 1. Write the code to make the app look the same as it does today, with the most relevant design change to solve the product problem
+The MCP tools are registered as `mcp__softlight__*` (e.g. `mcp__softlight__update_iframe_element`,
+`mcp__softlight__update_text_element`) and `mcp__playwright__*` (e.g. `mcp__playwright__create_session`,
+`mcp__playwright__browser_navigate`) in this subagent. Do **not** search for
+`mcp__plugin_softlight_*__*` — that namespace only exists in the user's parent session, never in
+subagents spawned via `--mcp-config`.
 
-First find the source code for the overall app that you are prototyping off of. Then figure out the initial design change from `<spec>`. Then make that clone + design change on top in the `prototype_dir`.
+### HTTP fallback for MCP tools
 
-Write all the code for the application into `src/`. Generate all TypeScript
-code for the clone in one `.tsx` file (replacing the placeholder
-`src/App.tsx`) and generate all CSS styles for the clone in one `.css`
-file. This limits the number of tool calls required to generate the
-application and reduces the likelihood of import errors.
+Always try to use the built-in MCP tools first. If a built-in MCP tool times out once or is still
+unavailable after the short retry window above, call the same MCP server directly over HTTPS using
+plain `curl`. Do not loop on the built-in tool after a timeout.
+This is still MCP, just over HTTP instead of through the built-in tool binding.
 
-# 2. Make the build pass
+- Softlight MCP endpoint: `https://softlight.orianna.ai/mcp/`
+- Playwright MCP endpoint: `https://playwright.orianna.ai/mcp/`
+- This transport is session-based. You must:
+  1. send `initialize`
+  2. capture the `Mcp-Session-Id` response header
+  3. send `notifications/initialized`
+  4. then send `tools/list` or `tools/call` with that same `Mcp-Session-Id`
+- If you need to call a tool over HTTP MCP, it is helpful to call `tools/list` first for that
+  server so you can see the tool schema and use the right argument shape.
+- Responses from HTTP MCP come back as SSE frames such as `event: message` and `data: {...}`.
+  If you need to inspect the JSON result, extract the `data:` line and parse that JSON.
+- Always send:
+  - `Content-Type: application/json`
+  - `Accept: application/json, text/event-stream`
 
-Keep running `pnpm build` (from the prototype directory) and fixing errors
-until the build passes. The harness will run and tunnel the app once you
-return.
+Minimal pattern:
+
+```bash
+MCP_URL="https://softlight.orianna.ai/mcp/"
+HDR=$(mktemp)
+INIT=$(mktemp)
+
+curl -s -X POST "$MCP_URL" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -D "$HDR" \
+  -d '{
+    "jsonrpc":"2.0",
+    "id":1,
+    "method":"initialize",
+    "params":{
+      "protocolVersion":"2025-03-26",
+      "capabilities":{},
+      "clientInfo":{"name":"curl","version":"1.0"}
+    }
+  }' >"$INIT"
+
+SESSION_ID=$(grep -i '^mcp-session-id:' "$HDR" | awk '{print $2}' | tr -d '\r\n')
+
+curl -s -X POST "$MCP_URL" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -H "Mcp-Session-Id: $SESSION_ID" \
+  -d '{"jsonrpc":"2.0","method":"notifications/initialized"}' >/dev/null
+
+curl -s -X POST "$MCP_URL" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -H "Mcp-Session-Id: $SESSION_ID" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list"}'
+
+rm -f "$HDR" "$INIT"
+```
+
+**Persisting `SESSION_ID` across `Bash` invocations.** Each `Bash` tool call is a fresh
+shell, so variables don't survive. If you need the session id for a follow-up `Bash` call,
+save it with `mktemp` too — e.g. `SID_FILE=$(mktemp); echo "$SESSION_ID" > "$SID_FILE"`,
+then read it back with `$(cat "$SID_FILE")` in subsequent calls. Don't write to a fixed
+path like `/tmp/mcp_session_id` — parallel agents would race on it the same way they would
+on `/tmp/mcp_headers.txt`.
+
+To call a tool, send:
+
+```bash
+curl -s -X POST "$MCP_URL" \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -H "Mcp-Session-Id: $SESSION_ID" \
+  -d '{
+    "jsonrpc":"2.0",
+    "id":3,
+    "method":"tools/call",
+    "params":{
+      "name":"update_text_element",
+      "arguments":{
+        "project_id":"<project_id>",
+        "slot_id":"<slot_id>",
+        "text":"example"
+      }
+    }
+  }'
+```
+
+Use the tool names exactly as MCP exposes them, without the `mcp__softlight__` or
+`mcp__playwright__` prefix. For example:
+- `mcp__softlight__update_iframe_element` -> `update_iframe_element`
+- `mcp__softlight__update_text_element` -> `update_text_element`
+- `mcp__playwright__create_session` -> `create_session`
+- `mcp__playwright__browser_navigate` -> `browser_navigate`
+
+## Phase 1: Create the prototype app
+
+1. **Copy the source.** If `<prototype_dir>` was provided (revising an existing prototype),
+   copy that directory — it already has the prior design changes. Otherwise, copy the baseline.
+   Use `rsync` with `--exclude=node_modules` — copying node_modules breaks pnpm's symlinks into
+   the store and wedges module resolution:
+
+   ```bash
+   rsync -a --exclude=node_modules --exclude=dist <prototype_dir or baseline_dir>/ /tmp/prototype_<slot_id>/
+   ```
+
+   Install dependencies with `pnpm` (fast, deduplicates across prototypes automatically):
+
+   ```bash
+   cd /tmp/prototype_<slot_id> && pnpm install --prefer-offline
+   ```
+
+2. **Read the spec.** Understand what design change is being requested.
+
+3. **Explore the codebase.** Read the baseline clone's files and the original application
+   source to understand the component structure, design system, routing, data shapes, and
+   styling. You need deep understanding to make changes that feel native to the app.
+   Treat visual fit as a core requirement: use the original application to find the right design patterns to reuse so the result feels native to this app rather than like a new product.
+
+4. **Make the design changes.** Edit the prototype's files to implement the spec. The result
+   should feel like a well-designed, fully functioning app — not a rough mockup. If your
+   changes introduce new UI that needs data, seed realistic mock data. Generate all code for
+   the prototype in one `.tsx` file and generate all styles for the prototype in one `.css` file.
+
+   ### Styling rules
+
+   **Use inline styles for layout on new elements.** When you create new containers or
+   wrappers, put layout properties — `display`, `flexDirection`, `alignItems`,
+   `justifyContent`, `gap`, `padding`, `width`, `maxWidth`, `gridTemplateColumns` — directly
+   on the element as inline styles. This keeps layout visible and co-located with the JSX,
+   preventing cascade bugs from a separate CSS file. Do not create new CSS classes for layout.
+
+   **Use the app's existing CSS classes for visual styling.** Colors, fonts, borders, shadows,
+   border-radius, transitions — these come from the app's design system. Read the existing CSS
+   to find the right classes and values. Never hardcode approximate colors. Never load external
+   CSS frameworks or component libraries when the app already has its own.
+   If the clone or provided context does not make the right design system obvious, explore the original application so you can style from its real patterns instead of approximating them.
+   If the prototype is missing fonts the original app loads — bundled `.woff`/`.woff2` files, Google Fonts `<link>` tags in `index.html`, `@import` rules in CSS, or design-system stylesheets like `@radix-ui/themes/styles.css` and the `--default-font-family` / `--heading-font-family` variables that go with them — bring them in. Page-level CSS using `font-family: inherit` is a signal the typography is configured higher up in the app shell; find it before approximating. Do the same for missing images, icons, logos, or brand assets — copy the real files and resolve their references instead of falling back to approximations.
+
+   **Do not modify existing CSS class definitions.** If you need different behavior, create a
+   new element with inline styles rather than changing a class that other elements depend on.
+
+5. **Build and serve the app.** Run a production build, then serve it on a free port.
+   **Do NOT use the default port (5173)** — multiple prototypes run in parallel and will
+   collide. Find a free port and bind to `127.0.0.1` explicitly (avoid IPv6 `[::1]`
+   ambiguity):
+   ```bash
+   cd /tmp/prototype_<slot_id> && pnpm build
+   ```
+   Fix any build errors until the build succeeds, then serve the production build.
+   The preview server must outlive this subagent — the canvas iframe will keep loading
+   it for hours after you finish. A bare `&` is **not enough**: when this subagent's
+   shell tears down, the preview process gets SIGHUP'd and dies, leaving the tunnel
+   pointing at nothing (frp returns "page not found"). You must `nohup` to ignore
+   SIGHUP, redirect stdout/stderr to a log so the bash tool returns immediately
+   instead of waiting on the long-running process, and `disown` to detach it from
+   the shell's job table:
+   ```bash
+   PORT=$(python3 -c "import socket; s=socket.socket(); s.bind(('',0)); print(s.getsockname()[1]); s.close()")
+   cd /tmp/prototype_<slot_id>
+   nohup pnpm preview --host 127.0.0.1 --port $PORT --strictPort > preview.log 2>&1 &
+   disown
+   ```
+   Wait a couple of seconds, then `cat preview.log` to confirm the server printed the
+   port it's listening on. Capture that port number.
+
+## Phase 2: Start a tunnel
+
+Run the `start-tunnel` skill with the port number from Phase 1. It returns a `tunnel_id` and
+`PID`. Capture the `tunnel_id` — you'll need it for Phase 3, Phase 4, and Phase 5.
+
+## Phase 3: Validate in the browser
+
+After the build succeeds and `pnpm preview` is running, you MUST validate that the app renders
+correctly with no runtime errors. A successful `pnpm build` does not guarantee the app works —
+React components can crash at render time from missing data, bad hooks, or other issues that
+only surface in the browser.
+
+Use the `playwright` MCP tools (registered as `mcp__playwright__*`):
+
+1. Call `create_session` to get an isolated browser instance.
+2. Call `browser_navigate` to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`.
+3. Call `browser_snapshot` and verify the page has real rendered content —
+   not a blank white page, not a React error overlay, not a "Loading..."
+   spinner stuck forever. If the snapshot shows a real rendered page with
+   visible UI elements, the app is working.
+
+If the page is broken (blank, error overlay, nothing rendered):
+1. Call `browser_console_messages` to diagnose. Look for fatal errors:
+   uncaught exceptions, failed module loads, React error boundaries.
+   Ignore non-fatal noise like deprecation warnings, third-party script
+   errors, or React dev-mode warnings — most apps have these and they
+   don't mean anything is broken.
+2. Fix the source code in the prototype directory.
+3. Rebuild with `pnpm build` and restart `pnpm preview --host`.
+4. Re-check in the browser.
+
+When validation passes, call `close_session` to clean up the browser.
+
+## Phase 4: Screenshot the prototype
+
+You MUST use the `playwright` MCP (tools registered as `mcp__playwright__*`) for all browser interactions. All standard Playwright browser tools are available through this MCP. It is a thin wrapper around Playwright MCP that gives each session its own isolated browser, so multiple prototype agents can browse in parallel without conflicts.
+
+Open the prototype in a browser and screenshot it so reviewers can see the design changes. The task is to take screenshot(s) of the prototype in states where the design change(s) are visible.
+
+If the page isn't loading or the browser becomes unresponsive, check the preview server output for build errors, fix them, and retry. Try up to 3 times before giving up. If the prototype still won't load, return whatever screenshots you managed to capture (even none) and move on.
+
+Call `create_session` to get an isolated browser instance. Resize the viewport to 1716x1065.
+Ensure you find the design change(s) so you can screenshot the design
+changes and look at it. You may need to interact with the prototype to find all the design
+changes to screenshot them (the codebase, spec, and source code can help you figure out what screenshots you need to take).
+
+1. Navigate to `https://softlight.orianna.ai/api/tunnel/{tunnel_id}/`
+2. Check that the page loaded, then find the design changes described in the spec. You  may need to interact with the application to get the app into a state where the design change is visible. Reminder: pages could be broken or stuck loading. If that happens, move on — do not wait indefinitely.
+3. Take a screenshot with `browser_take_screenshot` (`fullPage` set to `true`). This returns a URL.
+4. Call `close_session` to clean up the browser
+
+## Phase 5: Register on the canvas
+
+Call the `update_iframe_element` MCP tool with `project_id`, `slot_id`, `tunnel_id` (the new
+tunnel from Phase 2), `spec` (the `<spec>` from your input — pass it through
+unchanged), `screenshot_urls` (the **drive URLs** from Phase 4), and `preview_url` set to the
+screenshot that best represents the core of the design change.
+
+## Phase 6: Fill in the caption
+
+If `<caption_slot_id>` was provided, call `update_text_element` with `project_id`,
+`slot_id` set to the `<caption_slot_id>`, and a short `text` (1-2 sentences) describing what
+this prototype does, how it solves the problem, and what its tradeoffs are.
