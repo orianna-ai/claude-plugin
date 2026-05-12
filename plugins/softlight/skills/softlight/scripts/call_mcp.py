@@ -8,6 +8,22 @@ if TYPE_CHECKING:
     from scripts.load_config import Config
 
 
+def _parse_mcp_response(
+    raw: bytes,
+) -> dict[str, Any]:
+    text = raw.decode()
+    if text.lstrip().startswith("{"):
+        return json.loads(text)
+
+    for line in text.splitlines():
+        if line.startswith("data:"):
+            data = line.removeprefix("data:").strip()
+            if data and data != "[DONE]":
+                return json.loads(data)
+
+    raise RuntimeError(f"MCP response did not contain JSON: {text[:500]}")
+
+
 def call_mcp(
     config: Config,
     tool: str,
@@ -28,12 +44,12 @@ def call_mcp(
             ).encode(),
             headers={
                 "Content-Type": "application/json",
-                "Accept": "application/json",
+                "Accept": "application/json, text/event-stream",
             },
         ),
         timeout=timeout,
     ) as response:
-        payload = json.loads(response.read())
+        payload = _parse_mcp_response(response.read())
 
     if error := payload.get("error"):
         raise RuntimeError(f"{tool} failed: {error.get('message', error)}")
