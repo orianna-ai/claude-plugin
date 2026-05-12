@@ -143,7 +143,9 @@ ${existing_decisions}
     decisions: list[dict[str, Any]] = []
     if mode == "next":
         decisions.extend(
-            decision for decision in existing_decisions if decision.get("status") == "resolved"
+            decision
+            for decision in existing_decisions
+            if decision.get("status") == "resolved"
         )
         next_decision = result["decisions"][0]
         next_decision_id = _next_decision_id(existing_decisions)
