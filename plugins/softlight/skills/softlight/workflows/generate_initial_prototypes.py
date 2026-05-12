@@ -51,29 +51,6 @@ def generate_initial_prototypes(
     run_id = params.get("runId") or str(uuid.uuid4())
     brief = params.get("brief", "").strip()
 
-    project = get_project(config=config)
-    conversations = _conversations_for_prd(
-        brief=brief,
-        conversations=project.get("conversations", []),
-    )
-    spec = generate_prd_spec(
-        config=config,
-        conversations=conversations,
-        session_id=f"generate_prd:{run_id}",
-    )
-
-    post_events(
-        config=config,
-        events=[
-            {
-                "type": "project_updated",
-                "spec": spec,
-            },
-        ],
-    )
-
-    prototype_dir = create_app()
-
     exploration = call_mcp(
         config=config,
         tool="create_exploration",
@@ -101,6 +78,28 @@ def generate_initial_prototypes(
     )
 
     try:
+        project = get_project(config=config)
+        conversations = _conversations_for_prd(
+            brief=brief,
+            conversations=project.get("conversations", []),
+        )
+        spec = generate_prd_spec(
+            config=config,
+            conversations=conversations,
+            session_id=f"generate_prd:{run_id}",
+        )
+
+        post_events(
+            config=config,
+            events=[
+                {
+                    "type": "project_updated",
+                    "spec": spec,
+                },
+            ],
+        )
+
+        prototype_dir = create_app()
         project = get_project(config=config)
         generate_initial_prototype_app(
             config=config,
