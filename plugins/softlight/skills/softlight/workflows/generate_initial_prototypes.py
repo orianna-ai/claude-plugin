@@ -14,7 +14,6 @@ from scripts.run_app import run_app
 
 from workflows.base import workflow
 from workflows.generate_initial_prototype import generate_initial_prototype_app
-from workflows.generate_prd import generate_prd_spec, transcript_conversations
 
 if TYPE_CHECKING:
     from scripts.load_config import Config
@@ -81,6 +80,15 @@ def _conversations_for_prd(
     ]
 
 
+def _transcript_conversations(
+    conversations: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    return [
+        {key: value for key, value in conversation.items() if key != "screenshots"}
+        for conversation in conversations
+    ]
+
+
 def _generate_approaches(
     *,
     config: Config,
@@ -107,7 +115,7 @@ Return structured output matching the provided JSON schema.
             ],
             params={
                 "conversations": json.dumps(
-                    transcript_conversations(conversations),
+                    _transcript_conversations(conversations),
                     indent=2,
                 ),
             },
@@ -252,6 +260,8 @@ def generate_initial_prototypes(
     )
 
     def generate_prd_for_slot(index: int) -> dict[str, Any]:
+        from workflows.generate_prd import generate_prd_spec
+
         approach = approaches[index]
         spec = generate_prd_spec(
             approach=_format_approach(approach),
