@@ -144,9 +144,11 @@ UI — how it looks TODAY for the parts that are not represented in the design c
 
 # Workflow
 
-# 1. Write the code to make the app look the same as it does today, with the most relevant design change to solve the product problem
+# 1. Write the code to make the app look the same as it does today, with the most relevant design change to solve the product problem.
 
-First find the source code for the overall app that you are prototyping off of. Then figure out the initial design change from `<spec>`. Then make that clone + design change on top in the `prototype_dir`.
+First, you MUST find the source code for the overall app that you are prototyping off of. Without this context you will fail.
+
+Then, figure out the initial design change from `<spec>`. Then make that clone + design change on top in the `prototype_dir`.
 
 Write all the code for the application into `src/`. Generate all TypeScript
 code for the clone in one `.tsx` file (replacing the placeholder
