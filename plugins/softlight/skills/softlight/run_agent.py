@@ -19,6 +19,12 @@ if TYPE_CHECKING:
 
 AgentTask = Literal["dispatch_prompts", "emit_heartbeats", "upload_transcripts"]
 
+_MAX_RETRYABLE_PROMPT_ATTEMPTS = 3
+_PROMPT_RETRY_BACKOFF_SECONDS = 5
+_RETRYABLE_WORKFLOWS = {
+    "generate_decision_plan",
+}
+
 
 def _fetch_events(
     config: Config,
@@ -44,17 +50,17 @@ def _fetch_events(
 def _get_pending_prompts(
     events: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    completed_prompts = {
+    terminal_prompts = {
         event["prompt_id"]
         for event in events
-        if event.get("type") == "prompt_succeeded"
+        if event.get("type") in {"prompt_succeeded", "prompt_failed"}
     }
 
     pending_prompts = [
         event["prompt"]
         for event in events
         if event.get("type") == "prompt_created"
-        if event["prompt"]["metadata"]["id"] not in completed_prompts
+        if event["prompt"]["metadata"]["id"] not in terminal_prompts
         # HACK: ignore the synthetic generate_mock_revision prompts
         if not event["prompt"]["key"].startswith("generate_mock_revision:")
     ]
@@ -81,27 +87,37 @@ def _handle_prompt(
     config: Config,
     prompt: dict[str, Any],
 ) -> None:
-    _post_prompt_started(config, prompt)
+    workflow_name = prompt["workflow"]
+    max_attempts = _MAX_RETRYABLE_PROMPT_ATTEMPTS if workflow_name in _RETRYABLE_WORKFLOWS else 1
 
-    try:
-        if workflow := WORKFLOWS.get(prompt["workflow"]):
-            workflow.call(config, prompt.get("params") or {})
-        else:
-            raise ValueError(f"workflow {prompt['workflow']} does not exist")
-    except Exception:
-        traceback.print_exc()
+    for attempt in range(1, max_attempts + 1):
+        _post_prompt_started(config, prompt)
 
-        post_events(
-            config=config,
-            events=[
-                {
-                    "type": "prompt_failed",
-                    "prompt_id": prompt["metadata"]["id"],
-                    "error": traceback.format_exc(),
-                },
-            ],
-        )
-    else:
+        try:
+            if workflow := WORKFLOWS.get(workflow_name):
+                workflow.call(config, prompt.get("params") or {})
+            else:
+                raise ValueError(f"workflow {workflow_name} does not exist")
+        except Exception:
+            error = traceback.format_exc()
+            traceback.print_exc()
+
+            if attempt < max_attempts:
+                time.sleep(_PROMPT_RETRY_BACKOFF_SECONDS * attempt)
+                continue
+
+            post_events(
+                config=config,
+                events=[
+                    {
+                        "type": "prompt_failed",
+                        "prompt_id": prompt["metadata"]["id"],
+                        "error": (f"Prompt failed after {attempt} attempt(s).\n\n{error}"),
+                    },
+                ],
+            )
+            return
+
         post_events(
             config=config,
             events=[
@@ -111,6 +127,7 @@ def _handle_prompt(
                 },
             ],
         )
+        return
 
 
 def _dispatch_prompts(
