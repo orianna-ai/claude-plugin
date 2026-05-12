@@ -1,5 +1,5 @@
 import json
-from typing import TypedDict
+from typing import Any, TypedDict
 
 from scripts.call_claude import call_claude
 from scripts.get_project import get_project
@@ -26,14 +26,12 @@ _SPEC_SCHEMA = {
 }
 
 
-@workflow
-def generate_prd(
+def generate_prd_spec(
+    *,
     config: Config,
-    params: GeneratePrdParams,
-) -> None:
-    """Generate or update the project-level PRD/design brief."""
-    project = get_project(config)
-
+    conversations: list[dict[str, Any]],
+    session_id: str,
+) -> str:
     result = call_claude(
         config=config,
         prompt=[
@@ -42,23 +40,38 @@ Call the `generate-prd` skill.
 
 Return structured output matching the provided JSON schema.
 
-<previous_spec>${previous_spec}</previous_spec>
 <conversations>${conversations}</conversations>
 """,
         ],
         params={
-            "previous_spec": project.get("spec") or "",
-            "conversations": json.dumps(project.get("conversations", []), indent=2),
+            "conversations": json.dumps(conversations, indent=2),
         },
         json_schema=_SPEC_SCHEMA,
         model="opus",
         effort="xhigh",
-        session_id="generate_prd",
+        session_id=session_id,
     )
 
     spec = result["spec"].strip()
     if not spec:
         raise ValueError("generate-prd returned an empty spec")
+
+    return spec
+
+
+@workflow
+def generate_prd(
+    config: Config,
+    params: GeneratePrdParams,
+) -> None:
+    """Generate or update the project-level PRD/design brief."""
+    project = get_project(config)
+
+    spec = generate_prd_spec(
+        config=config,
+        conversations=project.get("conversations", []),
+        session_id="generate_prd",
+    )
 
     post_events(
         config=config,
