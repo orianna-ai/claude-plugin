@@ -168,9 +168,21 @@ def _generate_sketch(
     result = call_claude(
         prompt=[
             """\
-Call the `generate-decision-sketch` skill.
+You are a senior product designer using a quick sketch to help a PM/founder clarify one active
+decision. The sketch is a conversation probe, not a polished design.
 
-Return structured output matching the provided JSON schema.
+## Inputs
+
+You will receive:
+
+- `decision`: the active decision, including `open_question`, `subtext`, and
+  `sketch_prompt_context`.
+- `tradeoff`: a short description of the specific product/workflow tradeoff this sketch must
+  visualize. You will be called in parallel with sibling invocations covering different tradeoffs
+  for the same decision — do not try to cover every angle, just commit to this one.
+- `transcript`: the live conversation so far.
+- Attached screenshots: captured frames from the PM/founder's live screen share. These are helpful
+  as visual grounding for the current product surface and workflow context.
 
 <decision>
 ${decision}
@@ -186,6 +198,31 @@ ${transcript}
 
 The screenshots below are captured frames from what the PM/founder screenshared during the intake.
 Use the attached image blocks as context for the current product surface and workflow.
+
+## What To Do
+
+Generate exactly one lo-fi wireframe sketch for the given tradeoff.
+
+Each sketch should:
+
+- be self-contained HTML with inline CSS only.
+- use no JavaScript, external assets, external fonts, or remote URLs.
+- fit within a 1720px by 1120px canvas.
+- The must feel rough and fast, like an Excalidraw-style product wireframe. DO NOT make it look like
+  real UI or use any design system. It should feel like a simple sketch.
+- The idea must be immediately visible - reduce text, and UI elements, just make the idea apparent.
+  LESS IS MORE.
+- avoid realistic product styling: no shadows, polished cards, dense tables, pills, dashboards, nav,
+  headers, modals, or multi-section layouts, etc.
+- ESSENTIAL: Ruthlessly minimize what is in the sketch. The sketch should contain only what is
+  necessary to expose the tradeoff. If an element does not change how the PM understands the
+  decision, omit it. Make complexity visible through the contrast between the three approaches, not
+  by packing more controls into each approach.
+
+The caption should explain the product bet or tradeoff the sketch is testing. Make these captions
+snappy, short, to the point, and easy to read quickly.
+
+Return structured output matching the provided JSON schema.
 """,
             *(
                 {
@@ -251,9 +288,26 @@ def generate_decision(
     plan = call_claude(
         prompt=[
             """\
-Call the `generate-decision-plan` skill.
+You are a product designer, working inside the user's actual codebase for this Softlight project.
+You are given a discussion of a PM on your team who is working on a design problem.
 
-Return structured output matching the provided JSON schema.
+Your task is to identify the open product/design decisions the PM/founder should work through next.
+This is not a UI preference survey. A good decision is a load-bearing open question where different
+answers would meaningfully change the product experience, workflow, data shown, user control, edge
+cases, or implementation direction.
+
+Do not ask a user if they prefer a specific UI treatment, but rather the context that would make
+choosing the UI treatment clear.
+
+## Inputs
+
+You will receive:
+
+- `project_id`: the Softlight project id.
+- `mode`: `initial` or `next`.
+- `transcript`: the live conversation so far.
+- `existing_decisions`: previously generated decisions and their statuses.
+- attached screenshots: captured frames from the PM/founder's live screen share.
 
 <project_id>${project_id}</project_id>
 <mode>${mode}</mode>
@@ -261,12 +315,61 @@ Return structured output matching the provided JSON schema.
 ${transcript}
 </transcript>
 
-The screenshots below are captured frames from what the PM/founder screenshared during the intake.
-Use the attached image blocks as context for the current product surface and workflow.
-
 <existing_decisions>
 ${existing_decisions}
 </existing_decisions>
+
+The screenshots below are captured frames from what the PM/founder screenshared during the intake.
+Use the attached image blocks as context for the current product surface and workflow.
+
+## What To Do
+
+Use the transcript and codebase to determine what key decisions need to be made next. You MUST find
+the source code for the application in question and explore the codebase - a question not grounded
+in the current experience is a poor question.
+
+You can think of your task as "what are the open decisions we need to make", but focus on "product"
+questions, and not "engineering" questions. Think of these as what a PM would list in a PRD for what
+needs to be decided before starting the engineering work.
+
+For `initial` mode:
+- Generate 3-6 ordered decisions.
+- Each decision should be a direct open question with short explanatory subtext.
+- Make the first decision the most useful place to start, but keep every decision `pending`.
+
+For `next` mode:
+- Generate exactly one new active decision.
+- Treat resolved decisions as closed learning, not as things to ask again.
+- Use new transcript/context from the just-finished decision to choose the next best question.
+- Do not simply pop the next stale item if the conversation suggests a better next question.
+
+## Decision Quality
+
+Each decision must include:
+
+- `open_question`: one direct question the PM can work through. This should be a snappy direct
+  question, quick to read and intuit.
+- `subtext`: one short sentence explaining what the user is clarifying and why it matters. This
+  should snappy and to the point - something a user can read quickly and understand.
+- `sketch_prompt_context`: compact context for the sketch workflow: surface, tradeoff, constraints,
+  and what kinds of alternatives should be visualized.
+- `tradeoffs`: exactly three distinct product/workflow tradeoffs to visualize as lo-fi sketches.
+  Each tradeoff is a short string describing the product bet or alternative the sketch should test —
+  not a visual layout variation. Each tradeoff must be meaningfully different from the others
+  along the dimensions of user control, data shown, workflow steps, or edge case handling.
+- `follow_up_questions`: up to five concise follow-up questions the facilitator can ask the PM
+  about this specific decision. These must be about PM-owned context: users, workflow, business
+  rules, data, confidence, constraints, edge cases, or risk. Do not ask which sketch the PM prefers,
+  and do not ask for visual style feedback.
+
+Never ask for questions that a designer should figure out themselves:
+- vague design preferences (e.g. do you prefer this design or that one)
+- visual style, color, spacing, exact component, or layout preference questions.
+- questions already answered by the conversation.
+- generic questions that could apply to any product.
+- implementation details unless the PM's decision genuinely depends on a technical constraint.
+
+Return structured output matching the provided JSON schema.
 """,
             *(
                 {
