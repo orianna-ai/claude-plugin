@@ -22,7 +22,7 @@ AgentTask = Literal["dispatch_prompts", "emit_heartbeats", "upload_transcripts"]
 _MAX_RETRYABLE_PROMPT_ATTEMPTS = 3
 _PROMPT_RETRY_BACKOFF_SECONDS = 5
 _RETRYABLE_WORKFLOWS = {
-    "generate_decision_plan",
+    "generate_decision",
 }
 
 
@@ -88,9 +88,7 @@ def _handle_prompt(
     prompt: dict[str, Any],
 ) -> None:
     workflow_name = prompt["workflow"]
-    max_attempts = (
-        _MAX_RETRYABLE_PROMPT_ATTEMPTS if workflow_name in _RETRYABLE_WORKFLOWS else 1
-    )
+    max_attempts = _MAX_RETRYABLE_PROMPT_ATTEMPTS if workflow_name in _RETRYABLE_WORKFLOWS else 1
 
     for attempt in range(1, max_attempts + 1):
         _post_prompt_started(config, prompt)
@@ -114,9 +112,7 @@ def _handle_prompt(
                     {
                         "type": "prompt_failed",
                         "prompt_id": prompt["metadata"]["id"],
-                        "error": (
-                            f"Prompt failed after {attempt} attempt(s).\n\n{error}"
-                        ),
+                        "error": (f"Prompt failed after {attempt} attempt(s).\n\n{error}"),
                     },
                 ],
             )
