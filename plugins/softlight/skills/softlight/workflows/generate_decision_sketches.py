@@ -11,9 +11,9 @@ from scripts.post_events import post_events
 
 from workflows.base import workflow
 
-_SKETCH_WIDTH = 760.0
-_SKETCH_HEIGHT = 520.0
-_SKETCH_GAP = 80.0
+_SKETCH_WIDTH = 1720
+_SKETCH_HEIGHT = 1120
+_SKETCH_GAP = 120
 _TITLE_HEIGHT = 120.0
 _CAPTION_HEIGHT = 120.0
 _ROW_GAP = 64.0
@@ -121,8 +121,8 @@ def generate_decision_sketches(
                     "slot": {
                         "metadata": {"id": sketch_slot_id},
                         "element": {
-                            "type": "html",
-                            "html": "",
+                            "type": "placeholder",
+                            "content_type": "prototype",
                         },
                         "width": _SKETCH_WIDTH,
                         "height": _SKETCH_HEIGHT,
@@ -147,11 +147,7 @@ def generate_decision_sketches(
                         "width": _SKETCH_WIDTH,
                         "height": _CAPTION_HEIGHT,
                         "x": index * (_SKETCH_WIDTH + _SKETCH_GAP),
-                        "y": base_y
-                        + _TITLE_HEIGHT
-                        + _ROW_GAP
-                        + _SKETCH_HEIGHT
-                        + _ROW_GAP,
+                        "y": base_y + _TITLE_HEIGHT + _ROW_GAP + _SKETCH_HEIGHT + _ROW_GAP,
                     },
                 }
                 for index, caption_slot_id in enumerate(caption_slot_ids)
