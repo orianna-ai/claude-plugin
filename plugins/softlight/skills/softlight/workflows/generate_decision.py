@@ -14,6 +14,8 @@ from workflows.base import workflow
 
 _SKETCH_WIDTH = 1720
 _SKETCH_HEIGHT = 1120
+_SKETCH_AUTHOR_WIDTH = 760
+_SKETCH_AUTHOR_HEIGHT = 520
 _SKETCH_GAP = 120
 _TITLE_HEIGHT = 120.0
 _CAPTION_HEIGHT = 120.0
@@ -209,7 +211,7 @@ Each sketch should:
 idea.
 - Be self-contained HTML with inline CSS only.
 - Use no JavaScript, external assets, external fonts, or remote URLs.
-- Fit in 1720px by 1120px
+- Fit in a ${sketch_author_width}px by ${sketch_author_height}px canvas.
 - The must feel rough and fast, like an Excalidraw-style product wireframe. DO NOT make it look like
   real UI or use any design system. It should feel like a really simple sketch.
 - The idea must be immediately visible - reduce text, and UI elements, just make the idea apparent.
@@ -233,6 +235,9 @@ output schema should be snappy, short, to the point, and easy to read quickly.
         ],
         params={
             "decision": json.dumps(decision, indent=2),
+            "sketch_author_height": _SKETCH_AUTHOR_HEIGHT,
+            "sketch_author_width": _SKETCH_AUTHOR_WIDTH,
+            "sketch_display_width": _SKETCH_WIDTH,
             "tradeoff": tradeoff,
             "transcript": transcript,
         },
@@ -368,10 +373,32 @@ Each decision must include:
   Each tradeoff is a short string describing the product bet or alternative the sketch should test —
   not a visual layout variation. Each tradeoff must be meaningfully different from the others
   along the dimensions of user control, data shown, workflow steps, or edge case handling.
-- `follow_up_questions`: up to five concise follow-up questions the facilitator can ask the PM
+- `follow_up_questions`: up to 2-3 concise follow-up questions the facilitator can ask the PM
   about this specific decision. These must be about PM-owned context: users, workflow, business
   rules, data, confidence, constraints, edge cases, or risk. Do not ask which sketch the PM prefers,
   and do not ask for visual style feedback.
+
+## Follow-Up Question Quality
+
+The facilitator will ask these after sketches are available on the canvas, so frame each question
+through the alternatives the sketches are meant to explore. A strong follow-up question says what
+the sketches are testing, asks for the PM-owned truth that decides between those directions, and
+makes clear why the answer changes the product direction.
+
+Use this shape:
+"The sketches outline [product/workflow alternatives]. For [users/workflow/business/data/risk],
+is it more true that [A] or [B]? That tells us whether to [direction] or [direction]."
+
+Good examples:
+- "The sketches outline a guided setup versus a faster self-serve path. For new admins, is it more
+  important that they finish quickly or that they understand each permission before continuing?
+  That tells us whether to compress the flow or add checkpoints."
+- "The sketches test showing exceptions inline versus routing them to a review queue. When an
+  exception appears, does the operator usually need to keep working in context or hand it off? That
+  determines whether the UI should prioritize local resolution or triage."
+- "The sketches compare surfacing confidence early versus waiting until after the user commits.
+  Is low confidence something users should react to immediately, or only when it blocks action?
+  That tells us whether uncertainty belongs in the main path or the final review."
 
 Never ask for questions that a designer should figure out themselves:
 - vague design preferences (e.g. do you prefer this design or that one)
