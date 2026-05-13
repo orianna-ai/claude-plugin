@@ -1,8 +1,10 @@
 import dataclasses
+import functools
 import importlib
 import inspect
 import pathlib
 import pkgutil
+import traceback
 from collections.abc import Mapping
 from typing import Any, Callable, Generic, TypeVar, get_type_hints
 
@@ -14,13 +16,17 @@ _Call = Callable[[Config, _Params], None]
 
 
 def _infer_schema(
-    cls: type[_Params],
+    call: _Call[_Params],
 ) -> dict[str, Any]:
-    hints = get_type_hints(cls)
+    signature = inspect.signature(call)
+    params_name = list(signature.parameters)[1]
+    params_type = get_type_hints(call)[params_name]
+    type_hints = get_type_hints(params_type)
+
     return {
         "type": "object",
-        "properties": {name: {"type": "string"} for name in hints},
-        "required": list(hints),
+        "properties": {name: {"type": "string"} for name in type_hints},
+        "required": list(type_hints),
         "additionalProperties": False,
     }
 
@@ -37,26 +43,55 @@ WORKFLOWS: dict[str, Workflow[Any]] = {}
 
 
 def workflow(
+    *,
+    max_attempts: int = 1,
+) -> Callable[[_Call[_Params]], Workflow[_Params]]:
+    def decorator(
+        call: _Call[_Params],
+    ) -> Workflow[_Params]:
+        description = inspect.getdoc(call)
+        assert description, f"workflow {call.__name__!r} must have a docstring"
+
+        workflow = Workflow(
+            name=call.__name__,
+            description=description,
+            call=_with_retries(call, max_attempts=max_attempts),
+            schema=_infer_schema(call),
+        )
+
+        WORKFLOWS[call.__name__] = workflow
+
+        return workflow
+
+    return decorator
+
+
+def _with_retries(
     call: _Call[_Params],
-) -> Workflow[_Params]:
-    description = inspect.getdoc(call)
-    if not description:
-        raise ValueError(f"workflow {call.__name__!r} must have a docstring")
+    *,
+    max_attempts: int,
+) -> _Call[_Params]:
+    @functools.wraps(call)
+    def wrapper(
+        config: Config,
+        params: _Params,
+    ) -> None:
+        attempt = 0
 
-    sig = inspect.signature(call)
-    params_name = list(sig.parameters)[1]
-    params_type = get_type_hints(call)[params_name]
+        while True:
+            try:
+                call(config, params)
+            except Exception as exception:
+                traceback.print_exc()
 
-    workflow = Workflow(
-        name=call.__name__,
-        description=description,
-        call=call,
-        schema=_infer_schema(params_type),
-    )
+                attempt += 1
 
-    WORKFLOWS[call.__name__] = workflow
+                if attempt >= max_attempts:
+                    raise exception
+            else:
+                return
 
-    return workflow
+    return wrapper
 
 
 # register workflows as an import side-effect

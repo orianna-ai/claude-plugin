@@ -11,7 +11,7 @@ class ReplyToCommentParams(TypedDict):
     commentText: str
 
 
-@workflow
+@workflow()
 def reply_to_comment(
     config: Config,
     params: ReplyToCommentParams,

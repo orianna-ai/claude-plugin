@@ -16,7 +16,7 @@ class CloneAppParams(TypedDict):
     source_code_dir: str
 
 
-@workflow
+@workflow()
 def clone_app(
     config: Config,
     params: CloneAppParams,
