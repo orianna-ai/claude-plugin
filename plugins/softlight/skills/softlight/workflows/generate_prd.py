@@ -36,7 +36,7 @@ def generate_prd_spec(
     result = call_claude(
         config=config,
         prompt=[
-            """\
+            f"""\
 ---
 name: generate-prd
 description: "Turn Softlight design context into a concise PRD/design brief for prototype generation."
@@ -51,6 +51,7 @@ The engineer shouldn't have to think - they should be able to follow the design 
 ## Input
 
 ### `<conversations>`
+${conversations}
 
 A conversation between a PM and a designer, describing the product problem and approaches for solving the problem. This is an ongoing conversation.
 
