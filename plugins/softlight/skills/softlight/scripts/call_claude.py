@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-import datetime
 import functools
 import json
 import os
-import pathlib
 import shlex
 import string
 import subprocess
@@ -46,103 +44,6 @@ def _claude_code_command(
         sh = f"cd {shlex.quote(cwd)} && {sh}"
 
     return f"{sh} <<'EOF'\n{stdin}\nEOF"
-
-
-@functools.cache
-def _actual_plugin_dir() -> pathlib.Path:
-    return pathlib.Path(__file__).resolve().parents[3]
-
-
-@functools.cache
-def _harness_plugin_stamp() -> dict[str, Any]:
-    stamp_path = _actual_plugin_dir() / ".softlight-harness-plugin.json"
-    if not stamp_path.exists():
-        return {}
-    return json.loads(stamp_path.read_text())
-
-
-def _diagnostic_log_path() -> pathlib.Path | None:
-    path = os.environ.get("SOFTLIGHT_HARNESS_PLUGIN_DIAGNOSTIC_LOG")
-    if not path:
-        path = _harness_plugin_stamp().get("diagnostic_log_path")
-    return pathlib.Path(path) if path else None
-
-
-def _expected_plugin_dir() -> str | None:
-    if path := os.environ.get("SOFTLIGHT_HARNESS_EXPECTED_PLUGIN_DIR"):
-        return str(pathlib.Path(path).resolve())
-    if path := _harness_plugin_stamp().get("expected_plugin_dir"):
-        return str(pathlib.Path(path).resolve())
-    return None
-
-
-def _command_plugin_dir(cmd: list[str]) -> str | None:
-    try:
-        index = cmd.index("--plugin-dir")
-    except ValueError:
-        return None
-
-    try:
-        return cmd[index + 1]
-    except IndexError:
-        return ""
-
-
-def _append_diagnostic_event(event: dict[str, Any]) -> None:
-    log_path = _diagnostic_log_path()
-    if log_path is None:
-        return
-
-    log_path.parent.mkdir(parents=True, exist_ok=True)
-    with log_path.open("a") as file:
-        file.write(json.dumps(event, sort_keys=True) + "\n")
-
-
-def _stamp_claude_spawn(
-    *,
-    cmd: list[str],
-    config: Config,
-    parent_session_id: str | None,
-    session_id: str | None,
-) -> None:
-    actual_plugin_dir = str(_actual_plugin_dir())
-    expected_plugin_dir = _expected_plugin_dir()
-    command_plugin_dir = _command_plugin_dir(cmd)
-    resolved_command_plugin_dir = (
-        str(pathlib.Path(command_plugin_dir).resolve())
-        if command_plugin_dir
-        else command_plugin_dir
-    )
-    mismatches = []
-
-    if expected_plugin_dir and actual_plugin_dir != expected_plugin_dir:
-        mismatches.append("call_claude_script_loaded_from_unexpected_plugin_dir")
-
-    if expected_plugin_dir and resolved_command_plugin_dir != expected_plugin_dir:
-        if command_plugin_dir is None:
-            mismatches.append("inner_claude_command_missing_plugin_dir")
-        else:
-            mismatches.append("inner_claude_command_plugin_dir_mismatch")
-
-    stamp = _harness_plugin_stamp()
-    _append_diagnostic_event(
-        {
-            "actual_plugin_dir": actual_plugin_dir,
-            "command_plugin_dir": command_plugin_dir,
-            "cwd": _claude_code_cwd(),
-            "event": "call_claude_spawn",
-            "expected_plugin_dir": expected_plugin_dir,
-            "mcp_config_path": str(config.mcp_config_path),
-            "mismatches": mismatches,
-            "parent_session_id": parent_session_id,
-            "project_id": config.project_id,
-            "session_id": session_id,
-            "source_plugin_dir": os.environ.get("SOFTLIGHT_HARNESS_SOURCE_PLUGIN_DIR")
-            or stamp.get("source_plugin_dir"),
-            "status": "mismatch" if mismatches else "ok",
-            "timestamp": datetime.datetime.now(datetime.UTC).isoformat(),
-        },
-    )
 
 
 _Effort = Literal[
@@ -314,7 +215,9 @@ def call_claude(
                 content.append(
                     {
                         "type": "text",
-                        "text": string.Template(item).safe_substitute(params or {}).strip(),
+                        "text": string.Template(item)
+                        .safe_substitute(params or {})
+                        .strip(),
                     },
                 )
             elif isinstance(item, dict):
@@ -337,12 +240,6 @@ def call_claude(
         input.append(user_message)
 
     stdin = "\n".join(json.dumps(message) for message in input)
-    _stamp_claude_spawn(
-        cmd=cmd,
-        config=config,
-        parent_session_id=parent_session_id,
-        session_id=session_id,
-    )
 
     # run claude code as a subprocess and stream the output in real-time
     with subprocess.Popen(
