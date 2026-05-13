@@ -146,7 +146,7 @@ UI — how it looks TODAY for the parts that are not represented in the design c
 
 # 1. Write the code to make the app look the same as it does today, with the most relevant design change to solve the product problem
 
-1. Find the source code for the overall app that you are prototyping off of.
+1. Find the source code for the overall app that you are prototyping off of. You MUST find the source code for the overall app that you are prototyping off of. Without this context you will fail.
 
 2. Figure out the initial design change from `<spec>`.
 
@@ -157,7 +157,7 @@ UI — how it looks TODAY for the parts that are not represented in the design c
    errors in the following step.
 
 4. Write all the code for the application into `<prototype_dir>/src/`.
-   Generate all TypeScript code for the clone in one `.tsx` file
+   Generate all TypeScript code for the clone + design change in one `.tsx` file
    (replacing the placeholder `src/App.tsx`) and generate all CSS styles
    for the clone in one `.css` file. This limits the number of tool calls
    required to generate the application and reduces the likelihood of
