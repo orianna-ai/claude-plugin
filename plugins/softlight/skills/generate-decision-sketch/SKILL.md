@@ -25,21 +25,16 @@ You will receive:
 
 Generate exactly one lo-fi wireframe sketch for the given tradeoff.
 
-The sketch should:
+Each sketch should:
 
 - be self-contained HTML with inline CSS only.
 - use no JavaScript, external assets, external fonts, or remote URLs.
 - fit within a 1720px by 1120px canvas.
-- feel rough and fast, like an Excalidraw-style product wireframe.
-- visualize the assigned product/workflow tradeoff, not a different visual layout of the same idea.
-- treat screenshots as context for what the PM screenshared, not as a requirement to recreate every
-  visible detail. pull only the pieces needed to make the decision concrete.
-- ESSENTIAL: Ruthlessly reduce the UI. The sketch should contain only the elements necessary to
-  expose this tradeoff. If an element does not change how the PM understands the decision, omit it.
-  Make complexity visible through the contrast with the sibling sketches, not by packing more
-  controls into this one.
+- The must feel rough and fast, like an Excalidraw-style product wireframe. DO NOT make it look like real UI or use any design system. It should feel like a simple sketch.
+- The idea must be immediately visible - reduce text, and UI elements, just make the idea apparent. LESS IS MORE.
+- avoid realistic product styling: no shadows, polished cards, dense tables, pills, dashboards, nav, headers, modals, or multi-section layouts, etc.
+- ESSENTIAL: Ruthlessly minimize what is in the sketch. The sketch should contain only what is necessary to expose the tradeoff. If an element does not change how the PM understands the decision, omit it. Make complexity visible through the contrast between the three approaches, not by packing more controls into each approach.
 
-The caption should explain the product bet or tradeoff the sketch is testing. Make the caption
-snappy, short, to the point, and easy to read quickly.
+The caption should explain the product bet or tradeoff the sketch is testing. Make these captions snappy, short, to the point, and easy to read quickly.
 
 Return structured output matching the provided JSON schema.
