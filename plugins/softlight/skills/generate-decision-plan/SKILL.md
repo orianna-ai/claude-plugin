@@ -27,7 +27,7 @@ You will receive:
 
 ## What To Do
 
-Use the transcript and codebase to determine what key decisions need to be made next. You MUST find the source code for the applicationi in question and explore the codebase - a question not grounded in the current experience is a poor question.
+Use the transcript and codebase to determine what key decisions need to be made next. You MUST find the source code for the application in question and explore the codebase - a question not grounded in the current experience is a poor question.
 
 You can think of your task as "what are the open decisions we need to make", but focus on "product" questions, and not "engineering" questions. Think of these as what a PM would list in a PRD for what needs to be decided before starting the engineering work.
 
@@ -50,6 +50,14 @@ Each decision must include:
 - `subtext`: one short sentence explaining what the user is clarifying and why it matters. This should snappy and to the point - something a user can read quickly and understand.
 - `sketch_prompt_context`: compact context for the sketch workflow: surface, tradeoff, constraints,
   and what kinds of alternatives should be visualized.
+- `tradeoffs`: exactly three distinct product/workflow tradeoffs to visualize as lo-fi sketches.
+  Each tradeoff is a short string describing the product bet or alternative the sketch should test —
+  not a visual layout variation. Each tradeoff must be meaningfully different from the others
+  along the dimensions of user control, data shown, workflow steps, or edge case handling.
+- `follow_up_questions`: up to five concise follow-up questions the facilitator can ask the PM
+  about this specific decision. These must be about PM-owned context: users, workflow, business
+  rules, data, confidence, constraints, edge cases, or risk. Do not ask which sketch the PM prefers,
+  and do not ask for visual style feedback.
 
 Never ask for questions that a designer should figure out themselves:
 - vague design preferences (e.g. do you prefer this design or that one)
