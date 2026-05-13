@@ -168,7 +168,11 @@ def generate_decision_sketches(
                         "width": _SKETCH_WIDTH,
                         "height": _CAPTION_HEIGHT,
                         "x": index * (_SKETCH_WIDTH + _SKETCH_GAP),
-                        "y": base_y + _TITLE_HEIGHT + _ROW_GAP + _SKETCH_HEIGHT + _ROW_GAP,
+                        "y": base_y
+                        + _TITLE_HEIGHT
+                        + _ROW_GAP
+                        + _SKETCH_HEIGHT
+                        + _ROW_GAP,
                     },
                 }
                 for index, caption_slot_id in enumerate(caption_slot_ids)
