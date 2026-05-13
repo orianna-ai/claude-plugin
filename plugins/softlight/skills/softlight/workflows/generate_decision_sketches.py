@@ -38,6 +38,26 @@ def _conversation_transcript(project: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _screenshots(project: dict[str, Any]) -> list[dict[str, Any]]:
+    screenshots: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for conversation in project.get("conversations") or []:
+        for screenshot in conversation.get("screenshots") or []:
+            url = ((screenshot.get("image") or {}).get("url") or "").strip()
+            if not url or url in seen:
+                continue
+            seen.add(url)
+            screenshots.append(
+                {
+                    "url": url,
+                    "caption": screenshot.get("caption"),
+                    "timestamp": screenshot.get("timestamp"),
+                    "room": conversation.get("room"),
+                },
+            )
+    return screenshots
+
+
 def _canvas_bottom(project: dict[str, Any]) -> float:
     bottom = 0.0
     for revision in project.get("revisions") or []:
@@ -88,6 +108,7 @@ def generate_decision_sketches(
     project = get_project(config=config)
     decision = _decision_by_id(project, decision_id)
     transcript = _conversation_transcript(project)
+    screenshots = _screenshots(project)
     base_y = _canvas_bottom(project)
     row_width = 3 * _SKETCH_WIDTH + 2 * _SKETCH_GAP
 
@@ -147,11 +168,7 @@ def generate_decision_sketches(
                         "width": _SKETCH_WIDTH,
                         "height": _CAPTION_HEIGHT,
                         "x": index * (_SKETCH_WIDTH + _SKETCH_GAP),
-                        "y": base_y
-                        + _TITLE_HEIGHT
-                        + _ROW_GAP
-                        + _SKETCH_HEIGHT
-                        + _ROW_GAP,
+                        "y": base_y + _TITLE_HEIGHT + _ROW_GAP + _SKETCH_HEIGHT + _ROW_GAP,
                     },
                 }
                 for index, caption_slot_id in enumerate(caption_slot_ids)
@@ -173,7 +190,17 @@ ${decision}
 <transcript>
 ${transcript}
 </transcript>
+
+The screenshots below are captured frames from what the PM/founder screenshared during the intake.
+Use the attached image blocks as context for the current product surface and workflow.
 """,
+            *(
+                {
+                    "type": "image",
+                    "source": {"type": "url", "url": screenshot["url"]},
+                }
+                for screenshot in screenshots
+            ),
         ],
         params={
             "decision": json.dumps(decision, indent=2),
