@@ -110,9 +110,8 @@ Return structured output matching the provided JSON schema.
 ${transcript}
 </transcript>
 
-<screenshots>
-${screenshots}
-</screenshots>
+The screenshots below are captured frames from what the PM/founder screenshared during the intake.
+Use the attached image blocks as context for the current product surface and workflow.
 
 <existing_decisions>
 ${existing_decisions}
@@ -123,14 +122,13 @@ ${existing_decisions}
                     "type": "image",
                     "source": {"type": "url", "url": screenshot["url"]},
                 }
-                for screenshot in screenshots[:6]
+                for screenshot in screenshots
             ),
         ],
         params={
             "project_id": config.project_id,
             "mode": mode,
             "transcript": transcript,
-            "screenshots": json.dumps(screenshots, indent=2),
             "existing_decisions": json.dumps(existing_decisions, indent=2),
         },
         config=config,
@@ -143,9 +141,7 @@ ${existing_decisions}
     decisions: list[dict[str, Any]] = []
     if mode == "next":
         decisions.extend(
-            decision
-            for decision in existing_decisions
-            if decision.get("status") == "resolved"
+            decision for decision in existing_decisions if decision.get("status") == "resolved"
         )
         next_decision = result["decisions"][0]
         next_decision_id = _next_decision_id(existing_decisions)

@@ -21,14 +21,15 @@ You will receive:
 - `project_id`: the Softlight project id.
 - `mode`: `initial` or `next`.
 - `transcript`: the live conversation so far.
-- `screenshots`: captured screen-share screenshots.
 - `existing_decisions`: previously generated decisions and their statuses.
+- attached screenshots: captured frames from the PM/founder's live screen share.
+
 
 ## What To Do
 
-Use the transcript and codebase to determine what question to answer next. You MUST find the source code for the applicationi in question and explore the codebase - a question not grounded in the current experience is a poor question.
+Use the transcript and codebase to determine what key decisions need to be made next. You MUST find the source code for the applicationi in question and explore the codebase - a question not grounded in the current experience is a poor question.
 
-You can think of your task as "what are the open questions we need to figure out to best implement the solution", but focus on "product" and "design" questions, and not "engineering" questions.
+You can think of your task as "what are the open decisions we need to make", but focus on "product" questions, and not "engineering" questions. Think of these as what a PM would list in a PRD for what needs to be decided before starting the engineering work.
 
 For `initial` mode:
 - Generate 3-6 ordered decisions.
@@ -45,13 +46,13 @@ For `next` mode:
 
 Each decision must include:
 
-- `open_question`: one direct question the PM can work through.
-- `subtext`: one short sentence explaining what the user is clarifying and why it matters.
+- `open_question`: one direct question the PM can work through. This should be a snappy direct question, quick to read and intuit.
+- `subtext`: one short sentence explaining what the user is clarifying and why it matters. This should snappy and to the point - something a user can read quickly and understand.
 - `sketch_prompt_context`: compact context for the sketch workflow: surface, tradeoff, constraints,
   and what kinds of alternatives should be visualized.
 
-Avoid:
-
+Never ask for questions that a designer should figure out themselves:
+- vague design preferences (e.g. do you prefer this design or that one)
 - visual style, color, spacing, exact component, or layout preference questions.
 - questions already answered by the conversation.
 - generic questions that could apply to any product.
