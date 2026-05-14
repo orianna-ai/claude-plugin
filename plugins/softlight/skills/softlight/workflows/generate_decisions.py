@@ -1,7 +1,5 @@
 import concurrent.futures
-import html
 import json
-import math
 import uuid
 from typing import Any, TypedDict
 
@@ -12,21 +10,12 @@ from scripts.post_events import post_events
 
 from workflows.base import workflow
 
-_SKETCH_WIDTH = 1720
-_SKETCH_HEIGHT = 1120
 _SKETCH_AUTHOR_WIDTH = 760
 _SKETCH_AUTHOR_HEIGHT = 520
-_SKETCH_GAP = 120
-_TITLE_HEIGHT = 120.0
-_CAPTION_HEIGHT = 120.0
-_ROW_GAP = 64.0
-_REVISION_GAP = 800.0
-_GRID_SIZE = 40.0
 _SKETCH_PARALLELISM = 4
 
 
-class GenerateDecisionParams(TypedDict, total=False):
-    decisionId: str
+class GenerateDecisionsParams(TypedDict, total=False):
     mode: str
     runId: str
 
@@ -116,20 +105,6 @@ def _screenshots(project: dict[str, Any]) -> list[dict[str, Any]]:
     return screenshots
 
 
-def _canvas_bottom(project: dict[str, Any]) -> float:
-    bottom = 0.0
-    for revision in project.get("revisions") or []:
-        for slot in revision.get("slots") or []:
-            x = float(slot.get("x") or 0)
-            y = float(slot.get("y") or 0)
-            if x < -90000 or y < -90000:
-                continue
-            bottom = max(bottom, y + float(slot.get("height") or 0))
-    if bottom == 0:
-        return 0.0
-    return math.ceil((bottom + _REVISION_GAP) / _GRID_SIZE) * _GRID_SIZE
-
-
 def _next_decision_id(existing_decisions: list[dict[str, Any]]) -> str:
     used = {str(decision.get("id") or "") for decision in existing_decisions}
     for index in range(1, len(used) + 8):
@@ -139,22 +114,35 @@ def _next_decision_id(existing_decisions: list[dict[str, Any]]) -> str:
     return f"decision-{uuid.uuid4().hex[:8]}"
 
 
-def _wrap_sketch_html(body: str, title: str) -> str:
-    if "<html" in body.lower():
-        return body
-    return f"""\
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{html.escape(title)}</title>
-  </head>
-  <body>
-{body}
-  </body>
-</html>
-"""
+def _decision_from_raw(
+    *,
+    raw_decision: dict[str, Any],
+    decision_id: str,
+    status: str,
+) -> dict[str, Any]:
+    follow_up_questions = [
+        " ".join(str(question).split())
+        for question in (raw_decision.get("follow_up_questions") or [])
+        if isinstance(question, str) and question.strip()
+    ]
+    tradeoffs = [
+        " ".join(str(tradeoff).split())
+        for tradeoff in (raw_decision.get("tradeoffs") or [])
+        if isinstance(tradeoff, str) and str(tradeoff).strip()
+    ]
+    return {
+        "id": decision_id,
+        "open_question": str(raw_decision["open_question"]).strip(),
+        "subtext": str(raw_decision["subtext"]).strip(),
+        "sketch_prompt_context": str(
+            raw_decision.get("sketch_prompt_context") or "",
+        ).strip(),
+        "follow_up_questions": follow_up_questions,
+        "sketches": [],
+        "sketches_ready": False,
+        "tradeoffs": tradeoffs,
+        "status": status,
+    }
 
 
 def _generate_sketch(
@@ -164,10 +152,8 @@ def _generate_sketch(
     tradeoff: str,
     transcript: str,
     screenshots: list[dict[str, Any]],
-    sketch_slot_id: str,
-    caption_slot_id: str,
     session_id: str,
-) -> None:
+) -> dict[str, Any]:
     result = call_claude(
         prompt=[
             """\
@@ -237,7 +223,6 @@ output schema should be snappy, short, to the point, and easy to read quickly.
             "decision": json.dumps(decision, indent=2),
             "sketch_author_height": _SKETCH_AUTHOR_HEIGHT,
             "sketch_author_width": _SKETCH_AUTHOR_WIDTH,
-            "sketch_display_width": _SKETCH_WIDTH,
             "tradeoff": tradeoff,
             "transcript": transcript,
         },
@@ -248,59 +233,59 @@ output schema should be snappy, short, to the point, and easy to read quickly.
         session_id=session_id,
     )
 
-    post_events(
-        config=config,
-        events=[
-            {
-                "type": "slot_updated",
-                "slot_id": sketch_slot_id,
-                "element": {
-                    "type": "html",
-                    "html": _wrap_sketch_html(
-                        str(result["html"]),
-                        str(result["title"]),
-                    ),
-                },
-            },
-            {
-                "type": "slot_updated",
-                "slot_id": caption_slot_id,
-                "element": {
-                    "type": "text",
-                    "variant": "p",
-                    "bold": False,
-                    "text": f"**{result['title']}**\n\n{result['caption']}",
-                },
-            },
-        ],
-    )
+    return {
+        "tradeoff": tradeoff,
+        "title": str(result["title"]).strip(),
+        "html": str(result["html"]),
+        "caption": str(result["caption"]).strip(),
+    }
 
 
-@workflow
-def generate_decision(
+def _generate_sketches_for_decision(
+    *,
     config: Config,
-    params: GenerateDecisionParams,
-) -> None:
-    """Generate the open decision list, or sketches for one confirmed decision."""
-    mode = params.get("mode") or "initial"
-    run_id = params.get("runId") or str(uuid.uuid4())
-    project = get_project(config=config)
-    transcript = _conversation_transcript(project)
-    screenshots = _screenshots(project)
-    existing_decisions = project.get("decisions") or []
-
-    if mode == "sketch":
-        _generate_decision_sketches_for_selected_decision(
-            config=config,
-            project=project,
-            transcript=transcript,
-            screenshots=screenshots,
-            existing_decisions=existing_decisions,
-            decision_id=str(params.get("decisionId") or ""),
-            run_id=run_id,
+    decision: dict[str, Any],
+    transcript: str,
+    screenshots: list[dict[str, Any]],
+    run_id: str,
+) -> list[dict[str, Any]]:
+    tradeoffs = [tradeoff for tradeoff in decision.get("tradeoffs") or [] if str(tradeoff).strip()]
+    if not tradeoffs:
+        raise ValueError(
+            f"decision {decision.get('id')!r} has no tradeoffs to sketch",
         )
-        return
 
+    sketches: list[dict[str, Any] | None] = [None] * len(tradeoffs)
+    with concurrent.futures.ThreadPoolExecutor(
+        max_workers=min(_SKETCH_PARALLELISM, len(tradeoffs)),
+    ) as executor:
+        futures = {
+            executor.submit(
+                _generate_sketch,
+                config=config,
+                decision=decision,
+                tradeoff=tradeoff,
+                transcript=transcript,
+                screenshots=screenshots,
+                session_id=(f"generate_decision_sketch:{decision['id']}:{run_id}:{index}"),
+            ): index
+            for index, tradeoff in enumerate(tradeoffs)
+        }
+        for future in concurrent.futures.as_completed(futures):
+            sketches[futures[future]] = future.result()
+
+    return [sketch for sketch in sketches if sketch is not None]
+
+
+def _generate_decision_plan(
+    *,
+    config: Config,
+    mode: str,
+    transcript: str,
+    screenshots: list[dict[str, Any]],
+    existing_decisions: list[dict[str, Any]],
+    run_id: str,
+) -> list[dict[str, Any]]:
     plan = call_claude(
         prompt=[
             """\
@@ -430,271 +415,81 @@ Return structured output matching the provided JSON schema.
         session_id=f"generate_decision_plan:{run_id}",
     )
 
-    decisions: list[dict[str, Any]] = []
     if mode == "next":
-        decisions.extend(existing_decisions)
         raw_decision = plan["decisions"][0]
-        decisions.append(
-            _decision_from_raw(
-                raw_decision=raw_decision,
-                decision_id=_next_decision_id(existing_decisions),
-                status="pending",
-            ),
+        new_decision = _decision_from_raw(
+            raw_decision=raw_decision,
+            decision_id=_next_decision_id(existing_decisions),
+            status="pending",
+        )
+        return [*existing_decisions, new_decision]
+
+    return [
+        _decision_from_raw(
+            raw_decision=raw_decision,
+            decision_id=f"decision-{index}",
+            status="pending",
+        )
+        for index, raw_decision in enumerate(plan["decisions"], start=1)
+    ]
+
+
+@workflow
+def generate_decisions(
+    config: Config,
+    params: GenerateDecisionsParams,
+) -> None:
+    """Generate the open decision list and the sketches for each decision."""
+    mode = params.get("mode") or "initial"
+    run_id = params.get("runId") or str(uuid.uuid4())
+    project = get_project(config=config)
+    transcript = _conversation_transcript(project)
+    screenshots = _screenshots(project)
+    existing_decisions = list(project.get("decisions") or [])
+
+    if mode == "next" or not existing_decisions:
+        decisions = _generate_decision_plan(
+            config=config,
+            mode=mode,
+            transcript=transcript,
+            screenshots=screenshots,
+            existing_decisions=existing_decisions,
+            run_id=run_id,
+        )
+        post_events(
+            config=config,
+            events=[
+                {
+                    "type": "decision_updated",
+                    "decision_mode_started": True,
+                    "decisions": decisions,
+                },
+            ],
         )
     else:
-        for index, raw_decision in enumerate(plan["decisions"], start=1):
-            decisions.append(
-                _decision_from_raw(
-                    raw_decision=raw_decision,
-                    decision_id=f"decision-{index}",
-                    status="pending",
-                ),
-            )
+        decisions = existing_decisions
 
-    post_events(
-        config=config,
-        events=[
-            {"type": "decision_mode_started"},
-            {"type": "decision_list_updated", "decisions": decisions},
-        ],
-    )
+    for decision in decisions:
+        if decision.get("sketches_ready") or not decision.get("tradeoffs"):
+            continue
 
-
-def _decision_from_raw(
-    *,
-    raw_decision: dict[str, Any],
-    decision_id: str,
-    status: str,
-) -> dict[str, Any]:
-    follow_up_questions = [
-        " ".join(str(question).split())
-        for question in (raw_decision.get("follow_up_questions") or [])
-        if isinstance(question, str) and question.strip()
-    ]
-    return {
-        "id": decision_id,
-        "open_question": str(raw_decision["open_question"]).strip(),
-        "subtext": str(raw_decision["subtext"]).strip(),
-        "sketch_prompt_context": str(
-            raw_decision.get("sketch_prompt_context") or "",
-        ).strip(),
-        "follow_up_questions": follow_up_questions,
-        "sketches_ready": False,
-        "status": status,
-    }
-
-
-def _generate_decision_sketches_for_selected_decision(
-    *,
-    config: Config,
-    project: dict[str, Any],
-    transcript: str,
-    screenshots: list[dict[str, Any]],
-    existing_decisions: list[dict[str, Any]],
-    decision_id: str,
-    run_id: str,
-) -> None:
-    active_decision = next(
-        (
-            dict(decision)
-            for decision in existing_decisions
-            if str(decision.get("id") or "") == decision_id
-        ),
-        None,
-    )
-    if active_decision is None:
-        raise ValueError(f"No decision found for decisionId={decision_id!r}")
-
-    plan = call_claude(
-        prompt=[
-            """\
-You are a senior product designer preparing lo-fi sketches for one confirmed product/design
-decision.
-
-The PM/founder has already reviewed the decision list and selected the active decision below. Your
-job is not to choose a new decision. Your job is to enrich this exact decision with three distinct
-tradeoffs to sketch and concise follow-up questions the facilitator can ask.
-
-<decision>
-${decision}
-</decision>
-
-<transcript>
-${transcript}
-</transcript>
-
-<existing_decisions>
-${existing_decisions}
-</existing_decisions>
-
-Use the attached screenshots as grounding for the current product surface and workflow.
-
-Return exactly one decision object. Keep `open_question` and `subtext` aligned with the selected
-decision. Include exactly three tradeoffs that are meaningfully different product/workflow bets,
-not visual variations.
-""",
-            *(
+        sketches = _generate_sketches_for_decision(
+            config=config,
+            decision=decision,
+            transcript=transcript,
+            screenshots=screenshots,
+            run_id=run_id,
+        )
+        decision["sketches"] = sketches
+        decision["sketches_ready"] = True
+        post_events(
+            config=config,
+            events=[
                 {
-                    "type": "image",
-                    "source": {"type": "url", "url": screenshot["url"]},
-                }
-                for screenshot in screenshots
-            ),
-        ],
-        params={
-            "decision": json.dumps(active_decision, indent=2),
-            "transcript": transcript,
-            "existing_decisions": json.dumps(existing_decisions, indent=2),
-        },
-        config=config,
-        effort="low",
-        json_schema=_DECISION_PLAN_SCHEMA,
-        model="opus",
-        session_id=f"generate_decision_tradeoffs:{decision_id}:{run_id}",
-    )
-
-    raw_active = plan["decisions"][0]
-    tradeoffs = [
-        str(tradeoff).strip()
-        for tradeoff in raw_active.get("tradeoffs") or []
-        if isinstance(tradeoff, str) and str(tradeoff).strip()
-    ]
-    if not tradeoffs:
-        raise ValueError("generate_decision returned no tradeoffs for the active decision")
-
-    enriched_decision = _decision_from_raw(
-        raw_decision={
-            **raw_active,
-            "open_question": active_decision.get("open_question") or raw_active["open_question"],
-            "subtext": active_decision.get("subtext") or raw_active["subtext"],
-            "sketch_prompt_context": raw_active.get("sketch_prompt_context")
-            or active_decision.get("sketch_prompt_context")
-            or "",
-        },
-        decision_id=decision_id,
-        status="active",
-    )
-    decisions = [
-        enriched_decision if str(decision.get("id") or "") == decision_id else decision
-        for decision in existing_decisions
-    ]
-
-    base_y = _canvas_bottom(project)
-    sketch_count = len(tradeoffs)
-    row_width = sketch_count * _SKETCH_WIDTH + (sketch_count - 1) * _SKETCH_GAP
-
-    title_slot_id = str(uuid.uuid4())
-    sketch_slot_ids = [str(uuid.uuid4()) for _ in range(sketch_count)]
-    caption_slot_ids = [str(uuid.uuid4()) for _ in range(sketch_count)]
-
-    post_events(
-        config=config,
-        events=[
-            {"type": "decision_mode_started"},
-            {"type": "decision_list_updated", "decisions": decisions},
-            {"type": "revision_created", "revision": {}},
-            {
-                "type": "slot_created",
-                "slot": {
-                    "metadata": {"id": title_slot_id},
-                    "element": {
-                        "type": "text",
-                        "variant": "h2",
-                        "bold": True,
-                        "text": enriched_decision["open_question"],
-                    },
-                    "width": row_width,
-                    "height": _TITLE_HEIGHT,
-                    "x": 0,
-                    "y": base_y,
-                },
-            },
-            *[
-                {
-                    "type": "slot_created",
-                    "slot": {
-                        "metadata": {"id": sketch_slot_id},
-                        "element": {
-                            "type": "placeholder",
-                            "content_type": "prototype",
-                        },
-                        "width": _SKETCH_WIDTH,
-                        "height": _SKETCH_HEIGHT,
-                        "x": index * (_SKETCH_WIDTH + _SKETCH_GAP),
-                        "y": base_y + _TITLE_HEIGHT + _ROW_GAP,
-                    },
-                }
-                for index, sketch_slot_id in enumerate(sketch_slot_ids)
-            ],
-            *[
-                {
-                    "type": "slot_created",
-                    "slot": {
-                        "metadata": {"id": caption_slot_id},
-                        "references": [
-                            {"type": "slot", "slot_id": sketch_slot_ids[index]},
-                        ],
-                        "element": {
-                            "type": "placeholder",
-                            "content_type": "text",
-                        },
-                        "width": _SKETCH_WIDTH,
-                        "height": _CAPTION_HEIGHT,
-                        "x": index * (_SKETCH_WIDTH + _SKETCH_GAP),
-                        "y": base_y + _TITLE_HEIGHT + _ROW_GAP + _SKETCH_HEIGHT + _ROW_GAP,
-                    },
-                }
-                for index, caption_slot_id in enumerate(caption_slot_ids)
-            ],
-            {
-                "type": "prompt_progress",
-                "prompt_id": run_id,
-                "result": {
-                    "caption_slot_ids": caption_slot_ids,
-                    "decision_id": decision_id,
-                    "sketch_slot_ids": sketch_slot_ids,
-                    "title_slot_id": title_slot_id,
-                },
-            },
-        ],
-    )
-
-    with concurrent.futures.ThreadPoolExecutor(
-        max_workers=min(_SKETCH_PARALLELISM, sketch_count),
-    ) as executor:
-        futures = [
-            executor.submit(
-                _generate_sketch,
-                config=config,
-                decision=enriched_decision,
-                tradeoff=tradeoff,
-                transcript=transcript,
-                screenshots=screenshots,
-                sketch_slot_id=sketch_slot_ids[index],
-                caption_slot_id=caption_slot_ids[index],
-                session_id=f"generate_decision_sketch:{decision_id}:{run_id}:{index}",
-            )
-            for index, tradeoff in enumerate(tradeoffs)
-        ]
-        for future in concurrent.futures.as_completed(futures):
-            future.result()
-
-    enriched_decision["sketches_ready"] = True
-    post_events(
-        config=config,
-        events=[
-            {"type": "decision_list_updated", "decisions": decisions},
-            {
-                "type": "prompt_progress",
-                "prompt_id": run_id,
-                "result": {
-                    "caption_slot_ids": caption_slot_ids,
-                    "decision_id": decision_id,
-                    "follow_up_questions": enriched_decision["follow_up_questions"],
-                    "sketch_slot_ids": sketch_slot_ids,
+                    "type": "decision_updated",
+                    "decision_id": decision["id"],
+                    "sketches": sketches,
                     "sketches_ready": True,
-                    "title_slot_id": title_slot_id,
                 },
-            },
-        ],
-    )
+            ],
+        )
