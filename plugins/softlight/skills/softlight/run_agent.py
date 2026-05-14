@@ -23,7 +23,6 @@ _MAX_RETRYABLE_PROMPT_ATTEMPTS = 3
 _PROMPT_RETRY_BACKOFF_SECONDS = 5
 _RETRYABLE_WORKFLOWS = {
     "generate_decisions",
-    "show_decision",
 }
 
 
