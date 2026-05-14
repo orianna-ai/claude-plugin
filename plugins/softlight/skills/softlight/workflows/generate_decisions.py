@@ -36,7 +36,7 @@ _DECISION_PLAN_SCHEMA = {
                     "tradeoffs": {
                         "type": "array",
                         "minItems": 3,
-                        "maxItems": 3,
+                        "maxItems": 6,
                         "items": {"type": "string", "minLength": 1},
                     },
                     "follow_up_questions": {
@@ -250,11 +250,7 @@ def _generate_sketches_for_decision(
     screenshots: list[dict[str, Any]],
     run_id: str,
 ) -> list[dict[str, Any]]:
-    tradeoffs = [
-        tradeoff
-        for tradeoff in decision.get("tradeoffs") or []
-        if str(tradeoff).strip()
-    ]
+    tradeoffs = [tradeoff for tradeoff in decision.get("tradeoffs") or [] if str(tradeoff).strip()]
     if not tradeoffs:
         raise ValueError(
             f"decision {decision.get('id')!r} has no tradeoffs to sketch",
@@ -272,9 +268,7 @@ def _generate_sketches_for_decision(
                 tradeoff=tradeoff,
                 transcript=transcript,
                 screenshots=screenshots,
-                session_id=(
-                    f"generate_decision_sketch:{decision['id']}:{run_id}:{index}"
-                ),
+                session_id=(f"generate_decision_sketch:{decision['id']}:{run_id}:{index}"),
             ): index
             for index, tradeoff in enumerate(tradeoffs)
         }
@@ -361,10 +355,14 @@ Each decision must include:
   should snappy and to the point - something a user can read quickly and understand.
 - `sketch_prompt_context`: compact context for the sketch workflow: surface, tradeoff, constraints,
   and what kinds of alternatives should be visualized.
-- `tradeoffs`: exactly three distinct product/workflow tradeoffs to visualize as lo-fi sketches.
+- `tradeoffs`: between 3 and 6 distinct product/workflow tradeoffs to visualize as lo-fi sketches.
   Each tradeoff is a short string describing the product bet or alternative the sketch should test —
   not a visual layout variation. Each tradeoff must be meaningfully different from the others
-  along the dimensions of user control, data shown, workflow steps, or edge case handling.
+  along the dimensions of user control, data shown, workflow steps, or edge case handling. Pick the
+  count that fits the decision — only add a fourth, fifth, or sixth tradeoff if it tests a
+  meaningfully different bet, not to round out a set. If a decision really only has two strong
+  directions, expand to three by including a hybrid or escape-hatch alternative rather than padding
+  with a weak third.
 - `follow_up_questions`: up to 2-3 concise follow-up questions the facilitator can ask the PM
   about this specific decision. These must be about PM-owned context: users, workflow, business
   rules, data, confidence, constraints, edge cases, or risk. Do not ask which sketch the PM prefers,
@@ -468,7 +466,7 @@ def generate_decisions(
             config=config,
             events=[
                 {
-                    "type": "decision_updated",
+                    "type": "project_updated",
                     "decision_mode_started": True,
                     "decisions": decisions,
                 },
