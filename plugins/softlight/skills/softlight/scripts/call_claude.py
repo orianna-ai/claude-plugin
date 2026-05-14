@@ -271,6 +271,14 @@ def call_claude(
             ],
         )
 
+    if plugin_dir := os.environ.get("SOFTLIGHT_PLUGIN_DIR"):
+        cmd.extend(
+            [
+                "--plugin-dir",
+                plugin_dir,
+            ],
+        )
+
     # build the input context that will be passed to claude code
     input = []
 
@@ -293,9 +301,7 @@ def call_claude(
                 content.append(
                     {
                         "type": "text",
-                        "text": string.Template(item)
-                        .safe_substitute(params or {})
-                        .strip(),
+                        "text": string.Template(item).safe_substitute(params or {}).strip(),
                     },
                 )
             elif isinstance(item, dict):
