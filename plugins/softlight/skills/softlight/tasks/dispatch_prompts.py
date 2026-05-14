@@ -11,6 +11,13 @@ from workflows.base import WORKFLOWS
 
 from tasks.base import task
 
+# duration to wait between event queries
+_POLL_INTERVAL = 5
+
+
+# maximum number of prompts that can be run in parallel
+_MAX_CONCURRENT_PROMPTS = 8
+
 
 def _fetch_events(
     config: Config,
@@ -37,9 +44,7 @@ def _get_pending_prompts(
     events: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     completed_prompts = {
-        event["prompt_id"]
-        for event in events
-        if event.get("type") == "prompt_succeeded"
+        event["prompt_id"] for event in events if event.get("type") == "prompt_succeeded"
     }
 
     pending_prompts = [
@@ -102,7 +107,9 @@ def _handle_prompt(
 def dispatch_prompts(
     config: Config,
 ) -> None:
-    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
+    with concurrent.futures.ThreadPoolExecutor(
+        max_workers=_MAX_CONCURRENT_PROMPTS,
+    ) as executor:
         cursor = 0
 
         while True:
@@ -118,4 +125,4 @@ def dispatch_prompts(
 
                 cursor = len(events)
 
-            time.sleep(5)
+            time.sleep(_POLL_INTERVAL)

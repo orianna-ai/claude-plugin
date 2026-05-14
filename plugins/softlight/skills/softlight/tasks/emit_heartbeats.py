@@ -5,6 +5,9 @@ from scripts.post_events import post_events
 
 from tasks.base import task
 
+# duration to wait between heartbeats
+_POLL_INTERVAL = 30
+
 
 @task()
 def emit_heartbeats(
@@ -20,4 +23,4 @@ def emit_heartbeats(
             ],
         )
 
-        time.sleep(30)
+        time.sleep(_POLL_INTERVAL)
