@@ -23,8 +23,8 @@ def _infer_schema(
 ) -> dict[str, Any]:
     signature = inspect.signature(call)
     params_name = list(signature.parameters)[1]
-    params_type = get_type_hints(call)[params_name]
-    type_hints = get_type_hints(params_type)
+    params_type = get_type_hints(call, localns={"Config": Config})[params_name]
+    type_hints = get_type_hints(params_type, localns={"Config": Config})
 
     return {
         "type": "object",
