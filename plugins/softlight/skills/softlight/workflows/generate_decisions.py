@@ -231,6 +231,7 @@ output schema should be snappy, short, to the point, and easy to read quickly.
         json_schema=_DECISION_SKETCH_SCHEMA,
         model="sonnet",
         session_id=session_id,
+        tools=[],
     )
 
     return {
@@ -249,11 +250,7 @@ def _generate_sketches_for_decision(
     screenshots: list[dict[str, Any]],
     run_id: str,
 ) -> list[dict[str, Any]]:
-    tradeoffs = [
-        tradeoff
-        for tradeoff in decision.get("tradeoffs") or []
-        if str(tradeoff).strip()
-    ]
+    tradeoffs = [tradeoff for tradeoff in decision.get("tradeoffs") or [] if str(tradeoff).strip()]
     if not tradeoffs:
         raise ValueError(
             f"decision {decision.get('id')!r} has no tradeoffs to sketch",
@@ -271,9 +268,7 @@ def _generate_sketches_for_decision(
                 tradeoff=tradeoff,
                 transcript=transcript,
                 screenshots=screenshots,
-                session_id=(
-                    f"generate_decision_sketch:{decision['id']}:{run_id}:{index}"
-                ),
+                session_id=(f"generate_decision_sketch:{decision['id']}:{run_id}:{index}"),
             ): index
             for index, tradeoff in enumerate(tradeoffs)
         }
@@ -415,6 +410,7 @@ Return structured output matching the provided JSON schema.
             "existing_decisions": json.dumps(existing_decisions, indent=2),
         },
         config=config,
+        disallowed_tools=["mcp__softlight__create_exploration"],
         effort="low",
         json_schema=_DECISION_PLAN_SCHEMA,
         model="opus",
