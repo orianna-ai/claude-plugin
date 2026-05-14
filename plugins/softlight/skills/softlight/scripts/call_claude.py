@@ -6,7 +6,6 @@ import os
 import shlex
 import string
 import subprocess
-import tempfile
 from typing import TYPE_CHECKING, Any, Literal, overload
 
 if TYPE_CHECKING:
@@ -45,19 +44,6 @@ def _claude_code_command(
         sh = f"cd {shlex.quote(cwd)} && {sh}"
 
     return f"{sh} <<'EOF'\n{stdin}\nEOF"
-
-
-def _read_stderr_tail(
-    stderr_file: Any,
-    *,
-    max_chars: int = 12_000,
-) -> str:
-    stderr_file.flush()
-    stderr_file.seek(0)
-    stderr = stderr_file.read()
-    if len(stderr) <= max_chars:
-        return stderr
-    return stderr[-max_chars:]
 
 
 _Effort = Literal[
@@ -307,9 +293,7 @@ def call_claude(
                 content.append(
                     {
                         "type": "text",
-                        "text": string.Template(item)
-                        .safe_substitute(params or {})
-                        .strip(),
+                        "text": string.Template(item).safe_substitute(params or {}).strip(),
                     },
                 )
             elif isinstance(item, dict):
@@ -333,63 +317,53 @@ def call_claude(
 
     stdin = "\n".join(json.dumps(message) for message in input)
 
-    # Run claude code as a subprocess and stream the output in real-time. Keep stderr
-    # in a temp file so subprocess crashes include useful diagnostics without risking
-    # a pipe deadlock.
-    with tempfile.TemporaryFile(mode="w+t") as stderr_file:
-        with subprocess.Popen(
-            cmd,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=stderr_file,
-            cwd=_claude_code_cwd(),
-            env={
-                **{var: val for var, val in os.environ.items() if var != "CLAUDECODE"},
-                "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
-                "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
-                "CLAUDE_CODE_GLOB_NO_IGNORE": "false",
-                "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
-                "MCP_CONNECTION_NONBLOCKING": "false",
-                "MCP_TOOL_TIMEOUT": "300000",  # 5m
-                "SOFTLIGHT_PROJECT_ID": config.project_id,
-            },
-            text=True,
-        ) as claude_code:
-            assert claude_code.stdin is not None
-            claude_code.stdin.write(stdin)
-            claude_code.stdin.close()
+    # run claude code as a subprocess and stream the output in real-time
+    with subprocess.Popen(
+        cmd,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        cwd=_claude_code_cwd(),
+        env={
+            **{var: val for var, val in os.environ.items() if var != "CLAUDECODE"},
+            "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+            "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+            "CLAUDE_CODE_GLOB_NO_IGNORE": "false",
+            "ENABLE_CLAUDEAI_MCP_SERVERS": "false",
+            "MCP_CONNECTION_NONBLOCKING": "false",
+            "MCP_TOOL_TIMEOUT": "300000",  # 5m
+            "SOFTLIGHT_PROJECT_ID": config.project_id,
+        },
+        text=True,
+    ) as claude_code:
+        assert claude_code.stdin is not None
+        claude_code.stdin.write(stdin)
+        claude_code.stdin.close()
 
-            assert claude_code.stdout is not None
-            last_message: dict[str, Any] = {}
+        assert claude_code.stdout is not None
+        last_message: dict[str, Any] = {}
 
-            for line in claude_code.stdout:
-                print(line)
+        for line in claude_code.stdout:
+            print(line)
 
-                last_message = json.loads(line.rstrip("\n"))
+            last_message = json.loads(line.rstrip("\n"))
 
-                if session_id is not None:
-                    with config.lock:
-                        config.transcripts[session_id].append(last_message)
+            if session_id is not None:
+                with config.lock:
+                    config.transcripts[session_id].append(last_message)
 
-                if last_message.get("type") == "result":
-                    claude_code.terminate()
+            if last_message.get("type") == "result":
+                claude_code.terminate()
 
-                    if last_message.get("is_error"):
-                        stderr_tail = _read_stderr_tail(stderr_file)
-                        raise RuntimeError(
-                            f"{last_message['result']}\n\n"
-                            f"Claude stderr:\n{stderr_tail or '(empty)'}\n\n"
-                            f"{_claude_code_command(cmd, stdin)}",
-                        )
-                    elif json_schema:
-                        return last_message["structured_output"]
-                    else:
-                        return last_message["result"]
-
-        stderr_tail = _read_stderr_tail(stderr_file)
+                if last_message.get("is_error"):
+                    raise RuntimeError(
+                        f"{last_message['result']}:\n{_claude_code_command(cmd, stdin)}",
+                    )
+                elif json_schema:
+                    return last_message["structured_output"]
+                else:
+                    return last_message["result"]
 
     raise RuntimeError(
-        "claude did not emit a result message\n\n"
-        f"Claude stderr:\n{stderr_tail or '(empty)'}\n\n"
-        f"{_claude_code_command(cmd, stdin)}",
+        f"claude did not emit a result message:\n{_claude_code_command(cmd, stdin)}",
     )
