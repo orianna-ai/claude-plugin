@@ -22,22 +22,17 @@ _MAX_CONCURRENT_PROMPTS = 8
 def _fetch_events(
     config: Config,
 ) -> list[dict[str, Any]]:
-    try:
-        with urllib.request.urlopen(
-            urllib.request.Request(
-                f"{config.base_url}/api/projects/{config.project_id}/events",
-                headers={
-                    "Content-Type": "application/json",
-                    "User-Agent": "claude-code",
-                },
-            ),
-            timeout=10,
-        ) as response:
-            return json.loads(response.read())
-    except Exception:
-        traceback.print_exc()
-
-        return []
+    with urllib.request.urlopen(
+        urllib.request.Request(
+            f"{config.base_url}/api/projects/{config.project_id}/events",
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": "claude-code",
+            },
+        ),
+        timeout=30,
+    ) as response:
+        return json.loads(response.read())
 
 
 def _get_pending_prompts(
