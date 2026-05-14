@@ -301,9 +301,7 @@ def call_claude(
                 content.append(
                     {
                         "type": "text",
-                        "text": string.Template(item)
-                        .safe_substitute(params or {})
-                        .strip(),
+                        "text": string.Template(item).safe_substitute(params or {}).strip(),
                     },
                 )
             elif isinstance(item, dict):
