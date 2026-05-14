@@ -212,6 +212,9 @@ def call_claude(
         "--verbose",
     ]
 
+    if harness_plugin_dir := os.environ.get("SOFTLIGHT_HARNESS_EXPECTED_PLUGIN_DIR"):
+        cmd[1:1] = ["--plugin-dir", harness_plugin_dir]
+
     if fork_session:
         if original_session_id := _claude_code_session_id():
             cmd.extend(
