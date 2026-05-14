@@ -94,7 +94,7 @@ def _with_restarts(
                     events=[
                         {
                             "type": "agent_task_failed",
-                            "task": task,
+                            "task": call.__name__,
                             "error": error,
                             "restart_count": restart_count,
                         },
