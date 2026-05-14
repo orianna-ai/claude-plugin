@@ -88,12 +88,20 @@ def _with_restarts(
             else:
                 error = "task exited without raising an exception"
 
-            _post_agent_task_failed(
-                config,
-                error=error,
-                restart_count=restart_count,
-                task=call.__name__,
-            )
+            try:
+                post_events(
+                    config=config,
+                    events=[
+                        {
+                            "type": "agent_task_failed",
+                            "task": task,
+                            "error": error,
+                            "restart_count": restart_count,
+                        },
+                    ],
+                )
+            except Exception:
+                traceback.print_exc()
 
             if max_restarts is not None and restart_count >= max_restarts:
                 return
@@ -103,29 +111,6 @@ def _with_restarts(
             time.sleep(min(60, 2 ** min(restart_count, 6)))
 
     return wrapper
-
-
-def _post_agent_task_failed(
-    config: Config,
-    *,
-    error: str,
-    restart_count: int,
-    task: str,
-) -> None:
-    try:
-        post_events(
-            config=config,
-            events=[
-                {
-                    "type": "agent_task_failed",
-                    "task": task,
-                    "error": error,
-                    "restart_count": restart_count,
-                },
-            ],
-        )
-    except Exception:
-        traceback.print_exc()
 
 
 # register tasks as an import side-effect
