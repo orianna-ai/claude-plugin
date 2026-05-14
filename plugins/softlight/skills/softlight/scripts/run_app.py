@@ -19,6 +19,16 @@ def run_app(
     source_code_dir: pathlib.Path,
     tunnel_id: str,
 ) -> None:
+    """Install, build and serve a Vite app, and expose it through a Softlight tunnel.
+
+    Runs ``pnpm install`` and ``pnpm build`` in ``source_code_dir``, picks a free local port,
+    launches ``pnpm preview`` on that port in the background, and then opens a tunnel via
+    :func:`scripts.start_tunnel.start_tunnel`.
+
+    :param config: Project configuration.
+    :param source_code_dir: Directory containing the Vite app to build and serve.
+    :param tunnel_id: Identifier for the tunnel exposing the preview port.
+    """
     # install third-party dependencies and build the app
     subprocess.run(
         ["pnpm", "install"],

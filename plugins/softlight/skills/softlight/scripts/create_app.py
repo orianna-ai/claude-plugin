@@ -182,6 +182,16 @@ def _install_dependencies(
 def create_app(
     source_code_dir: pathlib.Path | None = None,
 ) -> pathlib.Path:
+    """Scaffold a Vite + React + TypeScript app in a temporary directory.
+
+    When ``source_code_dir`` is provided, the ``dependencies`` and ``devDependencies`` from
+    the nearest ancestor ``package.json`` are merged into the generated ``package.json`` so
+    the clone can build against the same library versions as the source project. When it is not
+    provided, a minimal React 19 dependency set is used instead.
+
+    :param source_code_dir: Directory containing reference source code.
+    :returns: Path to the newly created app directory.
+    """
     output_dir = pathlib.Path(tempfile.mkdtemp(prefix="clone."))
 
     _create_package_json(output_dir, source_code_dir)

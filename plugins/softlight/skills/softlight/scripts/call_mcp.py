@@ -31,6 +31,19 @@ def call_mcp(
     *,
     timeout: int | None = None,
 ) -> dict[str, Any]:
+    """Invoke a tool on the Softlight MCP server over HTTP.
+
+    Sends a JSON-RPC ``tools/call`` request to ``{base_url}/mcp/`` and returns the structured
+    content from the response. Both plain JSON and ``text/event-stream`` framed responses are
+    accepted.
+
+    :param config: Project configuration.
+    :param tool: The name of the MCP tool to invoke.
+    :param arguments: Tool arguments serialized to the JSON-RPC ``params.arguments``.
+    :param timeout: Optional socket timeout in seconds for the HTTP request.
+    :returns: The ``structuredContent`` field of the tool's result.
+    :raises RuntimeError: If the MCP call fails for any reason.
+    """
     with urllib.request.urlopen(
         urllib.request.Request(
             f"{config.base_url}/mcp/",

@@ -123,6 +123,19 @@ def start_tunnel(
     port: int,
     tunnel_id: str,
 ) -> None:
+    """Tunnel a local port to Softlight via ``frpc`` over WSS.
+
+    Verifies the local service is responsive, downloads and caches the ``frpc`` binary for the
+    current platform if needed, then launches it with a generated config pointing at
+    ``frp.orianna.ai`` in the background. The tunnel is confirmed by probing the Softlight side; if
+    that probe fails the ``frpc`` process is killed.
+
+    :param config: Project configuration.
+    :param port: Local port that the application is already listening on.
+    :param tunnel_id: Stable identifier used as the HTTP-user / route key for the tunnel.
+    :raises ValueError: If nothing is listening (or accessible) on ``port``.
+    :raises RuntimeError: If the tunnel fails to come up on the Softlight side.
+    """
     if not _can_access(f"http://localhost:{port}"):
         raise ValueError(f"application running on port {port} is not accessible")
 
