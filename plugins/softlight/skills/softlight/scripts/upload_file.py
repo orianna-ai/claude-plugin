@@ -6,6 +6,12 @@ import uuid
 def upload_file(
     path: pathlib.Path,
 ) -> str:
+    """Upload a local file to ``drive.orianna.ai`` as ``multipart/form-data``.
+
+    :param path: Path of the file to upload. Must point at an existing file.
+    :returns: The public URL of the uploaded file.
+    :raises RuntimeError: If ``path`` is not an existing file.
+    """
     if not path.is_file():
         raise RuntimeError(f"invalid path {path}")
 

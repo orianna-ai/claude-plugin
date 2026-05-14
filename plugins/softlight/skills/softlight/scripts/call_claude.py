@@ -106,6 +106,87 @@ def call_claude(
     session_id: str | None = None,
     tools: list[str] | None = None,
 ) -> str | dict[str, Any]:
+    """Invoke the ``claude`` CLI as a subprocess and stream its output to stdout.
+
+    The prompt is sent over stdin as stream-json. ``$``-style placeholders in any string
+    items are substituted using ``params``. Sessions are automatically scoped to the project so
+    transcripts from different projects never collide.
+
+    .. code-block::
+
+        # plain-text prompt
+        call_claude(
+            config,
+            prompt=[
+                "Summarize the project's goals in one sentence.",
+            ],
+        )
+
+        # parameterized prompt
+        call_claude(
+            config,
+            prompt=[
+                "Write a haiku about $topic.",
+            ],
+            params={
+                "topic": "frontend tooling",
+            },
+        )
+
+        # structured output
+        output = call_claude(
+            config,
+            prompt=[
+                "List three colors that pair well with navy.",
+            ],
+            json_schema={
+                "type": "object",
+                "properties": {
+                    "colors": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                        },
+                    },
+                },
+                "required": [
+                    "colors",
+                ],
+            },
+        )
+
+        print(output["colors"])
+
+        # prompt with images
+        call_claude(
+            config,
+            prompt=[
+                "Describe the mood of this screenshot in one sentence each.",
+                {
+                    "type": "image",
+                    "source": {
+                        "type": "url",
+                        "url": screenshot_url,
+                    },
+                },
+            ],
+        )
+
+    :param config: Project configuration.
+    :param prompt: Text or content blocks for the user turn.
+    :param allowed_tools: Optional whitelist forwarded to ``--allowed-tools``.
+    :param disallowed_tools: Additional tools to block. ``AskUserQuestion`` is always disallowed.
+    :param effort: Optional reasoning-effort tier (``low`` through ``max``).
+    :param fork_session: Whether to inherit the context window of the current Claude session.
+    :param json_schema: Shape of the structured output Claude is expected to return.
+    :param model: Optional model override forwarded to ``--model``.
+    :param params: Substitution values for ``string.Template`` placeholders in ``prompt``.
+    :param parent_session_id: Session id whose prior messages should be replayed as context.
+    :param session_id: Session id under which to record this turn's messages.
+    :param tools: Explicit tool list forwarded to ``--tools`` (an empty list disables all tools).
+    :returns: The final text result, or the parsed structured output when ``json_schema`` is set.
+    :raises RuntimeError: If Claude reports an error result, or exits without emitting one.
+    """
     # prepend the project id to the session id
     if parent_session_id is not None:
         parent_session_id = f"{config.project_id}:{parent_session_id}"

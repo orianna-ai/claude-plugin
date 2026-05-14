@@ -13,6 +13,16 @@ from scripts.load_config import Config
 def spawn_reaper(
     config: Config,
 ) -> None:
+    """Spawn a detached watchdog that reaps the project's subprocesses on exit.
+
+    The watchdog runs as a fully detached background process (with ``stdin``, ``stdout`` and
+    ``stderr`` redirected) so it survives the death of its spawning process. On macOS it is
+    wrapped in ``caffeinate -i`` to prevent idle sleep from suspending the agent. Subprocesses
+    are identified by the ``SOFTLIGHT_PROJECT_ID`` environment variable, which is automatically
+    inherited by child processes spawned by the agent.
+
+    :param config: Project configuration.
+    """
     command = shlex.join(
         [
             *(["/usr/bin/caffeinate", "-i"] if sys.platform == "darwin" else []),
@@ -85,7 +95,7 @@ def _kill_subprocesses_macos(
                 os.kill(int(pid), signal.SIGKILL)
 
 
-def main() -> None:
+def _run_watchdog() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--pid", type=int, required=True)
     parser.add_argument("--project-id", type=str, required=True)
@@ -100,4 +110,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    _run_watchdog()
