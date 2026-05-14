@@ -37,9 +37,7 @@ def _get_pending_prompts(
     events: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     completed_prompts = {
-        event["prompt_id"]
-        for event in events
-        if event.get("type") == "prompt_succeeded"
+        event["prompt_id"] for event in events if event.get("type") == "prompt_succeeded"
     }
 
     pending_prompts = [
@@ -58,17 +56,17 @@ def _handle_prompt(
     config: Config,
     prompt: dict[str, Any],
 ) -> None:
-    post_events(
-        config=config,
-        events=[
-            {
-                "type": "prompt_started",
-                "prompt_id": prompt["metadata"]["id"],
-            },
-        ],
-    )
-
     try:
+        post_events(
+            config=config,
+            events=[
+                {
+                    "type": "prompt_started",
+                    "prompt_id": prompt["metadata"]["id"],
+                },
+            ],
+        )
+
         if workflow := WORKFLOWS.get(prompt["workflow"]):
             workflow.call(config, prompt.get("params") or {})
         else:
