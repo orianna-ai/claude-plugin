@@ -6,6 +6,7 @@ import importlib
 import inspect
 import pathlib
 import pkgutil
+import time
 import traceback
 from collections.abc import Mapping
 from typing import Any, Callable, Generic, TypeVar, get_type_hints
@@ -114,6 +115,8 @@ def _with_retries(
                     raise exception
 
                 attempt += 1
+
+                time.sleep(min(60, 2 ** min(attempt, 6)))
             else:
                 return
 
