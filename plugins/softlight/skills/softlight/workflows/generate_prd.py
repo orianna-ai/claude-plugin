@@ -60,7 +60,7 @@ Return structured output matching the provided JSON schema.
     return spec
 
 
-@workflow
+@workflow()
 def generate_prd(
     config: Config,
     params: GeneratePrdParams,

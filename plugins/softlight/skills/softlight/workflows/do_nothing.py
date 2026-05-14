@@ -9,7 +9,7 @@ class DoNothingParams(TypedDict):
     pass
 
 
-@workflow
+@workflow()
 def do_nothing(
     config: Config,
     params: DoNothingParams,

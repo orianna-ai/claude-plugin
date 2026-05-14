@@ -11,7 +11,7 @@ class BuildWithClaudeParams(TypedDict):
     contextSection: str
 
 
-@workflow
+@workflow()
 def build_with_claude(
     config: Config,
     params: BuildWithClaudeParams,

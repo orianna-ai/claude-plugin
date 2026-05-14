@@ -13,7 +13,7 @@ class GenerateMocksParams(TypedDict):
     pass
 
 
-@workflow
+@workflow()
 def generate_mocks(
     config: Config,
     params: GenerateMocksParams,

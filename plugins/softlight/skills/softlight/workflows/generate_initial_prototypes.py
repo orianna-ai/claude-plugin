@@ -42,7 +42,7 @@ def _conversations_for_prd(
     ]
 
 
-@workflow
+@workflow()
 def generate_initial_prototypes(
     config: Config,
     params: GenerateInitialPrototypesParams,

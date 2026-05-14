@@ -48,7 +48,7 @@ class GeneratePrototypesParams(TypedDict):
     feedback: str
 
 
-@workflow
+@workflow()
 def generate_prototypes(
     config: Config,
     params: GeneratePrototypesParams,

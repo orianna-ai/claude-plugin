@@ -1,8 +1,13 @@
+from __future__ import annotations
+
 import dataclasses
+import functools
 import importlib
 import inspect
 import pathlib
 import pkgutil
+import time
+import traceback
 from collections.abc import Mapping
 from typing import Any, Callable, Generic, TypeVar, get_type_hints
 
@@ -14,21 +19,36 @@ _Call = Callable[[Config, _Params], None]
 
 
 def _infer_schema(
-    cls: type[_Params],
+    call: _Call[_Params],
 ) -> dict[str, Any]:
-    hints = get_type_hints(cls)
+    signature = inspect.signature(call)
+    params_name = list(signature.parameters)[1]
+    params_type = get_type_hints(call)[params_name]
+    type_hints = get_type_hints(params_type)
+
     return {
         "type": "object",
-        "properties": {name: {"type": "string"} for name in hints},
-        "required": list(hints),
+        "properties": {name: {"type": "string"} for name in type_hints},
+        "required": list(type_hints),
         "additionalProperties": False,
     }
 
 
 @dataclasses.dataclass
 class Workflow(Generic[_Params]):
+    """A short-lived unit of work that runs to completion in response to a prompt.
+
+    Workflows are invoked with a typed params mapping, retried on failure up to :attr:`max_retries`
+    times, and expected to return once the work is done.
+
+    :ivar call: Function that runs the workflow.
+    :ivar description: Human-readable description of the workflow, taken from its docstring.
+    :ivar name: Name of the workflow.
+    :ivar schema: JSON schema describing the workflow's params.
+    """
+
     call: _Call[_Params]
-    description: str
+    description: str | None
     name: str
     schema: dict[str, Any]
 
@@ -37,26 +57,70 @@ WORKFLOWS: dict[str, Workflow[Any]] = {}
 
 
 def workflow(
+    *,
+    max_retries: int = 0,
+) -> Callable[[_Call[_Params]], Workflow[_Params]]:
+    """Register a function as a workflow.
+
+    .. code-block:: python
+
+        class GreetParams(TypedDict):
+            name: str
+
+        @workflow()
+        def greet(config: Config, params: GreetParams) -> None:
+            \"\"\"Print a greeting.\"\"\"
+            print(f"hello, {params['name']}")
+
+    :param max_retries: Maximum number of times to retry the workflow after a failure.
+    :returns: A decorator that wraps the given function as a :class:`Workflow`.
+    """
+
+    def decorator(
+        call: _Call[_Params],
+    ) -> Workflow[_Params]:
+        workflow = Workflow(
+            name=call.__name__,
+            description=inspect.getdoc(call),
+            call=_with_retries(call, max_retries=max_retries),
+            schema=_infer_schema(call),
+        )
+
+        WORKFLOWS[call.__name__] = workflow
+
+        return workflow
+
+    return decorator
+
+
+def _with_retries(
     call: _Call[_Params],
-) -> Workflow[_Params]:
-    description = inspect.getdoc(call)
-    if not description:
-        raise ValueError(f"workflow {call.__name__!r} must have a docstring")
+    *,
+    max_retries: int,
+) -> _Call[_Params]:
+    @functools.wraps(call)
+    def wrapper(
+        config: Config,
+        params: _Params,
+    ) -> None:
+        attempt = 0
 
-    sig = inspect.signature(call)
-    params_name = list(sig.parameters)[1]
-    params_type = get_type_hints(call)[params_name]
+        while True:
+            try:
+                call(config, params)
+            except Exception as exception:
+                traceback.print_exc()
 
-    workflow = Workflow(
-        name=call.__name__,
-        description=description,
-        call=call,
-        schema=_infer_schema(params_type),
-    )
+                if attempt >= max_retries:
+                    raise exception
 
-    WORKFLOWS[call.__name__] = workflow
+                attempt += 1
 
-    return workflow
+                time.sleep(min(60, 2 ** min(attempt, 6)))
+            else:
+                return
+
+    return wrapper
 
 
 # register workflows as an import side-effect
