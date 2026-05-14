@@ -37,9 +37,7 @@ def _get_pending_prompts(
     events: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
     completed_prompts = {
-        event["prompt_id"]
-        for event in events
-        if event.get("type") == "prompt_succeeded"
+        event["prompt_id"] for event in events if event.get("type") == "prompt_succeeded"
     }
 
     pending_prompts = [
@@ -98,7 +96,7 @@ def _handle_prompt(
         )
 
 
-@task
+@task()
 def dispatch_prompts(
     config: Config,
 ) -> None:

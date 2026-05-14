@@ -6,7 +6,7 @@ from scripts.post_transcripts import post_transcripts
 from tasks.base import task
 
 
-@task
+@task()
 def upload_transcripts(
     config: Config,
 ) -> None:

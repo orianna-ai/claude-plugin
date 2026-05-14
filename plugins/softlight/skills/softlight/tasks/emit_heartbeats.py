@@ -6,7 +6,7 @@ from scripts.post_events import post_events
 from tasks.base import task
 
 
-@task
+@task()
 def emit_heartbeats(
     config: Config,
 ) -> None:

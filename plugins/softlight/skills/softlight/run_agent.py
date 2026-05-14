@@ -18,8 +18,8 @@ def main() -> None:
     with concurrent.futures.ThreadPoolExecutor(
         max_workers=len(TASKS),
     ) as executor:
-        for task in TASKS:
-            executor.submit(task, config)
+        for task in TASKS.values():
+            executor.submit(task.call, config)
 
 
 if __name__ == "__main__":

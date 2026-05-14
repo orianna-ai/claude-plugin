@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import dataclasses
 import functools
 import importlib
@@ -33,8 +35,19 @@ def _infer_schema(
 
 @dataclasses.dataclass
 class Workflow(Generic[_Params]):
+    """A short-lived unit of work that runs to completion in response to a prompt.
+
+    Workflows are invoked with a typed params mapping, retried on failure up to :attr:`max_retries`
+    times, and expected to return once the work is done.
+
+    :ivar call: Function that runs the workflow.
+    :ivar description: Human-readable description of the workflow, taken from its docstring.
+    :ivar name: Name of the workflow.
+    :ivar schema: JSON schema describing the workflow's params.
+    """
+
     call: _Call[_Params]
-    description: str
+    description: str | None
     name: str
     schema: dict[str, Any]
 
@@ -44,18 +57,31 @@ WORKFLOWS: dict[str, Workflow[Any]] = {}
 
 def workflow(
     *,
-    max_attempts: int = 1,
+    max_retries: int = 0,
 ) -> Callable[[_Call[_Params]], Workflow[_Params]]:
+    """Register a function as a workflow.
+
+    .. code-block:: python
+
+        class GreetParams(TypedDict):
+            name: str
+
+        @workflow()
+        def greet(config: Config, params: GreetParams) -> None:
+            \"\"\"Print a greeting.\"\"\"
+            print(f"hello, {params['name']}")
+
+    :param max_retries: Maximum number of times to retry the workflow after a failure.
+    :returns: A decorator that wraps the given function as a :class:`Workflow`.
+    """
+
     def decorator(
         call: _Call[_Params],
     ) -> Workflow[_Params]:
-        description = inspect.getdoc(call)
-        assert description, f"workflow {call.__name__!r} must have a docstring"
-
         workflow = Workflow(
             name=call.__name__,
-            description=description,
-            call=_with_retries(call, max_attempts=max_attempts),
+            description=inspect.getdoc(call),
+            call=_with_retries(call, max_retries=max_retries),
             schema=_infer_schema(call),
         )
 
@@ -69,7 +95,7 @@ def workflow(
 def _with_retries(
     call: _Call[_Params],
     *,
-    max_attempts: int,
+    max_retries: int,
 ) -> _Call[_Params]:
     @functools.wraps(call)
     def wrapper(
@@ -84,10 +110,10 @@ def _with_retries(
             except Exception as exception:
                 traceback.print_exc()
 
-                attempt += 1
-
-                if attempt >= max_attempts:
+                if attempt >= max_retries:
                     raise exception
+
+                attempt += 1
             else:
                 return
 
