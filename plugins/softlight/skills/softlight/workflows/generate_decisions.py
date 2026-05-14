@@ -250,7 +250,11 @@ def _generate_sketches_for_decision(
     screenshots: list[dict[str, Any]],
     run_id: str,
 ) -> list[dict[str, Any]]:
-    tradeoffs = [tradeoff for tradeoff in decision.get("tradeoffs") or [] if str(tradeoff).strip()]
+    tradeoffs = [
+        tradeoff
+        for tradeoff in decision.get("tradeoffs") or []
+        if str(tradeoff).strip()
+    ]
     if not tradeoffs:
         raise ValueError(
             f"decision {decision.get('id')!r} has no tradeoffs to sketch",
@@ -268,7 +272,9 @@ def _generate_sketches_for_decision(
                 tradeoff=tradeoff,
                 transcript=transcript,
                 screenshots=screenshots,
-                session_id=(f"generate_decision_sketch:{decision['id']}:{run_id}:{index}"),
+                session_id=(
+                    f"generate_decision_sketch:{decision['id']}:{run_id}:{index}"
+                ),
             ): index
             for index, tradeoff in enumerate(tradeoffs)
         }
