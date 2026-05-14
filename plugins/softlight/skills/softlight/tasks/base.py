@@ -3,6 +3,7 @@ from __future__ import annotations
 import dataclasses
 import functools
 import importlib
+import inspect
 import pathlib
 import pkgutil
 import time
@@ -24,11 +25,13 @@ class Task:
     backoff (until :attr:`max_restarts` is reached, if set).
 
     :ivar call: Function that runs the task.
+    :ivar description: Human-readable description of the task, taken from its docstring.
     :ivar max_restarts: Maximum number of times to restart the task after failure or early exit.
     :ivar name: Name of the task.
     """
 
     call: _Call
+    description: str | None
     max_restarts: int | None
     name: str
 
@@ -57,9 +60,10 @@ def task(
 
     def decorator(call: _Call) -> Task:
         task = Task(
-            name=call.__name__,
             call=_with_restarts(call, max_restarts=max_restarts),
+            description=inspect.getdoc(call),
             max_restarts=max_restarts,
+            name=call.__name__,
         )
 
         TASKS[call.__name__] = task
