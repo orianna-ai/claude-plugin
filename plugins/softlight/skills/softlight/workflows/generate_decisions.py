@@ -1,5 +1,6 @@
 import concurrent.futures
 import json
+import traceback
 import uuid
 from typing import Any, TypedDict
 
@@ -250,11 +251,7 @@ def _generate_sketches_for_decision(
     screenshots: list[dict[str, Any]],
     run_id: str,
 ) -> list[dict[str, Any]]:
-    tradeoffs = [
-        tradeoff
-        for tradeoff in decision.get("tradeoffs") or []
-        if str(tradeoff).strip()
-    ]
+    tradeoffs = [tradeoff for tradeoff in decision.get("tradeoffs") or [] if str(tradeoff).strip()]
     if not tradeoffs:
         raise ValueError(
             f"decision {decision.get('id')!r} has no tradeoffs to sketch",
@@ -272,14 +269,16 @@ def _generate_sketches_for_decision(
                 tradeoff=tradeoff,
                 transcript=transcript,
                 screenshots=screenshots,
-                session_id=(
-                    f"generate_decision_sketch:{decision['id']}:{run_id}:{index}"
-                ),
+                session_id=(f"generate_decision_sketch:{decision['id']}:{run_id}:{index}"),
             ): index
             for index, tradeoff in enumerate(tradeoffs)
         }
         for future in concurrent.futures.as_completed(futures):
-            sketches[futures[future]] = future.result()
+            index = futures[future]
+            try:
+                sketches[index] = future.result()
+            except Exception:
+                traceback.print_exc()
 
     return [sketch for sketch in sketches if sketch is not None]
 
@@ -485,13 +484,17 @@ def generate_decisions(
         if decision.get("sketches_ready") or not decision.get("tradeoffs"):
             continue
 
-        sketches = _generate_sketches_for_decision(
-            config=config,
-            decision=decision,
-            transcript=transcript,
-            screenshots=screenshots,
-            run_id=run_id,
-        )
+        try:
+            sketches = _generate_sketches_for_decision(
+                config=config,
+                decision=decision,
+                transcript=transcript,
+                screenshots=screenshots,
+                run_id=run_id,
+            )
+        except Exception:
+            traceback.print_exc()
+            sketches = []
         decision["sketches"] = sketches
         decision["sketches_ready"] = True
         post_events(
