@@ -13,7 +13,6 @@
     "prototyping",
     "mcp"
   ],
-  "mcpServers": "./.mcp.json",
   "name": "softlight",
   "repository": "https://github.com/orianna-ai/claude-plugin.git",
   "skills": "./skills",

@@ -591,9 +591,7 @@ def _run_edit_prototypes(
         futures = {}
         for index, plan in enumerate(planning_result["plans"]):
             slot_id = slot_ids[index]
-            caption_slot_id = (
-                caption_slot_ids[index] if index < len(caption_slot_ids) else None
-            )
+            caption_slot_id = caption_slot_ids[index] if index < len(caption_slot_ids) else None
             futures[
                 executor.submit(
                     _edit_prototype_for_plan,
