@@ -25,6 +25,7 @@ class GenerateInitialPrototypesParams(TypedDict, total=False):
 
 
 class InitialPrototypeApproach(TypedDict):
+    caption: str
     title: str
     description: str
 
@@ -45,8 +46,12 @@ _APPROACH_SCHEMA = {
                         "type": "string",
                         "description": "Concise design direction for this approach.",
                     },
+                    "caption": {
+                        "type": "string",
+                        "description": "Human-readable canvas caption for this prototype. Keep it snappy, short, to the point, and easy to read quickly.",
+                    },
                 },
-                "required": ["title", "description"],
+                "required": ["title", "description", "caption"],
                 "additionalProperties": False,
             },
         },
@@ -101,6 +106,9 @@ risks in approach 1.
 
 Keep each approach short and directional. Do not write PRDs.
 
+For `caption`, write the exact text that appears below the prototype on the canvas. It should be
+human-readable, very concise, snappy, short, to the point, and easy to read quickly.
+
 Return structured output matching the provided JSON schema.
 
 <conversations>${conversations}</conversations>
@@ -148,8 +156,11 @@ def _description_for_prototype(
     spec: str,
 ) -> str:
     if approach:
+        caption = approach.get("caption", "").strip()
         description = approach.get("description", "").strip()
         title = approach.get("title", "").strip()
+        if caption:
+            return caption
         if title and description:
             return f"{title}: {description}"
         if description:
@@ -265,9 +276,7 @@ def generate_initial_prototypes(
 
         return {
             "approach": approach,
-            "caption_slot_id": (
-                caption_slot_ids[index] if index < len(caption_slot_ids) else None
-            ),
+            "caption_slot_id": (caption_slot_ids[index] if index < len(caption_slot_ids) else None),
             "index": index,
             "slot_id": slot_ids[index],
             "spec": spec,
@@ -295,22 +304,18 @@ def generate_initial_prototypes(
             approach=job["approach"],
             spec=job["spec"],
         )
-        post_events(
+        call_mcp(
             config=config,
-            events=[
-                {
-                    "type": "slot_updated",
-                    "element": {
-                        "type": "iframe",
-                        "description": description,
-                        "source_code_dir": str(prototype_dir),
-                        "screenshots": [],
-                        "spec": job["spec"],
-                        "tunnel_id": tunnel_id,
-                    },
-                    "slot_id": job["slot_id"],
-                },
-            ],
+            tool="update_iframe_element",
+            arguments={
+                "project_id": config.project_id,
+                "screenshot_urls": [],
+                "slot_id": job["slot_id"],
+                "source_code_dir": str(prototype_dir),
+                "spec": job["spec"],
+                "tunnel_id": tunnel_id,
+            },
+            timeout=25,
         )
         if job["caption_slot_id"]:
             _update_text_slot(
@@ -326,8 +331,7 @@ def generate_initial_prototypes(
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=6) as executor:
         prd_futures = {
-            executor.submit(generate_prd_for_slot, index): index
-            for index in range(len(slot_ids))
+            executor.submit(generate_prd_for_slot, index): index for index in range(len(slot_ids))
         }
         prototype_futures: dict[concurrent.futures.Future, dict[str, Any]] = {}
 
@@ -363,8 +367,7 @@ def generate_initial_prototypes(
     if completed_jobs:
         completed_jobs.sort(key=lambda job: job["index"])
         combined_spec = "\n\n".join(
-            f"## Prototype {job['index'] + 1}\n\n{job['spec']}"
-            for job in completed_jobs
+            f"## Prototype {job['index'] + 1}\n\n{job['spec']}" for job in completed_jobs
         )
         post_events(
             config=config,

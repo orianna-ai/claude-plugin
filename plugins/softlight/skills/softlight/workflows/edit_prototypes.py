@@ -29,6 +29,7 @@ class EditPrototypesParams(TypedDict):
 
 
 class EditPrototypesPlan(TypedDict):
+    caption: str
     title: str
     prototype_source_index: int
     spec: str
@@ -65,6 +66,10 @@ _EDIT_PLANNING_SCHEMA = {
                         "type": "string",
                         "description": "Short label for this edited prototype.",
                     },
+                    "caption": {
+                        "type": "string",
+                        "description": "Human-readable canvas caption for this edited prototype. Keep it snappy, short, to the point, and easy to read quickly.",
+                    },
                     "prototype_source_index": {
                         "type": "integer",
                         "description": "Index from prototype_sources for the prototype to copy.",
@@ -74,7 +79,7 @@ _EDIT_PLANNING_SCHEMA = {
                         "description": "Concrete, small edit plan for this prototype.",
                     },
                 },
-                "required": ["title", "prototype_source_index", "spec"],
+                "required": ["title", "caption", "prototype_source_index", "spec"],
                 "additionalProperties": False,
             },
         },
@@ -172,6 +177,7 @@ def _validate_edit_planning_result(
             raise ValueError(f"edit plan {index} must be an object")
 
         title = str(plan.get("title") or "").strip()
+        caption = str(plan.get("caption") or "").strip()
         spec = str(plan.get("spec") or "").strip()
         try:
             prototype_source_index = int(plan.get("prototype_source_index"))
@@ -182,6 +188,8 @@ def _validate_edit_planning_result(
 
         if not title:
             raise ValueError(f"edit plan {index} is missing a title")
+        if not caption:
+            raise ValueError(f"edit plan {index} is missing a caption")
         if not spec:
             raise ValueError(f"edit plan {index} is missing spec")
 
@@ -198,6 +206,7 @@ def _validate_edit_planning_result(
 
         validated_plans.append(
             {
+                "caption": caption,
                 "title": title,
                 "prototype_source_index": prototype_source_index,
                 "spec": spec,
@@ -254,6 +263,9 @@ in <canvas_context>, but return only `prototype_source_index` in each plan.
 
 Keep the plans small and concrete. If feedback refers to a specific comment/prototype, prefer the
 referenced prototype. Otherwise choose the most relevant existing prototypes from the canvas.
+
+For each plan's `caption`, write the exact text that appears below the prototype on the canvas. It
+should be human-readable, very concise, snappy, short, to the point, and easy to read quickly.
 
 <project_id>${project_id}</project_id>
 <mode>${mode}</mode>
@@ -360,6 +372,9 @@ def _update_text_slot(
 def _caption_for_plan(
     plan: EditPrototypesPlan,
 ) -> str:
+    caption = plan["caption"].strip()
+    if caption:
+        return caption
     first_sentence = plan["spec"].split("\n", 1)[0].strip()
     return f"{plan['title']}: {first_sentence}" if first_sentence else plan["title"]
 
@@ -515,21 +530,18 @@ def _edit_prototype_for_plan(
         tunnel_id=tunnel_id,
     )
 
-    post_events(
+    call_mcp(
         config=config,
-        events=[
-            {
-                "type": "slot_updated",
-                "element": {
-                    "type": "iframe",
-                    "source_code_dir": str(new_prototype_dir),
-                    "screenshots": [],
-                    "spec": plan["spec"],
-                    "tunnel_id": tunnel_id,
-                },
-                "slot_id": slot_id,
-            },
-        ],
+        tool="update_iframe_element",
+        arguments={
+            "project_id": config.project_id,
+            "screenshot_urls": [],
+            "slot_id": slot_id,
+            "source_code_dir": str(new_prototype_dir),
+            "spec": plan["spec"],
+            "tunnel_id": tunnel_id,
+        },
+        timeout=25,
     )
 
     if caption_slot_id:
