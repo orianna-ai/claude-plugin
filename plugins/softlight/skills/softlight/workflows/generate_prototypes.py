@@ -1,12 +1,16 @@
+from __future__ import annotations
+
 import concurrent.futures
 import json
-from typing import Any, TypedDict
+from typing import TYPE_CHECKING, Any, TypedDict
 
 from scripts.call_claude import call_claude
 from scripts.get_project import get_project
-from scripts.load_config import Config
 
 from workflows.base import workflow
+
+if TYPE_CHECKING:
+    from scripts.load_config import Config
 
 
 def _is_filtered_canvas_slot(
@@ -26,11 +30,7 @@ def _filtered_canvas_context(
 ) -> dict[str, Any]:
     revisions = []
     for revision in project.get("revisions") or []:
-        slots = [
-            slot
-            for slot in revision.get("slots") or []
-            if not _is_filtered_canvas_slot(slot)
-        ]
+        slots = [slot for slot in revision.get("slots") or [] if not _is_filtered_canvas_slot(slot)]
         revisions.append({**revision, "slots": slots})
 
     return {
