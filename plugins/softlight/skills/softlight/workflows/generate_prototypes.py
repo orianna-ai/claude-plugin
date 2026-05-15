@@ -1,12 +1,16 @@
+from __future__ import annotations
+
 import concurrent.futures
 import json
-from typing import Any, TypedDict
+from typing import TYPE_CHECKING, Any, TypedDict
 
 from scripts.call_claude import call_claude
 from scripts.get_project import get_project
-from scripts.load_config import Config
 
 from workflows.base import workflow
+
+if TYPE_CHECKING:
+    from scripts.load_config import Config
 
 
 def _is_filtered_canvas_slot(
